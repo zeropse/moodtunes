@@ -40,39 +40,17 @@ export default function History() {
       window.confirm("Are you sure you want to clear all your mood history?")
     ) {
       localStorage.removeItem("moodMusicHistory");
+      sessionStorage.removeItem("selectedHistoryEntry");
+      sessionStorage.removeItem("moodData");
+
       setMoodHistory([]);
     }
-  };
-
-  const clearEntry = (indexToRemove, e) => {
-    e.stopPropagation();
-    const updatedHistory = moodHistory.filter(
-      (_, index) => index !== indexToRemove
-    );
-    setMoodHistory(updatedHistory);
-    localStorage.setItem("moodMusicHistory", JSON.stringify(updatedHistory));
   };
 
   const viewDetail = (index) => {
     const entry = moodHistory[index];
     sessionStorage.setItem("selectedHistoryEntry", JSON.stringify(entry));
     router.push(`/history/${index}`);
-  };
-
-  const formatTimestamp = (timestamp) => {
-    const date = new Date(timestamp);
-    const now = new Date();
-    const diffInMinutes = Math.floor((now - date) / (1000 * 60));
-    if (diffInMinutes < 1) return "Just now";
-    if (diffInMinutes < 60)
-      return `${diffInMinutes} minute${diffInMinutes > 1 ? "s" : ""} ago`;
-    const diffInHours = Math.floor(diffInMinutes / 60);
-    if (diffInHours < 24)
-      return `${diffInHours} hour${diffInHours > 1 ? "s" : ""} ago`;
-    const diffInDays = Math.floor(diffInHours / 24);
-    if (diffInDays < 7)
-      return `${diffInDays} day${diffInDays > 1 ? "s" : ""} ago`;
-    return date.toLocaleDateString();
   };
 
   if (isLoading) {
@@ -163,18 +141,6 @@ export default function History() {
                     onMouseLeave={() => setHoveredCard(null)}
                   >
                     <CardContent className="p-4 sm:p-6 space-y-4 relative">
-                      <div className="flex justify-between items-center text-xs text-white/60">
-                        <span>{formatTimestamp(entry.timestamp)}</span>
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          onClick={(e) => clearEntry(index, e)}
-                          className="text-white/30 hover:text-red-400 opacity-0 group-hover:opacity-100 transition"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
-
                       <div>
                         <div className="flex items-center gap-2 mb-1">
                           <MessageSquare className="w-4 h-4 text-blue-400" />
@@ -192,7 +158,7 @@ export default function History() {
                           <div className="flex items-center gap-2 mb-1">
                             <Music className="w-4 h-4 text-green-400" />
                             <span className="text-sm font-medium text-white/80">
-                              AI Analysis
+                              Analysis
                             </span>
                           </div>
                           <div className="bg-green-500/10 p-3 rounded-md">
