@@ -86,7 +86,7 @@ const MoodInput = ({ onSubmit, isLoading = false }) => {
               value={moodText}
               onChange={handleInputChange}
               onKeyDown={handleKeyDown}
-              placeholder="Describe how you're feeling... (anything you write will result in happy songs!)"
+              placeholder="Describe how you're feeling... (e.g., 'I'm feeling happy and energetic today' or 'I'm sad and need some comfort music')"
               disabled={isLoading}
               className={`
                 min-h-[120px] sm:min-h-[140px] text-base sm:text-lg resize-none text-white

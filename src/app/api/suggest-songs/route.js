@@ -28,7 +28,7 @@ function createErrorResponse(message, statusCode = 500) {
 }
 
 function validateSuggestionsRequest(body) {
-  const { mood, genres, energy, valence, tempo } = body;
+  const { mood, genres } = body;
   const errors = [];
 
   if (!mood || typeof mood !== "string") {
@@ -38,28 +38,6 @@ function validateSuggestionsRequest(body) {
   if (!genres || !Array.isArray(genres) || genres.length === 0) {
     errors.push(
       "Missing or invalid required field: genres (must be non-empty array)"
-    );
-  }
-
-  if (typeof energy !== "number" || energy < 0 || energy > 1) {
-    errors.push("Invalid energy value (must be number between 0 and 1)");
-  }
-
-  if (typeof valence !== "number" || valence < 0 || valence > 1) {
-    errors.push("Invalid valence value (must be number between 0 and 1)");
-  }
-
-  if (
-    tempo &&
-    (typeof tempo !== "object" ||
-      typeof tempo.min !== "number" ||
-      typeof tempo.max !== "number" ||
-      tempo.min < 0 ||
-      tempo.max < 0 ||
-      tempo.min > tempo.max)
-  ) {
-    errors.push(
-      "Invalid tempo value (must be object with valid min and max numbers)"
     );
   }
 
@@ -102,14 +80,11 @@ export async function POST(request) {
       return createErrorResponse(validation.errors[0], 400);
     }
 
-    const { mood, genres, energy, valence, tempo, moodText } = body;
+    const { mood, genres, moodText } = body;
 
     const moodAnalysis = {
       mood,
       genres: genres.slice(0, 5),
-      energy,
-      valence,
-      tempo,
     };
 
     let suggestionsData;
@@ -160,19 +135,12 @@ export async function POST(request) {
       });
     }
 
-    const targetCount = energy > 0.7 ? 20 : energy > 0.4 ? 15 : 10;
-    if (suggestionsData.tracks && suggestionsData.tracks.length > targetCount) {
-      suggestionsData.tracks = suggestionsData.tracks.slice(0, targetCount);
-    }
-
     const suggestionsResponse = {
       tracks: suggestionsData.tracks || [],
       totalTracks: suggestionsData.tracks?.length || 0,
       seedGenres: suggestionsData.seedGenres,
       mood: moodText || mood,
       moodAnalysis: {
-        energy,
-        valence,
         genres: genres.slice(0, 3),
       },
     };

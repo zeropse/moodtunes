@@ -1,4 +1,10 @@
 import { NextResponse } from "next/server";
+import {
+  analyzeMoodFromText,
+  sanitizeInput,
+  getAvailableMoods,
+  getMoodCategories,
+} from "@/lib/mood-analyzer";
 
 function generateRequestId() {
   return `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
@@ -58,31 +64,50 @@ export async function POST(request) {
       );
     }
 
+    // Sanitize input
+    const sanitizedText = sanitizeInput(trimmedText);
+    if (!sanitizedText) {
+      return createErrorResponse(
+        "Invalid input: please provide a meaningful mood description",
+        400
+      );
+    }
+
+    // Perform mood analysis
+    const analysisResult = analyzeMoodFromText(sanitizedText);
+
     const processingTime = Date.now() - startTime;
-    console.log("Simple mood analysis", {
+    console.log("Advanced mood analysis completed", {
       requestId,
-      mood: "happy",
+      detectedMood: analysisResult.mood,
+      confidence: analysisResult.confidence,
       processingTime,
       inputLength: moodText.length,
+      detectedKeywords: analysisResult.detectedKeywords,
     });
-
-    // Always return happy mood
-    const responseData = {
-      mood: "happy",
-      confidence: 0.9,
-      genres: ["pop", "dance", "funk", "disco", "house"],
-      energy: 0.8,
-      valence: 0.9,
-      tempo: { min: 120, max: 140 },
-    };
 
     return NextResponse.json({
       success: true,
-      data: responseData,
+      data: {
+        mood: analysisResult.mood,
+        confidence: analysisResult.confidence,
+        genres: analysisResult.genres,
+        energy: analysisResult.energy,
+        valence: analysisResult.valence,
+        tempo: analysisResult.tempo,
+        analysis: {
+          detectedKeywords: analysisResult.detectedKeywords,
+          inputText:
+            sanitizedText.length > 100
+              ? sanitizedText.substring(0, 97) + "..."
+              : sanitizedText,
+        },
+      },
       meta: {
         requestId,
         processingTime,
-        analysisMethod: "simple",
+        analysisMethod: "advanced_keyword_sentiment",
+        version: "4.0.0",
       },
     });
   } catch (error) {
@@ -91,6 +116,7 @@ export async function POST(request) {
     console.error("Unexpected error during mood analysis", {
       requestId,
       message: error.message,
+      stack: error.stack,
       processingTime,
     });
 
@@ -103,39 +129,51 @@ export async function POST(request) {
 
 export async function GET() {
   return NextResponse.json({
-    name: "Simple Mood Analysis API",
-    version: "3.0.0",
-    description: "Simple mood analysis that always returns happy mood",
+    name: "Advanced Mood Analysis API",
+    version: "4.0.0",
+    description:
+      "Intelligent mood analysis using keyword detection and sentiment analysis",
     endpoints: {
       POST: {
-        description: "Analyze mood from text input (always returns happy)",
+        description:
+          "Analyze mood from text input using advanced NLP techniques",
         body: {
           moodText: "string (3-500 characters)",
         },
         response: {
           success: "boolean",
           data: {
-            mood: "string (always 'happy')",
-            confidence: "number (0.9)",
-            genres: "string[]",
-            energy: "number (0.8)",
-            valence: "number (0.9)",
-            tempo: "object { min: 120, max: 140 }",
+            mood: "string (detected mood category)",
+            confidence: "number (0.0-1.0)",
+            genres: "string[] (recommended music genres)",
+            energy: "number (0.0-1.0, musical energy level)",
+            valence: "number (0.0-1.0, musical positivity)",
+            tempo: "object { min: number, max: number } (BPM range)",
+            analysis: {
+              detectedKeywords:
+                "string[] (keywords that influenced mood detection)",
+              inputText: "string (sanitized input text, truncated if long)",
+            },
+          },
+          meta: {
+            requestId: "string",
+            processingTime: "number (ms)",
+            analysisMethod: "string",
+            version: "string",
           },
         },
       },
     },
-    availableMoods: ["happy"],
+    availableMoods: getAvailableMoods(),
+    moodCategories: getMoodCategories(),
+    features: [
+      "Keyword-based mood detection",
+      "Sentiment analysis fallback",
+      "Confidence scoring",
+      "Genre recommendations based on mood",
+      "Musical parameter mapping (energy, valence, tempo)",
+      "Input sanitization and validation",
+      "Detailed analysis feedback",
+    ],
   });
-}
-
-function sanitizeInput(input) {
-  if (typeof input !== "string") {
-    return "";
-  }
-
-  return input
-    .replace(/[<>\"'&]/g, "")
-    .replace(/\s+/g, " ")
-    .trim();
 }

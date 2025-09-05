@@ -143,22 +143,60 @@ export async function generateSongSuggestions(moodAnalysis) {
   const { mood, genres } = moodAnalysis;
 
   try {
-    const randomGenre = genres[Math.floor(Math.random() * genres.length)];
+    console.log("Generating song suggestions from each genre:", {
+      mood,
+      genres,
+    });
 
-    const searchResults = await spotifyClient.searchTracks(
-      `genre:"${randomGenre}"`,
-      { limit: 10 }
-    );
+    let allTracks = [];
 
-    if (
-      !searchResults.tracks ||
-      !searchResults.tracks.items ||
-      searchResults.tracks.items.length === 0
-    ) {
-      throw new SpotifyAPIError("No tracks found for the specified mood", 404);
+    // Search for 10 songs from each genre
+    for (const genre of genres) {
+      try {
+        console.log(`Searching for 10 songs in genre: ${genre}`);
+
+        const results = await spotifyClient.searchTracks(`genre:"${genre}"`, {
+          limit: 10,
+        });
+
+        if (
+          results.tracks &&
+          results.tracks.items &&
+          results.tracks.items.length > 0
+        ) {
+          console.log(
+            `Found ${results.tracks.items.length} tracks from genre: ${genre}`
+          );
+
+          // Add genre info to each track for reference
+          const tracksWithGenre = results.tracks.items.map((track) => ({
+            ...track,
+            sourceGenre: genre,
+          }));
+
+          allTracks.push(...tracksWithGenre);
+        } else {
+          console.log(`No tracks found for genre: ${genre}`);
+        }
+      } catch (genreError) {
+        console.warn(`Failed to search genre "${genre}":`, genreError.message);
+      }
     }
 
-    const formattedTracks = searchResults.tracks.items.map((track) => ({
+    // Remove duplicates
+    const uniqueTracks = removeDuplicateTracks(allTracks);
+
+    // Shuffle the tracks for random order
+    const shuffledTracks = shuffleArray(uniqueTracks);
+
+    if (shuffledTracks.length === 0) {
+      throw new SpotifyAPIError(
+        "No tracks found for any of the mood genres",
+        404
+      );
+    }
+
+    const formattedTracks = shuffledTracks.map((track) => ({
       id: track.id,
       name: track.name,
       artists: track.artists.map((artist) => artist.name),
@@ -166,6 +204,7 @@ export async function generateSongSuggestions(moodAnalysis) {
       external_urls: track.external_urls,
       duration_ms: track.duration_ms,
       popularity: track.popularity,
+      sourceGenre: track.sourceGenre,
       album: {
         id: track.album.id,
         name: track.album.name,
@@ -175,11 +214,18 @@ export async function generateSongSuggestions(moodAnalysis) {
       },
     }));
 
+    console.log(
+      `Successfully found ${formattedTracks.length} tracks from ${genres.length} genres for mood: ${mood}`
+    );
+
     return {
       mood,
       tracks: formattedTracks,
       totalTracks: formattedTracks.length,
-      seedGenres: [randomGenre],
+      seedGenres: genres,
+      moodAnalysis: {
+        searchedGenres: genres,
+      },
     };
   } catch (error) {
     if (error instanceof SpotifyAPIError) {
@@ -192,8 +238,29 @@ export async function generateSongSuggestions(moodAnalysis) {
   }
 }
 
+// Helper function to shuffle array for random order
+function shuffleArray(array) {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
+
+// Helper function to remove duplicate tracks
+function removeDuplicateTracks(tracks) {
+  const seen = new Set();
+  return tracks.filter((track) => {
+    const key = `${track.id}-${track.name}`;
+    if (seen.has(key)) {
+      return false;
+    }
+    seen.add(key);
+    return true;
+  });
+}
+
 export function validateSpotifyConfig() {
   return !!(process.env.SPOTIFY_CLIENT_ID && process.env.SPOTIFY_CLIENT_SECRET);
 }
-
-export { spotifyClient };
