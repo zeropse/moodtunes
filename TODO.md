@@ -1,0 +1,3 @@
+- [ ] Add Clerk Auth
+- [ ] Fix songs.. if history already there add new songs...
+- [ ] add a shareable link 
