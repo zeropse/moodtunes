@@ -1,8 +1,12 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import { Button } from "@/components/ui/button";
+import { History, Info } from "lucide-react";
+import Link from "next/link";
 import MoodInput from "@/components/MoodInput";
 import SongSuggestions from "@/components/SongSuggestions";
+import Footer from "@/components/Footer";
 
 export default function Home() {
   // Application state
@@ -108,6 +112,27 @@ export default function Home() {
         : suggestionsData;
       setSuggestions(suggestions);
       setIsGeneratingSuggestions(false);
+
+      // Save to history
+      const historyEntry = {
+        timestamp: new Date().toISOString(),
+        mood: moodInput,
+        moodAnalysis: analysisData,
+        suggestions: suggestions,
+      };
+
+      try {
+        const existingHistory = JSON.parse(
+          localStorage.getItem("moodMusicHistory") || "[]"
+        );
+        const updatedHistory = [historyEntry, ...existingHistory.slice(0, 49)]; // Keep max 50 entries
+        localStorage.setItem(
+          "moodMusicHistory",
+          JSON.stringify(updatedHistory)
+        );
+      } catch (error) {
+        console.error("Error saving to history:", error);
+      }
     } catch (err) {
       console.error("Error in mood submission:", err);
 
@@ -144,25 +169,56 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 relative overflow-hidden">
       {/* Skip to main content link for keyboard users */}
       <a href="#main-content" className="skip-link">
         Skip to main content
       </a>
 
-      {/* Static Background */}
-      <div className="fixed inset-0 -z-10 bg-black"></div>
+      {/* Background Effects */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(120,119,198,0.3),rgba(255,255,255,0))]" />
+      <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-purple-500/20 rounded-full blur-3xl animate-pulse" />
+      <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-blue-500/20 rounded-full blur-3xl animate-pulse delay-1000" />
 
       {/* Main Content */}
       <div className="relative z-10 min-h-screen flex flex-col">
         {/* Header */}
-        <header className="w-full p-4 sm:p-6 text-center">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-2 drop-shadow-lg">
-            Mood Music
-          </h1>
-          <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-white/90 drop-shadow-md max-w-2xl mx-auto">
-            Get AI-powered song recommendations based on your mood
-          </p>
+        <header className="w-full p-4 sm:p-6">
+          {/* Navigation */}
+          <nav className="flex justify-between items-start mb-6">
+            <div className="flex gap-2">
+              <Link href="/about">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-white/80 hover:text-white hover:bg-white/20 transition-colors"
+                >
+                  <Info className="w-4 h-4 mr-2" />
+                  About
+                </Button>
+              </Link>
+              <Link href="/history">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-white/80 hover:text-white hover:bg-white/20 transition-colors"
+                >
+                  <History className="w-4 h-4 mr-2" />
+                  History
+                </Button>
+              </Link>
+            </div>
+          </nav>
+
+          {/* Title */}
+          <div className="text-center">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-2 drop-shadow-lg">
+              Mood Music
+            </h1>
+            <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-white/90 drop-shadow-md max-w-2xl mx-auto">
+              Get AI-powered song recommendations based on your mood
+            </p>
+          </div>
         </header>
 
         {/* Main Content Area */}
@@ -202,30 +258,9 @@ export default function Home() {
               )}
             </div>
           )}
-
-          {/* Loading Status */}
-          {isLoading && (
-            <div
-              className="text-center mt-6 text-white/80"
-              role="status"
-              aria-live="polite"
-            >
-              <p className="text-sm sm:text-base">
-                {isAnalyzing && "Analyzing your mood..."}
-                {isGeneratingSuggestions &&
-                  "Finding perfect songs for your mood..."}
-              </p>
-            </div>
-          )}
         </main>
 
-        {/* Footer */}
-        <footer
-          className="w-full p-4 sm:p-6 text-center text-white/60 text-xs sm:text-sm"
-          role="contentinfo"
-        >
-          <p>Powered by Spotify</p>
-        </footer>
+        <Footer />
       </div>
     </div>
   );

@@ -176,18 +176,6 @@ const MoodInput = ({ onSubmit, isLoading = false }) => {
             </Button>
           )}
         </div>
-
-        {/* Screen reader status updates */}
-        {isLoading && (
-          <div
-            id="loading-status"
-            className="sr-only"
-            aria-live="polite"
-            aria-atomic="true"
-          >
-            Finding songs that match your mood. Please wait.
-          </div>
-        )}
       </form>
     </div>
   );
