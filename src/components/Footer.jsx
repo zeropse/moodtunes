@@ -2,7 +2,7 @@ import { Linkedin, Github } from "lucide-react";
 
 export default function Footer() {
   return (
-    <footer className="text-white py-4 bg-black">
+    <footer className="text-white py-4 bg-[#000]">
       <div className="container mx-auto grid grid-cols-1 md:grid-cols-3 items-center text-center gap-4 md:gap-0">
         {/* Left */}
         <div className="text-center md:text-left">

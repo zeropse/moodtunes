@@ -13,6 +13,7 @@ import {
   Home,
   Play,
 } from "lucide-react";
+import { Vortex } from "@/components/ui/vortex";
 
 export default function SuggestionsPage() {
   const router = useRouter();
@@ -112,76 +113,6 @@ export default function SuggestionsPage() {
     initializeData();
   }, []);
 
-  // Handle retry functionality
-  const handleRetry = useCallback(async () => {
-    if (!mood || !moodAnalysis) {
-      router.push("/");
-      return;
-    }
-
-    try {
-      setError(null);
-      setIsLoading(true);
-
-      const suggestionsResponse = await fetch("/api/suggest-songs", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          mood: moodAnalysis.mood,
-          genres: moodAnalysis.genres,
-          energy: moodAnalysis.energy,
-          valence: moodAnalysis.valence,
-          tempo: moodAnalysis.tempo,
-          moodText: mood,
-        }),
-      });
-
-      if (!suggestionsResponse.ok) {
-        let errorMessage =
-          "We couldn't generate song suggestions right now. Please try again.";
-        try {
-          const errorData = await suggestionsResponse.json();
-          if (errorData.error?.message) {
-            errorMessage = errorData.error.message;
-          }
-        } catch {}
-        throw new Error(errorMessage);
-      }
-
-      const suggestionsData = await suggestionsResponse.json();
-      const newSuggestions = suggestionsData.success
-        ? suggestionsData.suggestions
-        : suggestionsData;
-
-      setSuggestions(newSuggestions);
-
-      const updatedMoodData = {
-        mood: mood,
-        moodAnalysis: moodAnalysis,
-        suggestions: newSuggestions,
-      };
-
-      sessionStorage.setItem("moodData", JSON.stringify(updatedMoodData));
-
-      // Save to history
-      saveToHistory(updatedMoodData, true); // Mark as retry
-    } catch (err) {
-      console.error("Error retrying suggestions:", err);
-      let userMessage = err.message;
-      if (err.message.includes("fetch")) {
-        userMessage =
-          "Unable to connect to our music service. Please check your internet connection and try again.";
-      } else if (err.message.includes("timeout")) {
-        userMessage = "The request is taking too long. Please try again.";
-      } else if (!userMessage || userMessage === "Failed to fetch") {
-        userMessage = "Something went wrong. Please try again.";
-      }
-      setError(userMessage);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [mood, moodAnalysis]);
-
   const handleStartOver = useCallback(() => {
     sessionStorage.removeItem("moodData");
     router.push("/");
@@ -226,18 +157,11 @@ export default function SuggestionsPage() {
                 <p className="text-white/70 sm:text-lg leading-relaxed">
                   {error}
                 </p>
-                <div className="flex gap-3 pt-2">
-                  <Button
-                    onClick={handleRetry}
-                    className="bg-blue-600 hover:bg-blue-700 text-white border-0"
-                  >
-                    <RefreshCw className="w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3" />
-                    Try Again
-                  </Button>
+                <div className="flex gap-3 pt-2 justify-center">
                   <Button
                     onClick={handleStartOver}
                     variant="ghost"
-                    className="text-white hover:text-white hover:bg-white/20 border border-white/30"
+                    className="w-full bg-white text-purple-600 hover:bg-white/90 font-semibold text-lg h-12 cursor-pointer"
                   >
                     <Home className="w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3" />
                     Go Home
@@ -282,7 +206,7 @@ export default function SuggestionsPage() {
               <div className="pt-2 md:pt-4">
                 <Button
                   onClick={handleStartOver}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white border-0 text-base md:text-lg py-4 md:py-6"
+                  className=" w-full bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 hover:from-purple-600 hover:via-pink-600 hover:to-blue-600 text-white font-semibold md:text-lg py-4 md:py-6 rounded-xl shadow-xl hover:shadow-purple-500/25 transition-all duration-300 transform cursor-pointer"
                   size="lg"
                 >
                   <RefreshCw className="w-4 h-4 md:w-5 md:h-5 mr-2 md:mr-3" />
@@ -384,24 +308,26 @@ export default function SuggestionsPage() {
   };
 
   return (
-    <div className="h-screen bg-gradient-to-br from-slate-900 via-blue-900/90 to-indigo-900 overflow-hidden">
-      <div className="container mx-auto px-3 sm:px-4 lg:px-6 py-4 sm:py-6 lg:py-8 h-full">
-        {!isInitialized ? (
-          <div className="flex items-center justify-center h-full">
-            <div className="text-white text-center">
-              <div className="relative mb-6 sm:mb-8">
-                <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 animate-pulse mx-auto"></div>
-                <Loader2 className="w-8 h-8 sm:w-10 sm:h-10 animate-spin text-white absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" />
+    <Vortex>
+      <div className="h-screen overflow-hidden">
+        <div className="container mx-auto px-3 sm:px-4 lg:px-6 py-4 sm:py-6 lg:py-8 h-full">
+          {!isInitialized ? (
+            <div className="flex items-center justify-center h-full">
+              <div className="text-white text-center">
+                <div className="relative mb-6 sm:mb-8">
+                  <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 animate-pulse mx-auto"></div>
+                  <Loader2 className="w-8 h-8 sm:w-10 sm:h-10 animate-spin text-white absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" />
+                </div>
+                <p className="text-lg sm:text-xl font-medium">
+                  Loading suggestions...
+                </p>
               </div>
-              <p className="text-lg sm:text-xl font-medium">
-                Loading suggestions...
-              </p>
             </div>
-          </div>
-        ) : (
-          <div className="h-full flex flex-col">{renderSuggestions()}</div>
-        )}
+          ) : (
+            <div className="h-full flex flex-col">{renderSuggestions()}</div>
+          )}
+        </div>
       </div>
-    </div>
+    </Vortex>
   );
 }

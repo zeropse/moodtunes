@@ -1,8 +1,11 @@
+// app/layout.tsx or app/layout.jsx
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { ThemeProvider } from "@/components/theme-provider";
 import { NavbarMain } from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
+// Load fonts
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -13,22 +16,28 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+// Metadata for the layout
 export const metadata = {
   title: "MoodTunes",
-  description: "",
+  description: "Get Tunes based on your mood",
 };
 
+// Root layout component
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <div className="sticky top-0 z-50">
-          <NavbarMain />
-        </div>
-        <main>{children}</main>
-        <Footer />
+    <html
+      lang="en"
+      className={`${geistSans.variable} ${geistMono.variable}`}
+      suppressHydrationWarning
+    >
+      <body className="antialiased">
+        <ThemeProvider attribute="class" defaultTheme="dark">
+          <div className="sticky top-0 z-50">
+            <NavbarMain />
+          </div>
+          <main>{children}</main>
+          <Footer />
+        </ThemeProvider>
       </body>
     </html>
   );
