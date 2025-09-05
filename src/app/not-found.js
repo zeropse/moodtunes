@@ -2,7 +2,7 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Home, Search, ArrowLeft, Music } from "lucide-react";
+import { Home, Music } from "lucide-react";
 import Link from "next/link";
 
 export default function NotFound() {
@@ -39,7 +39,7 @@ export default function NotFound() {
                   404
                 </h1>
                 <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">
-                  Track Not Found
+                  Page Not Found
                 </h2>
                 <p className="text-lg text-white/80 mb-6 max-w-md mx-auto">
                   Looks like this page went off-beat! The page you're looking
@@ -50,47 +50,6 @@ export default function NotFound() {
 
               {/* Suggestions */}
               <div className="space-y-6">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="p-4 bg-white/5 rounded-lg border border-white/10">
-                    <h3 className="text-lg font-semibold text-purple-300 mb-2">
-                      Looking for mood analysis?
-                    </h3>
-                    <p className="text-sm text-white/70 mb-3">
-                      Go back to the home page to describe your mood and get
-                      personalized music recommendations.
-                    </p>
-                    <Link href="/">
-                      <Button
-                        size="sm"
-                        className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white"
-                      >
-                        <Music className="w-4 h-4 mr-2" />
-                        Find Music
-                      </Button>
-                    </Link>
-                  </div>
-
-                  <div className="p-4 bg-white/5 rounded-lg border border-white/10">
-                    <h3 className="text-lg font-semibold text-purple-300 mb-2">
-                      Check your history?
-                    </h3>
-                    <p className="text-sm text-white/70 mb-3">
-                      View your previous mood analyses and song recommendations
-                      in your personal history.
-                    </p>
-                    <Link href="/history">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="w-full text-white border-white/30 hover:bg-white/20"
-                      >
-                        <Search className="w-4 h-4 mr-2" />
-                        View History
-                      </Button>
-                    </Link>
-                  </div>
-                </div>
-
                 {/* Main Actions */}
                 <div className="flex flex-col sm:flex-row gap-4 justify-center pt-6">
                   <Link href="/">
@@ -102,25 +61,7 @@ export default function NotFound() {
                       Go Home
                     </Button>
                   </Link>
-
-                  <Button
-                    variant="outline"
-                    size="lg"
-                    onClick={() => window.history.back()}
-                    className="text-white border-white/30 hover:bg-white/20 px-8"
-                  >
-                    <ArrowLeft className="w-5 h-5 mr-2" />
-                    Go Back
-                  </Button>
                 </div>
-              </div>
-
-              {/* Fun Message */}
-              <div className="mt-12 p-4 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-lg border border-purple-400/30">
-                <p className="text-sm text-purple-200">
-                  💡 <strong>Pro tip:</strong> Every mood deserves the perfect
-                  soundtrack. Let's find yours together!
-                </p>
               </div>
             </CardContent>
           </Card>

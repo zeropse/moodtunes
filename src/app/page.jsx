@@ -134,7 +134,7 @@ export default function Home() {
               type="submit"
               disabled={isLoading || !moodText.trim()}
               size="lg"
-              className="w-full bg-white text-purple-600 hover:bg-white/90 font-semibold text-lg h-12"
+              className="w-full bg-white text-purple-600 hover:bg-white/90 font-semibold text-lg h-12 cursor-pointer"
             >
               {isLoading ? (
                 <>

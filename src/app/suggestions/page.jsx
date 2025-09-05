@@ -25,6 +25,60 @@ export default function SuggestionsPage() {
   const [error, setError] = useState(null);
   const [isInitialized, setIsInitialized] = useState(false);
 
+  // Save to history
+  const saveToHistory = (moodData, isRetry = false) => {
+    try {
+      const existingHistory = localStorage.getItem("moodMusicHistory");
+      const history = existingHistory ? JSON.parse(existingHistory) : [];
+
+      // Check if this mood already exists in recent history (last 5 minutes)
+      const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+      const isDuplicate = history.some(
+        (entry) =>
+          entry.mood === moodData.mood &&
+          new Date(entry.timestamp) > fiveMinutesAgo
+      );
+
+      // Don't save if it's a duplicate and not a retry
+      if (isDuplicate && !isRetry) {
+        return;
+      }
+
+      const newEntry = {
+        mood: moodData.mood,
+        moodAnalysis: moodData.moodAnalysis,
+        suggestions: moodData.suggestions,
+        timestamp: new Date().toISOString(),
+      };
+
+      // If it's a retry, replace the most recent entry with same mood
+      if (isRetry) {
+        const existingIndex = history.findIndex(
+          (entry) =>
+            entry.mood === moodData.mood &&
+            new Date(entry.timestamp) > fiveMinutesAgo
+        );
+        if (existingIndex !== -1) {
+          history[existingIndex] = newEntry;
+        } else {
+          history.unshift(newEntry);
+        }
+      } else {
+        // Add to beginning of array (most recent first)
+        history.unshift(newEntry);
+      }
+
+      // Keep only last 50 entries to prevent localStorage from getting too large
+      if (history.length > 50) {
+        history.splice(50);
+      }
+
+      localStorage.setItem("moodMusicHistory", JSON.stringify(history));
+    } catch (error) {
+      console.error("Error saving to history:", error);
+    }
+  };
+
   // Load data from sessionStorage
   useEffect(() => {
     const initializeData = () => {
@@ -37,6 +91,11 @@ export default function SuggestionsPage() {
           setMoodAnalysis(parsedData.moodAnalysis);
           setSuggestions(parsedData.suggestions);
           setIsInitialized(true);
+
+          // Save to history when suggestions are successfully loaded
+          if (parsedData.suggestions) {
+            saveToHistory(parsedData);
+          }
         } else {
           setError(
             "No suggestions data found. Please start from the home page."
@@ -96,14 +155,16 @@ export default function SuggestionsPage() {
 
       setSuggestions(newSuggestions);
 
-      sessionStorage.setItem(
-        "moodData",
-        JSON.stringify({
-          mood: mood,
-          moodAnalysis: moodAnalysis,
-          suggestions: newSuggestions,
-        })
-      );
+      const updatedMoodData = {
+        mood: mood,
+        moodAnalysis: moodAnalysis,
+        suggestions: newSuggestions,
+      };
+
+      sessionStorage.setItem("moodData", JSON.stringify(updatedMoodData));
+
+      // Save to history
+      saveToHistory(updatedMoodData, true); // Mark as retry
     } catch (err) {
       console.error("Error retrying suggestions:", err);
       let userMessage = err.message;
