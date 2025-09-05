@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
@@ -13,7 +13,7 @@ export default function Home() {
   const router = useRouter();
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    e?.preventDefault();
 
     if (!moodText.trim()) {
       setError("Please tell us how you're feeling");
@@ -73,6 +73,23 @@ export default function Home() {
       setIsLoading(false);
     }
   };
+
+  // Keyboard shortcut for button
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (
+        (e.metaKey || e.ctrlKey) &&
+        e.key === "Enter" &&
+        !isLoading &&
+        moodText.trim()
+      ) {
+        handleSubmit();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [moodText, isLoading]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-violet-900 via-purple-900 to-blue-900 flex items-center justify-center p-4">
@@ -138,7 +155,7 @@ export default function Home() {
         <div className="flex justify-center gap-8 mt-8 text-gray-300">
           <div className="flex items-center gap-2">
             <Zap className="w-5 h-5" />
-            <span className="text-sm">AI-Powered</span>
+            <span className="text-sm">Fast</span>
           </div>
           <div className="flex items-center gap-2">
             <Music className="w-5 h-5" />
