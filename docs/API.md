@@ -1,150 +1,248 @@
-# API Documentation
+# MoodTunes API Documentation
 
-This document describes the API endpoints available in the MoodTunes application.
+This document provides comprehensive documentation for the MoodTunes API endpoints, including request/response formats, error handling, and usage examples.
 
 ## Base URL
 
 ```
-http://localhost:3000/api  (Development)
-https://your-domain.com/api  (Production)
+Development: http://localhost:3000
+Production: https://your-domain.com
 ```
 
 ## Authentication
 
-Currently, the API does not require authentication. All endpoints are publicly accessible.
-
-## Rate Limiting
-
-- **Mood Analysis**: 60 requests per minute per IP
-- **Song Suggestions**: 30 requests per minute per IP
-
-## Error Handling
-
-All API endpoints return consistent error responses:
-
-```json
-{
-  "success": false,
-  "error": "Error type",
-  "code": "ERROR_CODE",
-  "message": "Human-readable error message",
-  "retryable": true|false
-}
-```
-
-### Common Error Codes
-
-- `VALIDATION_ERROR`: Invalid input parameters
-- `RATE_LIMIT_EXCEEDED`: Too many requests
-- `SERVICE_UNAVAILABLE`: External service (Spotify) unavailable
-- `INTERNAL_ERROR`: Server error
-- `NOT_FOUND`: Resource not found
+The MoodTunes API uses server-side Spotify authentication. No client-side authentication is required for end users.
 
 ## Endpoints
 
 ### 1. Analyze Mood
 
-Analyzes user mood text and returns music characteristics.
+Analyzes user mood text and returns musical characteristics.
 
 **Endpoint:** `POST /api/analyze-mood`
 
-**Request Body:**
+#### Request
 
 ```json
 {
-  "moodText": "I'm feeling happy and energetic today!"
+  "moodText": "string (required, 3-500 characters)"
 }
 ```
 
-**Parameters:**
+#### Response
 
-- `moodText` (string, required): User's mood description (3-500 characters)
+```json
+{
+  "success": true,
+  "data": {
+    "mood": "string",
+    "confidence": "number (0.0-1.0)",
+    "genres": ["string"],
+    "energy": "number (0.0-1.0)",
+    "valence": "number (0.0-1.0)",
+    "tempo": {
+      "min": "number",
+      "max": "number"
+    },
+    "detectedKeywords": ["string"],
+    "analysis": {
+      "sentimentScore": {
+        "positive": "number",
+        "negative": "number",
+        "neutral": "number",
+        "overall": "number",
+        "intensity": "number",
+        "hasNegation": "boolean"
+      },
+      "contextFactors": {
+        "temporal": {
+          "past": "number",
+          "present": "number",
+          "future": "number"
+        },
+        "intensity": {
+          "high": "number",
+          "medium": "number",
+          "low": "number"
+        }
+      },
+      "linguisticFeatures": {
+        "wordCount": "number",
+        "sentenceCount": "number",
+        "avgWordsPerSentence": "number",
+        "hasExclamation": "boolean",
+        "hasQuestion": "boolean",
+        "hasEmoji": "boolean",
+        "repetition": "number",
+        "capsUsage": "number"
+      },
+      "sentences": "number",
+      "complexity": {
+        "avgWordLength": "number",
+        "avgSentenceLength": "number",
+        "complexity": "number"
+      }
+    }
+  },
+  "meta": {
+    "requestId": "string",
+    "processingTime": "number (milliseconds)",
+    "analysisMethod": "string",
+    "version": "string"
+  }
+}
+```
 
-**Response:**
+#### Example Request
+
+```bash
+curl -X POST http://localhost:3000/api/analyze-mood \
+  -H "Content-Type: application/json" \
+  -d '{
+    "moodText": "I am feeling incredibly happy and energetic today! Ready to take on the world!"
+  }'
+```
+
+#### Example Response
 
 ```json
 {
   "success": true,
   "data": {
     "mood": "happy",
-    "confidence": 0.85,
-    "genres": ["pop", "dance", "electronic"],
-    "energy": 0.8,
-    "valence": 0.9,
+    "confidence": 0.92,
+    "genres": ["pop", "dance", "funk", "disco"],
+    "energy": 0.85,
+    "valence": 0.95,
     "tempo": {
       "min": 120,
       "max": 140
     },
-    "backgroundTheme": {
-      "colors": {
-        "primary": "#FFD700",
-        "secondary": "#FF6B6B",
-        "accent": "#4ECDC4"
+    "detectedKeywords": ["happy", "energetic"],
+    "analysis": {
+      "sentimentScore": {
+        "positive": 3.2,
+        "negative": 0,
+        "neutral": 0,
+        "overall": 3.2,
+        "intensity": 1.3,
+        "hasNegation": false
       },
-      "animation": {
-        "type": "particles",
-        "speed": "fast",
-        "intensity": 0.8
+      "contextFactors": {
+        "temporal": {
+          "past": 0,
+          "present": 1,
+          "future": 0
+        },
+        "intensity": {
+          "high": 1,
+          "medium": 0,
+          "low": 0
+        }
+      },
+      "linguisticFeatures": {
+        "wordCount": 14,
+        "sentenceCount": 2,
+        "avgWordsPerSentence": 7,
+        "hasExclamation": true,
+        "hasQuestion": false,
+        "hasEmoji": false,
+        "repetition": 0,
+        "capsUsage": 0.07
+      },
+      "sentences": 2,
+      "complexity": {
+        "avgWordLength": 5.8,
+        "avgSentenceLength": 7,
+        "complexity": 6.4
       }
-    },
-    "sentimentScore": 2.5,
-    "sentimentComparative": 0.5
+    }
+  },
+  "meta": {
+    "requestId": "req_1704123456789_abc123",
+    "processingTime": 42,
+    "analysisMethod": "advanced_keyword_sentiment",
+    "version": "4.0.0"
   }
 }
 ```
 
-**Response Fields:**
+### 2. Suggest Songs
 
-- `mood`: Detected mood category (happy, sad, energetic, calm, anxious, romantic, nostalgic, angry)
-- `confidence`: Confidence score (0.0-1.0)
-- `genres`: Array of recommended music genres
-- `energy`: Energy level (0.0-1.0)
-- `valence`: Musical positivity (0.0-1.0)
-- `tempo`: Recommended tempo range (BPM)
-- `backgroundTheme`: Visual theme configuration
-- `sentimentScore`: Raw sentiment analysis score
-- `sentimentComparative`: Comparative sentiment score
-
-**Example cURL:**
-
-```bash
-curl -X POST http://localhost:3000/api/analyze-mood \
-  -H "Content-Type: application/json" \
-  -d '{"moodText": "I feel amazing and full of energy!"}'
-```
-
-### 2. Generate Song Suggestions
-
-Creates song suggestions based on mood analysis results.
+Generates personalized song recommendations based on mood analysis.
 
 **Endpoint:** `POST /api/suggest-songs`
 
-**Request Body:**
+#### Request
 
 ```json
 {
-  "mood": "happy",
-  "genres": ["pop", "dance"],
-  "energy": 0.8,
-  "valence": 0.9,
-  "tempo": {
-    "min": 120,
-    "max": 140
-  },
-  "moodText": "I'm feeling happy and energetic today!"
+  "mood": "string (required)",
+  "genres": ["string (required, non-empty array)"],
+  "moodText": "string (optional, original mood text)"
 }
 ```
 
-**Parameters:**
+#### Response
 
-- `mood` (string, required): Mood category
-- `genres` (array, required): Array of genre strings
-- `energy` (number, required): Energy level (0.0-1.0)
-- `valence` (number, required): Musical positivity (0.0-1.0)
-- `tempo` (object, required): Tempo range with min/max values
-- `moodText` (string, required): Original mood description
+```json
+{
+  "success": true,
+  "suggestions": {
+    "tracks": [
+      {
+        "id": "string",
+        "name": "string",
+        "artists": ["string"],
+        "album": {
+          "id": "string",
+          "name": "string",
+          "images": [
+            {
+              "url": "string",
+              "height": "number",
+              "width": "number"
+            }
+          ],
+          "release_date": "string (YYYY-MM-DD)",
+          "total_tracks": "number"
+        },
+        "external_urls": {
+          "spotify": "string"
+        },
+        "duration_ms": "number",
+        "popularity": "number (0-100)",
+        "sourceGenre": "string",
+        "preview_url": "string|null"
+      }
+    ],
+    "totalTracks": "number",
+    "seedGenres": ["string"],
+    "mood": "string",
+    "moodAnalysis": {
+      "genres": ["string"]
+    }
+  },
+  "meta": {
+    "requestId": "string",
+    "processingTime": "number (milliseconds)"
+  }
+}
+```
 
-**Response:**
+#### Example Request
+
+```bash
+curl -X POST http://localhost:3000/api/suggest-songs \
+  -H "Content-Type: application/json" \
+  -d '{
+    "mood": "happy",
+    "genres": ["pop", "dance"],
+    "moodText": "I am feeling incredibly happy and energetic today!"
+  }'
+```
+
+#### Example Response
 
 ```json
 {
@@ -155,283 +253,225 @@ Creates song suggestions based on mood analysis results.
         "id": "4iV5W9uYEdYUVa79Axb7Rh",
         "name": "Happy",
         "artists": ["Pharrell Williams"],
-        "preview_url": "https://p.scdn.co/mp3-preview/...",
+        "album": {
+          "id": "4m2880jivSbbyEGAKfITCa",
+          "name": "G I R L",
+          "images": [
+            {
+              "url": "https://i.scdn.co/image/ab67616d0000b273e318ddb0e8f7c6e276e8b2c1",
+              "height": 640,
+              "width": 640
+            }
+          ],
+          "release_date": "2014-03-03",
+          "total_tracks": 10
+        },
         "external_urls": {
           "spotify": "https://open.spotify.com/track/4iV5W9uYEdYUVa79Axb7Rh"
-        }
+        },
+        "duration_ms": 232560,
+        "popularity": 85,
+        "sourceGenre": "pop",
+        "preview_url": "https://p.scdn.co/mp3-preview/..."
       }
     ],
-    ],
     "totalTracks": 15,
-    "mood": "happy",
+    "seedGenres": ["pop", "dance"],
+    "mood": "I am feeling incredibly happy and energetic today!",
     "moodAnalysis": {
-      "energy": 0.8,
-      "valence": 0.9,
-      "genres": ["pop", "dance"]
+      "genres": ["pop", "dance", "funk"]
     }
+  },
+  "meta": {
+    "requestId": "suggestions_1704123456789_xyz789",
+    "processingTime": 1250
   }
 }
 ```
 
-**Response Fields:**
+## Error Handling
 
-- `tracks`: Array of suggested track objects
-- `totalTracks`: Number of suggested tracks
-- `mood`: Detected mood category
-- `moodAnalysis`: Analysis details including energy, valence, and genres
-
-**Example cURL:**
-
-```bash
-curl -X POST http://localhost:3000/api/suggest-songs \
-  -H "Content-Type: application/json" \
-  -d '{
-    "mood": "happy",
-    "genres": ["pop", "dance"],
-    "energy": 0.8,
-    "valence": 0.9,
-    "tempo": {"min": 120, "max": 140},
-    "moodText": "I feel happy!"
-  }'
-```
-
-### 3. Error Handling
-
-All endpoints return standardized error responses with the following format:
+### Error Response Format
 
 ```json
 {
   "success": false,
   "error": {
-    "type": "VALIDATION_ERROR",
-    "message": "Invalid mood input provided",
-    "code": "INVALID_INPUT",
-    "retryable": false
+    "message": "string",
+    "code": "string"
+  },
+  "meta": {
+    "timestamp": "string (ISO 8601)"
   }
 }
 ```
 
-### 3. API Information
+### Common Error Codes
 
-Get information about the mood analysis API.
-
-**Endpoint:** `GET /api/analyze-mood`
-
-**Response:**
+#### 400 Bad Request
 
 ```json
 {
-  "name": "Mood Analysis API",
-  "version": "1.0.0",
-  "description": "Analyzes mood text and returns music characteristics",
-  "endpoints": {
-    "POST": {
-      "description": "Analyze mood text",
-      "body": {
-        "moodText": "string (3-500 characters)"
-      },
-      "response": {
-        "mood": "string",
-        "confidence": "number",
-        "genres": "array",
-        "energy": "number",
-        "valence": "number",
-        "tempo": "object"
-      }
-    }
+  "success": false,
+  "error": {
+    "message": "Mood text is required",
+    "code": "API_ERROR"
   },
-  "availableMoods": [
-    "happy",
-    "sad",
-    "energetic",
-    "calm",
-    "anxious",
-    "romantic",
-    "nostalgic",
-    "angry"
-  ]
+  "meta": {
+    "timestamp": "2024-01-15T10:30:00.000Z"
+  }
 }
 ```
+
+**Common causes:**
+
+- Missing required fields
+- Invalid input format
+- Text too short (< 3 characters) or too long (> 500 characters)
+
+#### 500 Internal Server Error
+
+```json
+{
+  "success": false,
+  "error": {
+    "message": "We had trouble understanding your mood. Try rephrasing your description.",
+    "code": "API_ERROR"
+  },
+  "meta": {
+    "timestamp": "2024-01-15T10:30:00.000Z"
+  }
+}
+```
+
+#### 503 Service Unavailable
+
+```json
+{
+  "success": false,
+  "error": {
+    "message": "Music service is not available. Please check the server configuration.",
+    "code": "API_ERROR"
+  },
+  "meta": {
+    "timestamp": "2024-01-15T10:30:00.000Z"
+  }
+}
+```
+
+### Fallback Responses
+
+When Spotify API is unavailable, the `/api/suggest-songs` endpoint returns sample data:
+
+```json
+{
+  "success": true,
+  "suggestions": {
+    "id": "fallback-suggestions",
+    "mood": "happy",
+    "tracks": [
+      {
+        "id": "sample-1",
+        "name": "Sample Track 1",
+        "artists": ["Sample Artist"],
+        "preview_url": null,
+        "external_urls": { "spotify": "#" },
+        "duration_ms": 180000,
+        "popularity": 75
+      }
+    ],
+    "totalTracks": 2,
+    "seedGenres": ["pop"],
+    "fallback": true,
+    "message": "Sample song suggestions - Spotify connection unavailable"
+  },
+  "warning": "Spotify is temporarily unavailable. Here are some sample suggestions.",
+  "meta": {
+    "requestId": "suggestions_1704123456789_fallback",
+    "processingTime": 15,
+    "fallback": true
+  }
+}
+```
+
+## Rate Limiting
+
+The API includes built-in rate limiting and timeout protection:
+
+- **Request Timeout**: 5 seconds for external API calls
+- **Token Caching**: Spotify tokens are cached to reduce API calls
+- **Retry Logic**: Automatic retries for transient failures
 
 ## Mood Categories
 
-The API recognizes 8 primary mood categories:
+The API recognizes 10 distinct mood categories:
 
-### Happy
+| Mood       | Energy | Valence | Tempo Range | Primary Genres                  |
+| ---------- | ------ | ------- | ----------- | ------------------------------- |
+| happy      | 0.8    | 0.9     | 120-140 BPM | pop, dance, funk, disco         |
+| sad        | 0.3    | 0.2     | 60-90 BPM   | blues, indie, folk, alternative |
+| energetic  | 0.95   | 0.7     | 128-160 BPM | electronic, edm, techno, house  |
+| relaxed    | 0.4    | 0.6     | 60-100 BPM  | ambient, chillout, lo-fi, jazz  |
+| angry      | 0.9    | 0.1     | 140-180 BPM | rock, metal, punk, hardcore     |
+| romantic   | 0.5    | 0.8     | 80-120 BPM  | r&b, soul, jazz, indie-pop      |
+| nostalgic  | 0.5    | 0.6     | 90-130 BPM  | classic-rock, oldies, folk      |
+| anxious    | 0.6    | 0.3     | 100-130 BPM | indie, alternative, ambient     |
+| confident  | 0.8    | 0.8     | 110-140 BPM | hip-hop, rap, trap, funk        |
+| thoughtful | 0.4    | 0.5     | 70-110 BPM  | jazz, classical, post-rock      |
 
-- **Genres**: pop, dance, electronic, funk
-- **Energy**: 0.7-0.9
-- **Valence**: 0.8-1.0
-- **Tempo**: 120-140 BPM
-- **Keywords**: happy, joyful, excited, cheerful, delighted
+## Usage Examples
 
-### Sad
+### JavaScript/TypeScript
 
-- **Genres**: acoustic, folk, indie, blues
-- **Energy**: 0.1-0.4
-- **Valence**: 0.0-0.3
-- **Tempo**: 60-90 BPM
-- **Keywords**: sad, depressed, melancholy, down, heartbroken
-
-### Energetic
-
-- **Genres**: electronic, rock, dance, hip-hop
-- **Energy**: 0.8-1.0
-- **Valence**: 0.6-0.9
-- **Tempo**: 130-160 BPM
-- **Keywords**: energetic, pumped, hyper, motivated, dynamic
-
-### Calm
-
-- **Genres**: ambient, chill, classical, new-age
-- **Energy**: 0.0-0.3
-- **Valence**: 0.5-0.8
-- **Tempo**: 60-100 BPM
-- **Keywords**: calm, peaceful, relaxed, serene, tranquil
-
-### Anxious
-
-- **Genres**: ambient, classical, acoustic, chill
-- **Energy**: 0.2-0.5
-- **Valence**: 0.3-0.6
-- **Tempo**: 70-110 BPM
-- **Keywords**: anxious, nervous, worried, stressed, tense
-
-### Romantic
-
-- **Genres**: r&b, soul, jazz, pop
-- **Energy**: 0.3-0.7
-- **Valence**: 0.6-0.9
-- **Tempo**: 80-120 BPM
-- **Keywords**: romantic, loving, passionate, intimate, tender
-
-### Nostalgic
-
-- **Genres**: classic rock, oldies, folk, indie
-- **Energy**: 0.3-0.6
-- **Valence**: 0.4-0.7
-- **Tempo**: 90-130 BPM
-- **Keywords**: nostalgic, reminiscent, wistful, longing, memories
-
-### Angry
-
-- **Genres**: rock, metal, punk, hardcore
-- **Energy**: 0.7-1.0
-- **Valence**: 0.0-0.4
-- **Tempo**: 120-180 BPM
-- **Keywords**: angry, furious, mad, irritated, frustrated
-
-## Error Examples
-
-### Validation Error
-
-```json
-{
-  "success": false,
-  "error": "Invalid input",
-  "code": "VALIDATION_ERROR",
-  "message": "Mood description must be at least 3 characters long",
-  "retryable": false
+```typescript
+interface MoodAnalysisRequest {
+  moodText: string;
 }
-```
 
-### Rate Limit Error
-
-```json
-{
-  "success": false,
-  "error": "Rate limit exceeded",
-  "code": "RATE_LIMIT_EXCEEDED",
-  "message": "Too many requests. Please try again later.",
-  "retryable": true,
-  "retryAfter": 60
+interface MoodAnalysisResponse {
+  success: boolean;
+  data: {
+    mood: string;
+    confidence: number;
+    genres: string[];
+    energy: number;
+    valence: number;
+    tempo: { min: number; max: number };
+    detectedKeywords: string[];
+    analysis: object;
+  };
+  meta: {
+    requestId: string;
+    processingTime: number;
+    analysisMethod: string;
+    version: string;
+  };
 }
-```
 
-### Service Unavailable
+async function analyzeMood(moodText: string): Promise<MoodAnalysisResponse> {
+  const response = await fetch("/api/analyze-mood", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ moodText }),
+  });
 
-```json
-{
-  "success": false,
-  "error": "Music service temporarily unavailable",
-  "code": "SERVICE_UNAVAILABLE",
-  "message": "Unable to connect to Spotify. Please try again later.",
-  "retryable": true
-}
-```
-
-### Not Found
-
-```json
-{
-  "success": false,
-  "error": "Song suggestions not found",
-  "code": "SUGGESTIONS_NOT_FOUND",
-  "message": "The requested song suggestions could not be found.",
-  "retryable": false
-}
-```
-
-## SDK Examples
-
-### JavaScript/Node.js
-
-```javascript
-class MoodMusicAPI {
-  constructor(baseUrl = "http://localhost:3000/api") {
-    this.baseUrl = baseUrl;
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
   }
 
-  async analyzeMood(moodText) {
-    const response = await fetch(`${this.baseUrl}/analyze-mood`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ moodText }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-    }
-
-    return response.json();
-  }
-
-  async generateSuggestions(moodData) {
-    const response = await fetch(`${this.baseUrl}/suggest-songs`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(moodData),
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-    }
-
-    return response.json();
-  }
+  return response.json();
 }
 
 // Usage
-const api = new MoodMusicAPI();
-
 try {
-  const moodResult = await api.analyzeMood("I'm feeling great today!");
-  const suggestions = await api.generateSuggestions({
-    mood: moodResult.data.mood,
-    genres: moodResult.data.genres,
-    energy: moodResult.data.energy,
-    valence: moodResult.data.valence,
-    tempo: moodResult.data.tempo,
-    moodText: "I'm feeling great today!",
-  });
-
-  console.log(
-    "Generated suggestions:",
-    suggestions.suggestions.totalTracks,
-    "tracks"
-  );
+  const result = await analyzeMood("I'm feeling great today!");
+  console.log(`Detected mood: ${result.data.mood}`);
+  console.log(`Confidence: ${result.data.confidence}`);
+  console.log(`Recommended genres: ${result.data.genres.join(", ")}`);
 } catch (error) {
-  console.error("API Error:", error.message);
+  console.error("Mood analysis failed:", error);
 }
 ```
 
@@ -441,66 +481,104 @@ try {
 import requests
 import json
 
-class MoodMusicAPI:
-    def __init__(self, base_url="http://localhost:3000/api"):
-        self.base_url = base_url
+def analyze_mood(mood_text: str) -> dict:
+    """Analyze mood using the MoodTunes API."""
+    url = "http://localhost:3000/api/analyze-mood"
+    payload = {"moodText": mood_text}
+    headers = {"Content-Type": "application/json"}
 
-    def analyze_mood(self, mood_text):
-        response = requests.post(
-            f"{self.base_url}/analyze-mood",
-            json={"moodText": mood_text}
-        )
-        response.raise_for_status()
-        return response.json()
+    response = requests.post(url, json=payload, headers=headers)
+    response.raise_for_status()
 
-    def generate_suggestions(self, mood_data):
-        response = requests.post(
-            f"{self.base_url}/suggest-songs",
-            json=mood_data
-        )
-        response.raise_for_status()
-        return response.json()
+    return response.json()
 
+def suggest_songs(mood: str, genres: list) -> dict:
+    """Get song suggestions based on mood analysis."""
+    url = "http://localhost:3000/api/suggest-songs"
+    payload = {
+        "mood": mood,
+        "genres": genres
+    }
+    headers = {"Content-Type": "application/json"}
 
+    response = requests.post(url, json=payload, headers=headers)
+    response.raise_for_status()
 
-# Usage
-api = MoodMusicAPI()
+    return response.json()
 
+# Usage example
 try:
-    mood_result = api.analyze_mood("I'm feeling energetic and ready to dance!")
-    suggestions = api.generate_suggestions({
-        "mood": mood_result["data"]["mood"],
-        "genres": mood_result["data"]["genres"],
-        "energy": mood_result["data"]["energy"],
-        "valence": mood_result["data"]["valence"],
-        "tempo": mood_result["data"]["tempo"],
-        "moodText": "I'm feeling energetic and ready to dance!"
-    })
+    # Analyze mood
+    mood_result = analyze_mood("I'm feeling energetic and ready to work out!")
+    print(f"Detected mood: {mood_result['data']['mood']}")
 
-    print(f"Generated suggestions: {suggestions['suggestions']['totalTracks']} tracks")
+    # Get song suggestions
+    songs_result = suggest_songs(
+        mood_result['data']['mood'],
+        mood_result['data']['genres']
+    )
+
+    print(f"Found {songs_result['suggestions']['totalTracks']} songs:")
+    for track in songs_result['suggestions']['tracks'][:5]:
+        print(f"- {track['name']} by {', '.join(track['artists'])}")
+
 except requests.exceptions.RequestException as e:
-    print(f"API Error: {e}")
+    print(f"API request failed: {e}")
 ```
 
-## Changelog
+## Testing the API
 
-### v1.0.0 (Current)
+### Using curl
 
-- Initial API release
-- Mood analysis endpoint
-- Song suggestions endpoint
+```bash
+# Test mood analysis
+curl -X POST http://localhost:3000/api/analyze-mood \
+  -H "Content-Type: application/json" \
+  -d '{"moodText": "I feel amazing today!"}'
 
-- 8 mood categories support
+# Test song suggestions
+curl -X POST http://localhost:3000/api/suggest-songs \
+  -H "Content-Type: application/json" \
+  -d '{"mood": "happy", "genres": ["pop", "dance"]}'
 
-### Planned Features
+# Test error handling
+curl -X POST http://localhost:3000/api/analyze-mood \
+  -H "Content-Type: application/json" \
+  -d '{"moodText": ""}'
+```
 
-- User authentication
-- Suggestions history
-- Custom mood categories
+### Using Postman
 
-- GraphQL endpoint
-- Batch processing
+1. **Create a new request**
 
----
+   - Method: POST
+   - URL: `http://localhost:3000/api/analyze-mood`
 
-For more information, see the [main documentation](../README.md) or [setup guide](SETUP.md).
+2. **Set headers**
+
+   - Content-Type: `application/json`
+
+3. **Set body (raw JSON)**
+
+   ```json
+   {
+     "moodText": "I'm feeling fantastic and ready to dance!"
+   }
+   ```
+
+4. **Send request and verify response**
+
+## API Versioning
+
+The current API version is `4.0.0`. Version information is included in response metadata:
+
+```json
+{
+  "meta": {
+    "version": "4.0.0",
+    "analysisMethod": "advanced_keyword_sentiment"
+  }
+}
+```
+
+Future versions will maintain backward compatibility where possible, with breaking changes requiring a new major version.

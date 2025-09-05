@@ -1,197 +1,270 @@
-# Deployment Guide
+# MoodTunes Deployment Guide
 
-This guide covers deploying the MoodTunes application to various platforms and environments.
+This guide covers deploying MoodTunes to various platforms, including configuration, environment setup, and best practices.
 
-## 🚀 Quick Deploy Options
+## Prerequisites
 
-### Vercel (Recommended)
+Before deploying, ensure you have:
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/yourusername/mood-music)
+- **Spotify Developer Account** with app credentials
+- **Node.js 18+** for local builds
+- **Git repository** with your code
+- **Domain name** (optional, for custom domains)
 
-1. **Connect Repository**
+## Platform-Specific Deployment
 
-   - Fork the repository to your GitHub account
-   - Connect your GitHub account to Vercel
-   - Import the mood-music repository
+### 1. Vercel (Recommended)
 
-2. **Configure Environment Variables**
+Vercel provides optimal Next.js 15 support with Turbopack integration.
 
-   ```env
-   SPOTIFY_CLIENT_ID=your_spotify_client_id
-   SPOTIFY_CLIENT_SECRET=your_spotify_client_secret
-   NEXT_PUBLIC_APP_URL=https://your-app.vercel.app
+#### Quick Deploy
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/yourusername/moodtunes)
+
+#### Manual Deployment
+
+1. **Install Vercel CLI**
+
+   ```bash
+   npm i -g vercel
    ```
 
-3. **Deploy**
-   - Vercel will automatically build and deploy
-   - Subsequent pushes to main branch will auto-deploy
+2. **Login to Vercel**
 
-### Netlify
+   ```bash
+   vercel login
+   ```
 
-[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/yourusername/mood-music)
+3. **Deploy from project directory**
 
-1. **Connect Repository**
+   ```bash
+   vercel
+   ```
 
-   - Fork the repository
-   - Connect to Netlify via GitHub
+4. **Set environment variables**
 
-2. **Build Settings**
+   ```bash
+   vercel env add SPOTIFY_CLIENT_ID
+   vercel env add SPOTIFY_CLIENT_SECRET
+   ```
+
+5. **Deploy to production**
+   ```bash
+   vercel --prod
+   ```
+
+#### Vercel Configuration
+
+Create `vercel.json` for advanced configuration:
+
+```json
+{
+  "framework": "nextjs",
+  "buildCommand": "pnpm build",
+  "devCommand": "pnpm dev",
+  "installCommand": "pnpm install",
+  "functions": {
+    "src/app/api/*/route.js": {
+      "maxDuration": 10
+    }
+  },
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        }
+      ]
+    }
+  ]
+}
+```
+
+### 2. Netlify
+
+Alternative deployment platform with good Next.js support.
+
+#### Deploy Steps
+
+1. **Connect repository** to Netlify
+2. **Configure build settings**:
 
    - Build command: `pnpm build`
    - Publish directory: `.next`
    - Node version: `18`
 
-3. **Environment Variables**
-   ```env
-   SPOTIFY_CLIENT_ID=your_spotify_client_id
-   SPOTIFY_CLIENT_SECRET=your_spotify_client_secret
-   NEXT_PUBLIC_APP_URL=https://your-app.netlify.app
+3. **Set environment variables** in Netlify dashboard:
+
+   ```
+   SPOTIFY_CLIENT_ID=your_client_id
+   SPOTIFY_CLIENT_SECRET=your_client_secret
+   NEXT_PUBLIC_APP_URL=https://your-site.netlify.app
    ```
 
-### Railway
+4. **Deploy**
 
-[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/new/template/mood-music)
+#### Netlify Configuration
 
-1. **One-Click Deploy**
+Create `netlify.toml`:
 
-   - Click the Railway button above
-   - Connect your GitHub account
-   - Set environment variables
+```toml
+[build]
+  command = "pnpm build"
+  publish = ".next"
 
-2. **Configuration**
-   - Railway will auto-detect Next.js
-   - No additional configuration needed
+[build.environment]
+  NODE_VERSION = "18"
+  NPM_FLAGS = "--version"
 
-## 🐳 Docker Deployment
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
 
-### Using Docker Compose (Recommended)
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+```
 
-1. **Create docker-compose.yml**
+### 3. Railway
 
-   ```yaml
-   version: "3.8"
+Simple deployment with automatic builds.
 
-   services:
-     mood-music:
-       build: .
-       ports:
-         - "3000:3000"
-       environment:
-         - SPOTIFY_CLIENT_ID=${SPOTIFY_CLIENT_ID}
-         - SPOTIFY_CLIENT_SECRET=${SPOTIFY_CLIENT_SECRET}
-         - NEXT_PUBLIC_APP_URL=http://localhost:3000
-       restart: unless-stopped
+#### Deploy Steps
 
-     redis:
-       image: redis:7-alpine
-       ports:
-         - "6379:6379"
-       restart: unless-stopped
-       command: redis-server --appendonly yes
-       volumes:
-         - redis_data:/data
-
-   volumes:
-     redis_data:
+1. **Connect GitHub repository** to Railway
+2. **Set environment variables**:
    ```
-
-2. **Create .env file**
-
-   ```env
-   SPOTIFY_CLIENT_ID=your_spotify_client_id
-   SPOTIFY_CLIENT_SECRET=your_spotify_client_secret
+   SPOTIFY_CLIENT_ID=your_client_id
+   SPOTIFY_CLIENT_SECRET=your_client_secret
    ```
+3. **Deploy automatically** on push
 
-3. **Deploy**
-   ```bash
-   docker-compose up -d
-   ```
+### 4. Docker Deployment
 
-### Standalone Docker
+For containerized deployments on any platform.
 
-1. **Build Image**
-
-   ```bash
-   docker build -t mood-music .
-   ```
-
-2. **Run Container**
-   ```bash
-   docker run -d \
-     --name mood-music \
-     -p 3000:3000 \
-     -e SPOTIFY_CLIENT_ID=your_client_id \
-     -e SPOTIFY_CLIENT_SECRET=your_client_secret \
-     -e NEXT_PUBLIC_APP_URL=http://localhost:3000 \
-     mood-music
-   ```
-
-### Multi-Stage Dockerfile
+#### Dockerfile
 
 ```dockerfile
-# Build stage
-FROM node:18-alpine AS builder
+# Use Node.js 18 Alpine image
+FROM node:18-alpine AS base
 
+# Install dependencies only when needed
+FROM base AS deps
+RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
-# Copy package files
-COPY package*.json pnpm-lock.yaml ./
+# Install dependencies based on the preferred package manager
+COPY package.json pnpm-lock.yaml* ./
+RUN \
+  if [ -f pnpm-lock.yaml ]; then \
+    corepack enable pnpm && pnpm i --frozen-lockfile; \
+  else \
+    echo "Lockfile not found." && exit 1; \
+  fi
 
-# Install pnpm
-RUN npm install -g pnpm
-
-# Install dependencies
-RUN pnpm install --frozen-lockfile
-
-# Copy source code
+# Rebuild the source code only when needed
+FROM base AS builder
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Build application
-RUN pnpm build
+# Build the application
+RUN \
+  if [ -f pnpm-lock.yaml ]; then \
+    corepack enable pnpm && pnpm build; \
+  else \
+    echo "Lockfile not found." && exit 1; \
+  fi
 
-# Production stage
-FROM node:18-alpine AS runner
-
+# Production image, copy all the files and run next
+FROM base AS runner
 WORKDIR /app
 
-# Create non-root user
+ENV NODE_ENV=production
+
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
-# Copy built application
 COPY --from=builder /app/public ./public
-COPY --from=builder /app/.next/standalone ./
-COPY --from=builder /app/.next/static ./.next/static
 
-# Set ownership
-RUN chown -R nextjs:nodejs /app
+# Set the correct permission for prerender cache
+RUN mkdir .next
+RUN chown nextjs:nodejs .next
+
+# Automatically leverage output traces to reduce image size
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
 USER nextjs
 
 EXPOSE 3000
 
-ENV PORT 3000
-ENV HOSTNAME "0.0.0.0"
+ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
 
 CMD ["node", "server.js"]
 ```
 
-## ☁️ Cloud Platform Deployments
+#### Docker Compose
 
-### AWS (Amazon Web Services)
+```yaml
+version: "3.8"
+
+services:
+  moodtunes:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - SPOTIFY_CLIENT_ID=${SPOTIFY_CLIENT_ID}
+      - SPOTIFY_CLIENT_SECRET=${SPOTIFY_CLIENT_SECRET}
+      - NEXT_PUBLIC_APP_URL=http://localhost:3000
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/analyze-mood"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+```
+
+#### Build and Run
+
+```bash
+# Build the image
+docker build -t moodtunes .
+
+# Run the container
+docker run -p 3000:3000 \
+  -e SPOTIFY_CLIENT_ID=your_client_id \
+  -e SPOTIFY_CLIENT_SECRET=your_client_secret \
+  moodtunes
+
+# Or use Docker Compose
+docker-compose up -d
+```
+
+### 5. AWS Deployment
 
 #### Using AWS Amplify
 
-1. **Connect Repository**
+1. **Connect repository** to AWS Amplify
+2. **Configure build settings**:
 
-   ```bash
-   npm install -g @aws-amplify/cli
-   amplify init
-   amplify add hosting
-   amplify publish
-   ```
-
-2. **Build Settings**
    ```yaml
    version: 1
    frontend:
@@ -210,673 +283,329 @@ CMD ["node", "server.js"]
      cache:
        paths:
          - node_modules/**/*
-         - .next/cache/**/*
    ```
 
-#### Using AWS ECS (Fargate)
+3. **Set environment variables** in Amplify console
 
-1. **Create Task Definition**
+#### Using AWS ECS with Fargate
 
-   ```json
-   {
-     "family": "mood-music",
-     "networkMode": "awsvpc",
-     "requiresCompatibilities": ["FARGATE"],
-     "cpu": "256",
-     "memory": "512",
-     "executionRoleArn": "arn:aws:iam::account:role/ecsTaskExecutionRole",
-     "containerDefinitions": [
-       {
-         "name": "mood-music",
-         "image": "your-account.dkr.ecr.region.amazonaws.com/mood-music:latest",
-         "portMappings": [
-           {
-             "containerPort": 3000,
-             "protocol": "tcp"
-           }
-         ],
-         "environment": [
-           {
-             "name": "SPOTIFY_CLIENT_ID",
-             "value": "your_client_id"
-           }
-         ],
-         "secrets": [
-           {
-             "name": "SPOTIFY_CLIENT_SECRET",
-             "valueFrom": "arn:aws:secretsmanager:region:account:secret:spotify-secret"
-           }
-         ]
-       }
-     ]
-   }
-   ```
+1. **Build and push Docker image** to ECR
+2. **Create ECS task definition**
+3. **Deploy to Fargate cluster**
 
-2. **Deploy with CDK**
+Example task definition:
 
-   ```typescript
-   import * as ecs from "aws-cdk-lib/aws-ecs";
-   import * as ec2 from "aws-cdk-lib/aws-ec2";
+```json
+{
+  "family": "moodtunes",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "256",
+  "memory": "512",
+  "executionRoleArn": "arn:aws:iam::account:role/ecsTaskExecutionRole",
+  "containerDefinitions": [
+    {
+      "name": "moodtunes",
+      "image": "your-account.dkr.ecr.region.amazonaws.com/moodtunes:latest",
+      "portMappings": [
+        {
+          "containerPort": 3000,
+          "protocol": "tcp"
+        }
+      ],
+      "environment": [
+        {
+          "name": "SPOTIFY_CLIENT_ID",
+          "value": "your_client_id"
+        },
+        {
+          "name": "SPOTIFY_CLIENT_SECRET",
+          "value": "your_client_secret"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/moodtunes",
+          "awslogs-region": "us-east-1",
+          "awslogs-stream-prefix": "ecs"
+        }
+      }
+    }
+  ]
+}
+```
 
-   const cluster = new ecs.Cluster(this, "MoodMusicCluster", {
-     vpc: vpc,
-   });
+## Environment Configuration
 
-   const taskDefinition = new ecs.FargateTaskDefinition(this, "TaskDef", {
-     memoryLimitMiB: 512,
-     cpu: 256,
-   });
-
-   const container = taskDefinition.addContainer("mood-music", {
-     image: ecs.ContainerImage.fromRegistry("your-image"),
-     environment: {
-       NEXT_PUBLIC_APP_URL: "https://your-domain.com",
-     },
-     secrets: {
-       SPOTIFY_CLIENT_SECRET: ecs.Secret.fromSecretsManager(secret),
-     },
-   });
-
-   container.addPortMappings({
-     containerPort: 3000,
-   });
-   ```
-
-### Google Cloud Platform
-
-#### Using Cloud Run
-
-1. **Build and Push Image**
-
-   ```bash
-   # Build image
-   docker build -t gcr.io/PROJECT_ID/mood-music .
-
-   # Push to Container Registry
-   docker push gcr.io/PROJECT_ID/mood-music
-   ```
-
-2. **Deploy to Cloud Run**
-
-   ```bash
-   gcloud run deploy mood-music \
-     --image gcr.io/PROJECT_ID/mood-music \
-     --platform managed \
-     --region us-central1 \
-     --allow-unauthenticated \
-     --set-env-vars NEXT_PUBLIC_APP_URL=https://your-service-url \
-     --set-secrets SPOTIFY_CLIENT_SECRET=spotify-secret:latest
-   ```
-
-3. **Using Cloud Build**
-   ```yaml
-   # cloudbuild.yaml
-   steps:
-     - name: "gcr.io/cloud-builders/docker"
-       args: ["build", "-t", "gcr.io/$PROJECT_ID/mood-music", "."]
-     - name: "gcr.io/cloud-builders/docker"
-       args: ["push", "gcr.io/$PROJECT_ID/mood-music"]
-     - name: "gcr.io/cloud-builders/gcloud"
-       args:
-         - "run"
-         - "deploy"
-         - "mood-music"
-         - "--image"
-         - "gcr.io/$PROJECT_ID/mood-music"
-         - "--region"
-         - "us-central1"
-         - "--platform"
-         - "managed"
-         - "--allow-unauthenticated"
-   ```
-
-#### Using App Engine
-
-1. **Create app.yaml**
-
-   ```yaml
-   runtime: nodejs18
-
-   env_variables:
-     NEXT_PUBLIC_APP_URL: https://PROJECT_ID.appspot.com
-
-   automatic_scaling:
-     min_instances: 0
-     max_instances: 10
-     target_cpu_utilization: 0.6
-   ```
-
-2. **Deploy**
-   ```bash
-   gcloud app deploy
-   ```
-
-### Microsoft Azure
-
-#### Using Azure Container Instances
-
-1. **Create Resource Group**
-
-   ```bash
-   az group create --name mood-music-rg --location eastus
-   ```
-
-2. **Deploy Container**
-   ```bash
-   az container create \
-     --resource-group mood-music-rg \
-     --name mood-music \
-     --image your-registry/mood-music:latest \
-     --dns-name-label mood-music-app \
-     --ports 3000 \
-     --environment-variables \
-       NEXT_PUBLIC_APP_URL=https://mood-music-app.eastus.azurecontainer.io \
-     --secure-environment-variables \
-       SPOTIFY_CLIENT_ID=your_client_id \
-       SPOTIFY_CLIENT_SECRET=your_client_secret
-   ```
-
-#### Using Azure App Service
-
-1. **Create App Service Plan**
-
-   ```bash
-   az appservice plan create \
-     --name mood-music-plan \
-     --resource-group mood-music-rg \
-     --sku B1 \
-     --is-linux
-   ```
-
-2. **Create Web App**
-
-   ```bash
-   az webapp create \
-     --resource-group mood-music-rg \
-     --plan mood-music-plan \
-     --name mood-music-app \
-     --deployment-container-image-name your-registry/mood-music:latest
-   ```
-
-3. **Configure Environment Variables**
-   ```bash
-   az webapp config appsettings set \
-     --resource-group mood-music-rg \
-     --name mood-music-app \
-     --settings \
-       SPOTIFY_CLIENT_ID=your_client_id \
-       SPOTIFY_CLIENT_SECRET=your_client_secret \
-       NEXT_PUBLIC_APP_URL=https://mood-music-app.azurewebsites.net
-   ```
-
-## 🔧 Environment Configuration
-
-### Production Environment Variables
+### Required Environment Variables
 
 ```env
-# Required
-SPOTIFY_CLIENT_ID=your_spotify_client_id
-SPOTIFY_CLIENT_SECRET=your_spotify_client_secret
-NEXT_PUBLIC_APP_URL=https://your-production-domain.com
+# Spotify API (Required)
+SPOTIFY_CLIENT_ID=your_spotify_client_id_here
+SPOTIFY_CLIENT_SECRET=your_spotify_client_secret_here
 
-# Optional Performance
-REDIS_URL=redis://your-redis-instance:6379
-NODE_ENV=production
-
-# Optional Analytics
-GOOGLE_ANALYTICS_ID=GA_MEASUREMENT_ID
-SENTRY_DSN=your_sentry_dsn
-
-# Optional Advanced Features
-OPENAI_API_KEY=your_openai_key
-
-# Security
-NEXTAUTH_SECRET=your_nextauth_secret
-NEXTAUTH_URL=https://your-production-domain.com
+# Application URL (Optional)
+NEXT_PUBLIC_APP_URL=https://your-domain.com
 ```
 
 ### Spotify App Configuration
 
-1. **Update Redirect URIs**
+1. **Go to** [Spotify Developer Dashboard](https://developer.spotify.com/dashboard)
+2. **Create a new app** or use existing one
+3. **Configure app settings**:
+   - App name: MoodTunes
+   - App description: AI-powered mood-based music recommendations
+   - Website: Your deployment URL
+   - Redirect URIs: Not required for client credentials flow
+4. **Copy credentials** to environment variables
 
-   - Add your production domain to Spotify app settings
-   - Example: `https://your-domain.com/api/auth/callback/spotify`
+### Security Considerations
 
-2. **Update App URLs**
-   - Website: `https://your-domain.com`
-   - Privacy Policy: `https://your-domain.com/privacy`
-   - Terms of Service: `https://your-domain.com/terms`
+#### Environment Variables Security
 
-## 🔒 Security Considerations
+- **Never commit** `.env` files to version control
+- **Use platform-specific** secret management (Vercel Secrets, AWS Secrets Manager, etc.)
+- **Rotate credentials** regularly
+- **Use different credentials** for development and production
 
-### HTTPS Configuration
+#### Content Security Policy
 
-1. **SSL Certificate**
+Add to `next.config.mjs`:
 
-   - Use Let's Encrypt for free certificates
-   - Configure automatic renewal
+```javascript
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  async headers() {
+    return [
+      {
+        source: "/(.*)",
+        headers: [
+          {
+            key: "Content-Security-Policy",
+            value: [
+              "default-src 'self'",
+              "script-src 'self' 'unsafe-eval' 'unsafe-inline'",
+              "style-src 'self' 'unsafe-inline'",
+              "img-src 'self' data: https:",
+              "font-src 'self'",
+              "connect-src 'self' https://api.spotify.com https://accounts.spotify.com",
+              "media-src 'self' https:",
+            ].join("; "),
+          },
+        ],
+      },
+    ];
+  },
+};
 
-2. **Security Headers**
-   ```javascript
-   // next.config.js
-   module.exports = {
-     async headers() {
-       return [
-         {
-           source: "/(.*)",
-           headers: [
-             {
-               key: "X-Frame-Options",
-               value: "DENY",
-             },
-             {
-               key: "X-Content-Type-Options",
-               value: "nosniff",
-             },
-             {
-               key: "Referrer-Policy",
-               value: "origin-when-cross-origin",
-             },
-             {
-               key: "Content-Security-Policy",
-               value:
-                 "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline';",
-             },
-           ],
-         },
-       ];
-     },
-   };
-   ```
+export default nextConfig;
+```
 
-### Environment Security
-
-1. **Secret Management**
-
-   - Use platform-specific secret managers
-   - Never commit secrets to version control
-   - Rotate secrets regularly
-
-2. **API Rate Limiting**
-
-   ```javascript
-   // Implement rate limiting
-   import rateLimit from "express-rate-limit";
-
-   const limiter = rateLimit({
-     windowMs: 15 * 60 * 1000, // 15 minutes
-     max: 100, // limit each IP to 100 requests per windowMs
-   });
-   ```
-
-## 📊 Monitoring and Logging
-
-### Application Monitoring
-
-1. **Sentry Integration**
-
-   ```javascript
-   // sentry.client.config.js
-   import * as Sentry from "@sentry/nextjs";
-
-   Sentry.init({
-     dsn: process.env.SENTRY_DSN,
-     tracesSampleRate: 1.0,
-   });
-   ```
-
-2. **Custom Logging**
-
-   ```javascript
-   // lib/logger.js
-   import winston from "winston";
-
-   const logger = winston.createLogger({
-     level: "info",
-     format: winston.format.json(),
-     transports: [
-       new winston.transports.File({ filename: "error.log", level: "error" }),
-       new winston.transports.File({ filename: "combined.log" }),
-     ],
-   });
-   ```
-
-### Performance Monitoring
-
-1. **Web Vitals**
-
-   ```javascript
-   // pages/_app.js
-   export function reportWebVitals(metric) {
-     if (metric.label === "web-vital") {
-       console.log(metric);
-       // Send to analytics
-     }
-   }
-   ```
-
-2. **API Monitoring**
-
-   ```javascript
-   // Middleware for API monitoring
-   export function withMonitoring(handler) {
-     return async (req, res) => {
-       const start = Date.now();
-
-       try {
-         await handler(req, res);
-       } catch (error) {
-         console.error("API Error:", error);
-         throw error;
-       } finally {
-         const duration = Date.now() - start;
-         console.log(`${req.method} ${req.url} - ${duration}ms`);
-       }
-     };
-   }
-   ```
-
-## 🚀 Performance Optimization
+## Performance Optimization
 
 ### Build Optimization
 
-1. **Bundle Analysis**
+```javascript
+// next.config.mjs
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  // Enable Turbopack for faster builds
+  experimental: {
+    turbo: {
+      rules: {
+        "*.svg": {
+          loaders: ["@svgr/webpack"],
+          as: "*.js",
+        },
+      },
+    },
+  },
 
-   ```bash
-   # Analyze bundle size
-   ANALYZE=true pnpm build
-   ```
+  // Optimize images
+  images: {
+    domains: ["i.scdn.co"], // Spotify image domains
+    formats: ["image/webp", "image/avif"],
+  },
 
-2. **Image Optimization**
-   ```javascript
-   // next.config.js
-   module.exports = {
-     images: {
-       domains: ["i.scdn.co", "mosaic.scdn.co"],
-       formats: ["image/webp", "image/avif"],
-     },
-   };
-   ```
+  // Enable compression
+  compress: true,
 
-### Caching Strategy
+  // Optimize bundle
+  swcMinify: true,
 
-1. **Redis Caching**
+  // Static optimization
+  trailingSlash: false,
 
-   ```javascript
-   // lib/cache.js
-   import Redis from "ioredis";
+  // Headers for caching
+  async headers() {
+    return [
+      {
+        source: "/api/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, s-maxage=60, stale-while-revalidate=300",
+          },
+        ],
+      },
+    ];
+  },
+};
 
-   const redis = new Redis(process.env.REDIS_URL);
-
-   export async function getCached(key) {
-     const cached = await redis.get(key);
-     return cached ? JSON.parse(cached) : null;
-   }
-
-   export async function setCached(key, data, ttl = 3600) {
-     await redis.setex(key, ttl, JSON.stringify(data));
-   }
-   ```
-
-2. **CDN Configuration**
-   ```javascript
-   // next.config.js
-   module.exports = {
-     assetPrefix: process.env.CDN_URL || "",
-     images: {
-       loader: "custom",
-       loaderFile: "./lib/imageLoader.js",
-     },
-   };
-   ```
-
-## 🔄 CI/CD Pipeline
-
-### GitHub Actions
-
-```yaml
-# .github/workflows/deploy.yml
-name: Deploy to Production
-
-on:
-  push:
-    branches: [main]
-
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: "18"
-          cache: "pnpm"
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Run tests
-        run: pnpm test
-
-      - name: Run linting
-        run: pnpm lint
-
-      - name: Build application
-        run: pnpm build
-
-  deploy:
-    needs: test
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Deploy to Vercel
-        uses: amondnet/vercel-action@v20
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.ORG_ID }}
-          vercel-project-id: ${{ secrets.PROJECT_ID }}
-          vercel-args: "--prod"
+export default nextConfig;
 ```
 
-### GitLab CI
+### CDN Configuration
 
-```yaml
-# .gitlab-ci.yml
-stages:
-  - test
-  - build
-  - deploy
+For static assets, configure CDN caching:
 
-variables:
-  NODE_VERSION: "18"
-
-test:
-  stage: test
-  image: node:$NODE_VERSION
-  before_script:
-    - npm install -g pnpm
-    - pnpm install --frozen-lockfile
-  script:
-    - pnpm test
-    - pnpm lint
-  cache:
-    paths:
-      - node_modules/
-
-build:
-  stage: build
-  image: node:$NODE_VERSION
-  before_script:
-    - npm install -g pnpm
-    - pnpm install --frozen-lockfile
-  script:
-    - pnpm build
-  artifacts:
-    paths:
-      - .next/
-    expire_in: 1 hour
-
-deploy:
-  stage: deploy
-  image: docker:latest
-  services:
-    - docker:dind
-  script:
-    - docker build -t mood-music .
-    - docker tag mood-music $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
-    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
-  only:
-    - main
+```javascript
+// next.config.mjs
+const nextConfig = {
+  assetPrefix:
+    process.env.NODE_ENV === "production" ? "https://cdn.your-domain.com" : "",
+};
 ```
 
-## 🔍 Troubleshooting
-
-### Common Deployment Issues
-
-1. **Build Failures**
-
-   ```bash
-   # Clear cache and rebuild
-   rm -rf .next node_modules
-   pnpm install
-   pnpm build
-   ```
-
-2. **Environment Variable Issues**
-
-   ```bash
-   # Check environment variables
-   printenv | grep SPOTIFY
-
-   # Test API connectivity
-   curl -X POST https://accounts.spotify.com/api/token \
-     -H "Authorization: Basic $(echo -n $SPOTIFY_CLIENT_ID:$SPOTIFY_CLIENT_SECRET | base64)" \
-     -d "grant_type=client_credentials"
-   ```
-
-3. **Memory Issues**
-   ```javascript
-   // Increase Node.js memory limit
-   "scripts": {
-     "build": "NODE_OPTIONS='--max-old-space-size=4096' next build"
-   }
-   ```
+## Monitoring and Analytics
 
 ### Health Checks
 
-1. **Application Health Endpoint**
+Create a health check endpoint:
 
-   ```javascript
-   // pages/api/health.js
-   export default function handler(req, res) {
-     res.status(200).json({
-       status: "healthy",
-       timestamp: new Date().toISOString(),
-       version: process.env.npm_package_version,
-     });
-   }
-   ```
+```javascript
+// src/app/api/health/route.js
+import { NextResponse } from "next/server";
 
-2. **Database Connectivity**
-   ```javascript
-   // pages/api/health/db.js
-   export default async function handler(req, res) {
-     try {
-       // Test database connection
-       await testConnection();
-       res.status(200).json({ status: "healthy" });
-     } catch (error) {
-       res.status(503).json({ status: "unhealthy", error: error.message });
-     }
-   }
-   ```
+export async function GET() {
+  try {
+    // Check Spotify API connectivity
+    const spotifyHealth = await fetch("https://api.spotify.com/v1", {
+      method: "HEAD",
+    });
 
-## 📈 Scaling Considerations
+    return NextResponse.json({
+      status: "healthy",
+      timestamp: new Date().toISOString(),
+      services: {
+        spotify: spotifyHealth.ok ? "up" : "down",
+      },
+    });
+  } catch (error) {
+    return NextResponse.json(
+      {
+        status: "unhealthy",
+        timestamp: new Date().toISOString(),
+        error: error.message,
+      },
+      { status: 503 }
+    );
+  }
+}
+```
 
-### Horizontal Scaling
+### Error Tracking
 
-1. **Load Balancer Configuration**
+For production deployments, consider integrating:
 
-   ```nginx
-   upstream mood_music {
-       server app1:3000;
-       server app2:3000;
-       server app3:3000;
-   }
+- **Sentry** for error tracking
+- **LogRocket** for session replay
+- **Google Analytics** for usage analytics
 
-   server {
-       listen 80;
-       server_name your-domain.com;
+```javascript
+// Example Sentry integration
+import * as Sentry from "@sentry/nextjs";
 
-       location / {
-           proxy_pass http://mood_music;
-           proxy_set_header Host $host;
-           proxy_set_header X-Real-IP $remote_addr;
-       }
-   }
-   ```
+Sentry.init({
+  dsn: process.env.SENTRY_DSN,
+  environment: process.env.NODE_ENV,
+});
+```
 
-2. **Session Management**
+## Troubleshooting
 
-   ```javascript
-   // Use Redis for session storage
-   import session from "express-session";
-   import RedisStore from "connect-redis";
+### Common Deployment Issues
 
-   app.use(
-     session({
-       store: new RedisStore({ client: redisClient }),
-       secret: process.env.SESSION_SECRET,
-       resave: false,
-       saveUninitialized: false,
-     })
-   );
-   ```
+#### Build Failures
 
-### Database Scaling
+```bash
+# Clear Next.js cache
+rm -rf .next
 
-1. **Read Replicas**
+# Clear node_modules and reinstall
+rm -rf node_modules pnpm-lock.yaml
+pnpm install
 
-   ```javascript
-   // Database connection with read replicas
-   const writeDB = new Database(process.env.WRITE_DB_URL);
-   const readDB = new Database(process.env.READ_DB_URL);
+# Build locally to test
+pnpm build
+```
 
-   export function getConnection(operation = "read") {
-     return operation === "write" ? writeDB : readDB;
-   }
-   ```
+#### Environment Variable Issues
 
-2. **Caching Layer**
+```bash
+# Verify environment variables are set
+echo $SPOTIFY_CLIENT_ID
+echo $SPOTIFY_CLIENT_SECRET
 
-   ```javascript
-   // Multi-level caching
-   export async function getCachedData(key) {
-     // L1: Memory cache
-     let data = memoryCache.get(key);
-     if (data) return data;
+# Test API endpoints locally
+curl -X POST http://localhost:3000/api/analyze-mood \
+  -H "Content-Type: application/json" \
+  -d '{"moodText": "test"}'
+```
 
-     // L2: Redis cache
-     data = await redisCache.get(key);
-     if (data) {
-       memoryCache.set(key, data, 300); // 5 min
-       return data;
-     }
+#### Spotify API Issues
 
-     // L3: Database
-     data = await database.get(key);
-     if (data) {
-       await redisCache.set(key, data, 3600); // 1 hour
-       memoryCache.set(key, data, 300); // 5 min
-     }
+- **Check credentials** in Spotify Developer Dashboard
+- **Verify app status** (not in development mode)
+- **Check rate limits** and quotas
+- **Test with curl**:
 
-     return data;
-   }
-   ```
+```bash
+curl -X POST https://accounts.spotify.com/api/token \
+  -H "Authorization: Basic $(echo -n 'client_id:client_secret' | base64)" \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "grant_type=client_credentials"
+```
 
----
+### Performance Issues
 
-For more deployment options and advanced configurations, see the [main documentation](../README.md) or reach out to the community for support.
+#### Slow API Responses
+
+- **Check Spotify API latency**
+- **Implement caching** for repeated requests
+- **Optimize mood analysis** algorithm
+- **Use CDN** for static assets
+
+#### Memory Issues
+
+- **Monitor memory usage** in production
+- **Optimize particle system** parameters
+- **Implement proper cleanup** for animations
+
+## Maintenance
+
+### Regular Tasks
+
+1. **Update dependencies** monthly
+2. **Rotate Spotify credentials** quarterly
+3. **Monitor error rates** and performance
+4. **Review security headers** and CSP
+5. **Update documentation** as needed
+
+### Backup Strategy
+
+- **Code**: Version control with Git
+- **Configuration**: Environment variable documentation
+- **User data**: Local storage (no server-side data)
+
+### Scaling Considerations
+
+For high-traffic deployments:
+
+1. **Implement Redis caching** for Spotify tokens
+2. **Use load balancer** for multiple instances
+3. **Add rate limiting** for API endpoints
+4. **Monitor resource usage** and scale accordingly
+
+This deployment guide should help you successfully deploy MoodTunes to your preferred platform while maintaining security and performance best practices.
