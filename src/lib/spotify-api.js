@@ -150,13 +150,13 @@ export async function generateSongSuggestions(moodAnalysis) {
 
     let allTracks = [];
 
-    // Search for 10 songs from each genre
+    // Search for 11 songs from each genre (extra song for duplicates)
     for (const genre of genres) {
       try {
-        console.log(`Searching for 10 songs in genre: ${genre}`);
+        console.log(`Searching for 11 songs in genre: ${genre}`);
 
         const results = await spotifyClient.searchTracks(`genre:"${genre}"`, {
-          limit: 10,
+          limit: 11,
         });
 
         if (
@@ -183,8 +183,8 @@ export async function generateSongSuggestions(moodAnalysis) {
       }
     }
 
-    // Remove duplicates
-    const uniqueTracks = removeDuplicateTracks(allTracks);
+    // Remove duplicates and select up to 10 tracks per genre
+    const uniqueTracks = removeDuplicatesAndSelect(allTracks);
 
     // Shuffle the tracks for random order
     const shuffledTracks = shuffleArray(uniqueTracks);
@@ -248,17 +248,44 @@ function shuffleArray(array) {
   return shuffled;
 }
 
-// Helper function to remove duplicate tracks
-function removeDuplicateTracks(tracks) {
-  const seen = new Set();
-  return tracks.filter((track) => {
-    const key = `${track.id}-${track.name}`;
-    if (seen.has(key)) {
-      return false;
+// Helper function to remove duplicates and select up to 10 tracks per genre
+function removeDuplicatesAndSelect(tracks) {
+  // Group tracks by genre
+  const tracksByGenre = {};
+
+  tracks.forEach((track) => {
+    if (!tracksByGenre[track.sourceGenre]) {
+      tracksByGenre[track.sourceGenre] = [];
     }
-    seen.add(key);
-    return true;
+    tracksByGenre[track.sourceGenre].push(track);
   });
+
+  const finalTracks = [];
+  const seen = new Set();
+
+  // For each genre, select up to 10 unique tracks
+  Object.entries(tracksByGenre).forEach(([genre, genreTracks]) => {
+    let selectedFromGenre = 0;
+
+    for (const track of genreTracks) {
+      if (selectedFromGenre >= 10) break;
+
+      const key = `${track.id}-${track.name}`;
+      if (!seen.has(key)) {
+        seen.add(key);
+        finalTracks.push(track);
+        selectedFromGenre++;
+      } else {
+        console.log(`Duplicate found, adding new track from genre: ${genre}`);
+      }
+    }
+
+    console.log(
+      `Selected ${selectedFromGenre} unique tracks from genre: ${genre}`
+    );
+  });
+
+  return finalTracks;
 }
 
 export function validateSpotifyConfig() {

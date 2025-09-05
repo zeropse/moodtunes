@@ -1,6 +1,6 @@
 # API Documentation
 
-This document describes the API endpoints available in the Mood Music application.
+This document describes the API endpoints available in the MoodTunes application.
 
 ## Base URL
 

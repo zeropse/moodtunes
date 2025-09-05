@@ -1,6 +1,6 @@
 # Deployment Guide
 
-This guide covers deploying the Mood Music application to various platforms and environments.
+This guide covers deploying the MoodTunes application to various platforms and environments.
 
 ## 🚀 Quick Deploy Options
 
@@ -556,6 +556,7 @@ NEXTAUTH_URL=https://your-production-domain.com
    ```
 
 2. **API Monitoring**
+
    ```javascript
    // Middleware for API monitoring
    export function withMonitoring(handler) {
@@ -850,6 +851,7 @@ deploy:
    ```
 
 2. **Caching Layer**
+
    ```javascript
    // Multi-level caching
    export async function getCachedData(key) {

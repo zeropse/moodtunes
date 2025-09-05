@@ -28,7 +28,7 @@ export default function About() {
           </Link>
           <div className="text-center">
             <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-              About Mood Music
+              About MoodTunes
             </h1>
             <p className="text-white/80 text-lg mt-2">
               Discover the perfect soundtrack for your emotions
@@ -47,9 +47,9 @@ export default function About() {
                 </div>
                 <h2 className="text-3xl font-bold">How It Works</h2>
                 <p className="text-xl text-white/90 max-w-3xl mx-auto leading-relaxed">
-                  Mood Music uses advanced AI to analyze your emotions and
-                  curate the perfect playlist. Simply describe how you're
-                  feeling, and we'll find songs that match your vibe perfectly.
+                  MoodTunes uses advanced AI to analyze your emotions and curate
+                  the perfect playlist. Simply describe how you're feeling, and
+                  we'll find songs that match your vibe perfectly.
                 </p>
               </div>
             </CardContent>
@@ -114,7 +114,7 @@ export default function About() {
           <Card className="bg-white/10 backdrop-blur-md border-white/20 text-white">
             <CardHeader>
               <CardTitle className="text-2xl text-center">
-                How to Use Mood Music
+                How to Use MoodTunes
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -207,7 +207,7 @@ export default function About() {
                 size="lg"
                 className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold px-8 py-3 text-lg"
               >
-                Try Mood Music Now
+                Try MoodTunes Now
               </Button>
             </Link>
           </div>

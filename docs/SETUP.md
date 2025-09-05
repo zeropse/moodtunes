@@ -1,6 +1,6 @@
-# Setup Guide - Mood Music
+# Setup Guide - MoodTunes
 
-This comprehensive guide will help you set up the Mood Music development environment from scratch.
+This comprehensive guide will help you set up the MoodTunes development environment from scratch.
 
 ## 📋 Prerequisites
 
@@ -52,7 +52,7 @@ This comprehensive guide will help you set up the Mood Music development environ
 
    - Click "Create an App"
    - Fill in the details:
-     - **App Name**: "Mood Music Development"
+     - **App Name**: "MoodTunes Development"
      - **App Description**: "Local development for mood-based song suggestions app"
      - **Website**: `http://localhost:3000`
      - **Redirect URI**: `http://localhost:3000/callback` (if using auth)

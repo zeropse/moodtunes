@@ -1,8 +1,8 @@
-# Mood Music - AI-Powered Song Recommendations
+# MoodTunes - AI-Powered Song Recommendations
 
-Transform your feelings into perfect song suggestions. Mood Music analyzes your emotional state and recommends 10-20 songs from Spotify that match exactly how you're feeling.
+Transform your feelings into perfect song suggestions. MoodTunes analyzes your emotional state and recommends 10-20 songs from Spotify that match exactly how you're feeling.
 
-![Mood Music Demo](https://via.placeholder.com/800x400/4ECDC4/FFFFFF?text=Mood+Music+Demo)
+![MoodTunes Demo](https://via.placeholder.com/800x400/4ECDC4/FFFFFF?text=Mood+Music+Demo)
 
 ## ✨ Features
 
@@ -485,6 +485,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**Made with ❤️ by the Mood Music team**
+**Made with ❤️ by the MoodTunes team**
 
 _Transform your feelings into music, one mood at a time._

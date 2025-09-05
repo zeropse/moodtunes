@@ -6,7 +6,7 @@ export default function Footer() {
       <div className="container mx-auto grid grid-cols-3 items-center text-center">
         <div className="text-left">
           <p className="text-sm">
-            &copy; {new Date().getFullYear()} Mood Music. All rights reserved.
+            &copy; {new Date().getFullYear()} MoodTunes. All rights reserved.
           </p>
         </div>
 

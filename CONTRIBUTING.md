@@ -1,6 +1,6 @@
-# Contributing to Mood Music
+# Contributing to MoodTunes
 
-Thank you for your interest in contributing to Mood Music! This guide will help you get started with contributing to our AI-powered playlist generator.
+Thank you for your interest in contributing to MoodTunes! This guide will help you get started with contributing to our AI-powered playlist generator.
 
 ## 🚀 Getting Started
 
@@ -492,4 +492,4 @@ By contributing, you agree that your contributions will be licensed under the MI
 
 ---
 
-Thank you for contributing to Mood Music! 🎵✨
+Thank you for contributing to MoodTunes! 🎵✨
