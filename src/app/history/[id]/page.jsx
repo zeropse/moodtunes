@@ -1,16 +1,14 @@
 "use client";
 
 import { useRouter, useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import {
   ArrowLeft,
   Music,
   Star,
-  ExternalLink,
   Calendar,
-  MessageSquare,
   Play,
   AlertCircle,
   RefreshCw,
@@ -23,6 +21,8 @@ export default function HistoryDetailPage() {
   const [historyEntry, setHistoryEntry] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [currentTrack, setCurrentTrack] = useState(null);
+  const scrollContainerRef = useRef(null);
 
   useEffect(() => {
     const loadHistoryEntry = () => {
@@ -70,6 +70,27 @@ export default function HistoryDetailPage() {
     );
   };
 
+  const handleTrackSelect = useCallback((track) => {
+    // Preserve scroll position before state update
+    const scrollTop = scrollContainerRef.current?.scrollTop || 0;
+
+    setCurrentTrack(track);
+
+    // Restore scroll position after state update
+    requestAnimationFrame(() => {
+      if (scrollContainerRef.current) {
+        scrollContainerRef.current.scrollTop = scrollTop;
+      }
+    });
+  }, []);
+
+  const formatDuration = useCallback((ms) => {
+    if (!ms) return "";
+    const minutes = Math.floor(ms / 60000);
+    const seconds = Math.floor((ms % 60000) / 1000);
+    return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+  }, []);
+
   const handleGoBack = () => {
     router.push("/history");
   };
@@ -77,6 +98,93 @@ export default function HistoryDetailPage() {
   const handleStartOver = () => {
     router.push("/");
   };
+
+  const TrackItem = ({ track, index, isCurrentTrack }) => (
+    <div
+      className={`flex items-center gap-3 p-3 rounded-lg transition-all duration-300 cursor-pointer group border ${
+        isCurrentTrack
+          ? "bg-green-500/10 border-green-400/30 hover:bg-green-500/15"
+          : "bg-white/0 hover:bg-white/5 border-transparent hover:border-white/10"
+      }`}
+      onClick={() => handleTrackSelect(track)}
+    >
+      {/* Track Number */}
+      <div className="hidden xs:flex flex-shrink-0 w-6 text-center">
+        <span className="text-white/40 text-xs font-mono">
+          {(index + 1).toString().padStart(2, "0")}
+        </span>
+      </div>
+
+      {/* Album Art */}
+      <div className="flex-shrink-0">
+        {track.album?.images?.[0]?.url ? (
+          <img
+            src={track.album.images[0].url || "/placeholder.svg"}
+            alt={`${track.album.name} cover`}
+            className="w-10 h-10 rounded-md object-cover group-hover:scale-105 transition-transform duration-300 shadow-md"
+          />
+        ) : (
+          <div className="w-10 h-10 rounded-md bg-white/10 flex items-center justify-center">
+            <Music className="w-5 h-5 text-white/40" />
+          </div>
+        )}
+      </div>
+
+      {/* Track Info */}
+      <div className="flex-1 min-w-0 space-y-0.5">
+        <p className="font-semibold truncate text-white group-hover:text-blue-300 transition-colors text-sm">
+          {track.name}
+        </p>
+        <p className="text-white/60 truncate text-xs">
+          {Array.isArray(track.artists)
+            ? track.artists.map((artist) => artist.name || artist).join(", ")
+            : track.artists}
+        </p>
+      </div>
+
+      {/* Duration */}
+      <div className="hidden sm:block text-white/50 text-xs flex-shrink-0">
+        {track.duration_ms && formatDuration(track.duration_ms)}
+      </div>
+
+      {/* Play Indicator */}
+      {isCurrentTrack && (
+        <div className="flex-shrink-0 flex items-center justify-center w-6 h-6" />
+      )}
+    </div>
+  );
+
+  const NowPlaying = () => (
+    <Card className="bg-black/30 backdrop-blur-xl border-white/20 shadow-2xl">
+      <CardContent className="p-4">
+        {currentTrack ? (
+          <div className="rounded-lg overflow-hidden">
+            <iframe
+              src={`https://open.spotify.com/embed/track/${currentTrack.id}?utm_source=generator&theme=0`}
+              width="100%"
+              height="152"
+              frameBorder="0"
+              allowFullScreen=""
+              allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+              loading="lazy"
+            ></iframe>
+          </div>
+        ) : (
+          <div className="flex items-center justify-center py-6">
+            <div className="text-center text-white/40">
+              <div className="w-12 h-12 mx-auto mb-3 bg-white/5 rounded-full flex items-center justify-center">
+                <Music className="w-6 h-6" />
+              </div>
+              <p className="text-sm font-medium mb-1">No song selected</p>
+              <p className="text-xs text-white/30">
+                Choose a track from your suggestions to start playing
+              </p>
+            </div>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
 
   if (isLoading) {
     return (
@@ -145,10 +253,10 @@ export default function HistoryDetailPage() {
 
   return (
     <Vortex>
-      <div className="h-screen overflow-hidden">
-        <div className="container mx-auto px-3 sm:px-4 lg:px-6 py-4 sm:py-6 lg:py-8 h-full">
+      <div className="min-h-screen">
+        <div className="container mx-auto px-4 py-6 max-w-6xl">
           {/* Header */}
-          <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center justify-between mb-6">
             <Button
               onClick={handleGoBack}
               variant="ghost"
@@ -167,142 +275,97 @@ export default function HistoryDetailPage() {
             </div>
           </div>
 
-          <div className="h-[calc(100vh-8rem)] md:h-[calc(100vh-6rem)] lg:h-[calc(100vh-8rem)] flex flex-col md:flex-row lg:flex-row gap-4 md:gap-6 lg:gap-8">
-            {/* Mood Info Card */}
-            <div className="w-full lg:w-80 flex-shrink-0 order-2 lg:order-1">
-              <Card className="h-auto lg:h-full bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-pink-500/10 backdrop-blur-xl border-white/20 text-white shadow-2xl">
-                <CardHeader className="text-center pb-4 md:pb-6">
-                  <div className="mx-auto w-16 h-16 md:w-20 md:h-20 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mb-4 md:mb-6 shadow-lg">
-                    <Music className="w-8 h-8 md:w-10 md:h-10 text-white" />
-                  </div>
-                  <CardTitle className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-                    Your Past Vibe
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4 md:space-y-6">
-                  {/* Original Mood Input */}
-                  {historyEntry.mood && (
-                    <div className="p-4 md:p-6 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-sm">
-                      <p className="text-lg md:text-xl font-medium text-center italic text-balance leading-relaxed">
-                        "{historyEntry.mood}"
-                      </p>
+          <div className="space-y-6">
+            {/* Mobile-first layout: stack vertically on small screens, side-by-side on larger */}
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+              {/* Mood info - full width on mobile, sidebar on desktop */}
+              <div className="lg:col-span-1">
+                <Card className="bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-pink-500/10 backdrop-blur-xl border-white/20 text-white shadow-2xl">
+                  <CardHeader className="text-center pb-4">
+                    <div className="mx-auto w-12 h-12 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 rounded-xl flex items-center justify-center mb-3 shadow-lg">
+                      <Music className="w-6 h-6 text-white" />
                     </div>
-                  )}
-
-                  <div className="flex items-center justify-center space-x-3 text-white/60">
-                    <Star className="w-4 h-4 md:w-5 md:h-5 text-yellow-400" />
-                    <span className="text-base md:text-lg">
-                      Curated for you
-                    </span>
-                  </div>
-
-                  <div className="pt-2 md:pt-4">
-                    <Button
-                      onClick={handleStartOver}
-                      className="w-full bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 hover:from-purple-600 hover:via-pink-600 hover:to-blue-600 text-white font-semibold md:text-lg py-4 md:py-6 rounded-xl shadow-xl hover:shadow-purple-500/25 transition-all duration-300 transform cursor-pointer"
-                      size="lg"
-                    >
-                      <RefreshCw className="w-4 h-4 md:w-5 md:h-5 mr-2 md:mr-3" />
-                      Get New Suggestions
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Songs List */}
-            <div className="flex-1 min-h-0 order-1 lg:order-2">
-              <Card className="h-full bg-white/5 backdrop-blur-xl border-white/10 text-white shadow-2xl">
-                <CardHeader className="pb-3 md:pb-4">
-                  <CardTitle className="text-xl md:text-2xl font-bold text-white flex items-center gap-2 md:gap-3">
-                    <Play className="w-5 h-5 md:w-6 md:h-6 text-green-400" />
-                    Songs Just for You
-                    <span className="text-xs md:text-sm font-normal text-white/60 ml-auto">
-                      {historyEntry.suggestions?.tracks?.length || 0} songs
-                    </span>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="p-0 h-[calc(100%-4rem)] md:h-[calc(100%-5rem)]">
-                  {historyEntry.suggestions?.tracks?.length > 0 ? (
-                    <div className="h-full overflow-y-auto px-3 md:px-6 pb-4 md:pb-6">
-                      <div className="space-y-1 md:space-y-2">
-                        {historyEntry.suggestions.tracks.map((track, index) => (
-                          <div
-                            key={track.id || index}
-                            className="flex items-center gap-3 md:gap-4 p-3 md:p-4 bg-white/0 hover:bg-white/5 rounded-xl transition-all duration-300 cursor-pointer group border border-transparent hover:border-white/10"
-                            onClick={() => {
-                              if (track.external_urls?.spotify) {
-                                window.open(
-                                  track.external_urls.spotify,
-                                  "_blank",
-                                  "noopener,noreferrer"
-                                );
-                              }
-                            }}
-                          >
-                            {/* Album Art */}
-                            <div className="flex-shrink-0">
-                              {track.album?.images?.[0]?.url ? (
-                                <img
-                                  src={
-                                    track.album.images[0].url ||
-                                    "/placeholder.svg"
-                                  }
-                                  alt={`${track.album.name} cover`}
-                                  className="w-12 h-12 md:w-14 md:h-14 rounded-lg object-cover group-hover:scale-105 transition-transform duration-300 shadow-lg"
-                                />
-                              ) : (
-                                <div className="w-12 h-12 md:w-14 md:h-14 rounded-lg bg-white/10 flex items-center justify-center">
-                                  <Music className="w-6 h-6 md:w-7 md:h-7 text-white/40" />
-                                </div>
-                              )}
-                            </div>
-
-                            {/* Track Info */}
-                            <div className="flex-1 min-w-0 space-y-0.5 md:space-y-1">
-                              <p className="font-semibold truncate text-white group-hover:text-blue-300 transition-colors text-base md:text-lg">
-                                {track.name}
-                              </p>
-                              <p className="text-white/60 truncate text-sm md:text-base">
-                                {Array.isArray(track.artists)
-                                  ? track.artists
-                                      .map((artist) => artist.name || artist)
-                                      .join(", ")
-                                  : track.artists}
-                              </p>
-                            </div>
-
-                            {/* Album Info */}
-                            <div className="text-right text-white/50 hidden md:block min-w-0 max-w-32 md:max-w-48 flex-shrink-0">
-                              <p className="truncate text-xs md:text-sm">
-                                {track.album?.name}
-                              </p>
-                              {track.album?.release_date && (
-                                <p className="text-xs text-white/30">
-                                  {new Date(
-                                    track.album.release_date
-                                  ).getFullYear()}
-                                </p>
-                              )}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="flex items-center justify-center h-full">
-                      <div className="text-center text-white/60">
-                        <Music className="w-16 h-16 mx-auto mb-4 text-white/40" />
-                        <p className="text-lg">No song recommendations found</p>
-                        <p className="text-sm">
-                          This entry might be incomplete
+                    <CardTitle className="text-lg font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+                      Your Past Vibe
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {/* Original Mood Input */}
+                    {historyEntry.mood && (
+                      <div className="p-3 bg-white/5 rounded-xl border border-white/10 backdrop-blur-sm">
+                        <p className="text-sm font-medium text-center italic text-balance leading-relaxed">
+                          "{historyEntry.mood}"
                         </p>
                       </div>
+                    )}
+
+                    <div className="flex items-center justify-center space-x-2 text-white/60">
+                      <Star className="w-4 h-4 text-yellow-400" />
+                      <span className="text-sm">Curated for you</span>
                     </div>
-                  )}
-                </CardContent>
-              </Card>
+
+                    <Button
+                      onClick={handleStartOver}
+                      className="w-full bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 hover:from-purple-600 hover:via-pink-600 hover:to-blue-600 text-white font-semibold text-sm py-3 rounded-xl shadow-xl hover:shadow-purple-500/25 transition-all duration-300 transform cursor-pointer"
+                    >
+                      <RefreshCw className="w-4 h-4 mr-2" />
+                      Get New Suggestions
+                    </Button>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Songs list - full width on mobile, main content on desktop */}
+              <div className="lg:col-span-3">
+                <Card className="bg-white/5 backdrop-blur-xl border-white/10 text-white shadow-2xl">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-lg font-bold text-white flex items-center gap-2">
+                      <Play className="w-5 h-5 text-green-400" />
+                      Songs Just for You
+                      <span className="text-xs font-normal text-white/60 ml-auto">
+                        {historyEntry.suggestions?.tracks?.length || 0} songs
+                      </span>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-0">
+                    {historyEntry.suggestions?.tracks?.length > 0 ? (
+                      <div
+                        ref={scrollContainerRef}
+                        className="max-h-[60vh] overflow-y-auto px-4 pb-4"
+                      >
+                        <div className="space-y-1">
+                          {historyEntry.suggestions.tracks.map(
+                            (track, index) => (
+                              <TrackItem
+                                key={track.id || index}
+                                track={track}
+                                index={index}
+                                isCurrentTrack={currentTrack?.id === track.id}
+                              />
+                            )
+                          )}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex items-center justify-center py-12">
+                        <div className="text-center text-white/60">
+                          <Music className="w-16 h-16 mx-auto mb-4 text-white/40" />
+                          <p className="text-lg">
+                            No song recommendations found
+                          </p>
+                          <p className="text-sm">
+                            This entry might be incomplete
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
             </div>
+
+            {/* Now playing */}
+            <NowPlaying />
           </div>
         </div>
       </div>
