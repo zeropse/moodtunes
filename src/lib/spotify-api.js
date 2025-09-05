@@ -139,24 +139,78 @@ export class SpotifyAPIError extends Error {
 
 const spotifyClient = new SpotifyAPIClient();
 
-export async function generateSongSuggestions(moodAnalysis) {
+export async function generateSongSuggestions(moodAnalysis, options = {}) {
   const { mood, genres } = moodAnalysis;
+  const { retryAttempt = 0, excludeTrackIds = [] } = options;
 
   try {
     console.log("Generating song suggestions from each genre:", {
       mood,
       genres,
+      retryAttempt,
+      excludeCount: excludeTrackIds.length,
     });
 
     let allTracks = [];
 
-    // Search for 11 songs from each genre (extra song for duplicates)
+    // Create varied search strategies for repeated moods
+    const searchStrategies = [
+      // Attempt 0: Standard genre search
+      {
+        query: (genre) => `genre:"${genre}"`,
+        offset: 0,
+        description: "standard genre search",
+      },
+      // Attempt 1: Add time constraints for variety
+      {
+        query: (genre) => `genre:"${genre}" year:2020-2024`,
+        offset: 0,
+        description: "recent music (2020-2024)",
+      },
+      // Attempt 2: Different time period
+      {
+        query: (genre) => `genre:"${genre}" year:2015-2019`,
+        offset: 0,
+        description: "mid-period music (2015-2019)",
+      },
+      // Attempt 3: Older music
+      {
+        query: (genre) => `genre:"${genre}" year:2010-2014`,
+        offset: 0,
+        description: "classic period (2010-2014)",
+      },
+      // Attempt 4: Use offset for same query
+      {
+        query: (genre) => `genre:"${genre}"`,
+        offset: 20,
+        description: "standard search with offset",
+      },
+      // Attempt 5: Use larger offset
+      {
+        query: (genre) => `genre:"${genre}"`,
+        offset: 40,
+        description: "standard search with larger offset",
+      },
+    ];
+
+    const currentStrategy =
+      searchStrategies[Math.min(retryAttempt, searchStrategies.length - 1)];
+
+    console.log(
+      `Using search strategy ${retryAttempt}: ${currentStrategy.description}`
+    );
+
+    // Search for songs from each genre using the current strategy
     for (const genre of genres) {
       try {
-        console.log(`Searching for 11 songs in genre: ${genre}`);
+        console.log(
+          `Searching for songs in genre: ${genre} (${currentStrategy.description})`
+        );
 
-        const results = await spotifyClient.searchTracks(`genre:"${genre}"`, {
-          limit: 11,
+        const searchQuery = currentStrategy.query(genre);
+        const results = await spotifyClient.searchTracks(searchQuery, {
+          limit: 20, // Get more tracks to filter out duplicates
+          offset: currentStrategy.offset,
         });
 
         if (
@@ -164,17 +218,54 @@ export async function generateSongSuggestions(moodAnalysis) {
           results.tracks.items &&
           results.tracks.items.length > 0
         ) {
-          console.log(
-            `Found ${results.tracks.items.length} tracks from genre: ${genre}`
-          );
+          // Filter out excluded tracks and get up to 11 tracks per genre
+          const newTracks = results.tracks.items
+            .filter((track) => !excludeTrackIds.includes(track.id))
+            .slice(0, 11);
 
-          // Add genre info to each track for reference
-          const tracksWithGenre = results.tracks.items.map((track) => ({
-            ...track,
-            sourceGenre: genre,
-          }));
+          if (newTracks.length > 0) {
+            console.log(
+              `Found ${newTracks.length} new tracks from genre: ${genre}`
+            );
 
-          allTracks.push(...tracksWithGenre);
+            // Add genre info to each track for reference
+            const tracksWithGenre = newTracks.map((track) => ({
+              ...track,
+              sourceGenre: genre,
+            }));
+
+            allTracks.push(...tracksWithGenre);
+          } else {
+            console.log(
+              `All tracks from genre ${genre} were duplicates, trying fallback...`
+            );
+
+            // Fallback: try with a different offset
+            const fallbackResults = await spotifyClient.searchTracks(
+              searchQuery,
+              {
+                limit: 20,
+                offset: currentStrategy.offset + 20,
+              }
+            );
+
+            if (fallbackResults.tracks && fallbackResults.tracks.items) {
+              const fallbackTracks = fallbackResults.tracks.items
+                .filter((track) => !excludeTrackIds.includes(track.id))
+                .slice(0, 11);
+
+              if (fallbackTracks.length > 0) {
+                console.log(
+                  `Found ${fallbackTracks.length} fallback tracks from genre: ${genre}`
+                );
+                const tracksWithGenre = fallbackTracks.map((track) => ({
+                  ...track,
+                  sourceGenre: genre,
+                }));
+                allTracks.push(...tracksWithGenre);
+              }
+            }
+          }
         } else {
           console.log(`No tracks found for genre: ${genre}`);
         }

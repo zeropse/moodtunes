@@ -6,6 +6,11 @@ import { Card } from "@/components/ui/card";
 import { Music, Sparkles, Heart, Zap } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Vortex } from "@/components/ui/vortex";
+import {
+  getPreviousTrackIds,
+  getRetryAttempt,
+  isRepeatedMood,
+} from "@/lib/history-utils";
 
 export default function Home() {
   const [moodText, setMoodText] = useState("");
@@ -36,7 +41,19 @@ export default function Home() {
       const moodData = await moodResponse.json();
       const analysisData = moodData.success ? moodData.data : moodData;
 
-      // Generate suggestions
+      // Check for previous similar moods and get retry attempt
+      const previousTrackIds = getPreviousTrackIds();
+      const retryAttempt = getRetryAttempt(moodText.trim(), analysisData);
+      const isRepeated = isRepeatedMood(moodText.trim(), analysisData);
+
+      console.log("Mood generation info:", {
+        isRepeated,
+        retryAttempt,
+        previousTracksCount: previousTrackIds.length,
+        mood: analysisData.mood,
+      });
+
+      // Generate suggestions with diversity for repeated moods
       const suggestionsResponse = await fetch("/api/suggest-songs", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -47,6 +64,8 @@ export default function Home() {
           valence: analysisData.valence,
           tempo: analysisData.tempo,
           moodText: moodText.trim(),
+          retryAttempt: retryAttempt,
+          excludeTrackIds: previousTrackIds,
         }),
       });
 

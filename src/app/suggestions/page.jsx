@@ -14,6 +14,7 @@ import {
   Play,
 } from "lucide-react";
 import { Vortex } from "@/components/ui/vortex";
+import { getPreviousTrackIds, getRetryAttempt } from "@/lib/history-utils";
 
 export default function SuggestionsPage() {
   const router = useRouter();
@@ -120,6 +121,80 @@ export default function SuggestionsPage() {
     router.push("/");
   }, [router]);
 
+  const handleGetNewSongs = useCallback(async () => {
+    if (!state.mood || !state.moodAnalysis) return;
+
+    setState((prev) => ({ ...prev, isLoading: true, error: null }));
+
+    try {
+      // Get current track IDs to exclude from new suggestions
+      const currentTrackIds =
+        state.suggestions?.tracks?.map((track) => track.id) || [];
+      const previousTrackIds = getPreviousTrackIds();
+      const allExcludeIds = [
+        ...new Set([...currentTrackIds, ...previousTrackIds]),
+      ];
+
+      // Get incremented retry attempt
+      const retryAttempt = getRetryAttempt(state.mood, state.moodAnalysis) + 1;
+
+      console.log("Getting new songs:", {
+        retryAttempt,
+        excludeCount: allExcludeIds.length,
+        mood: state.moodAnalysis.mood,
+      });
+
+      const response = await fetch("/api/suggest-songs", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          mood: state.moodAnalysis.mood,
+          genres: state.moodAnalysis.genres,
+          energy: state.moodAnalysis.energy,
+          valence: state.moodAnalysis.valence,
+          tempo: state.moodAnalysis.tempo,
+          moodText: state.mood,
+          retryAttempt: retryAttempt,
+          excludeTrackIds: allExcludeIds,
+        }),
+      });
+
+      if (!response.ok) throw new Error("Failed to get new suggestions");
+
+      const suggestionsData = await response.json();
+      const suggestions = suggestionsData.success
+        ? suggestionsData.suggestions
+        : suggestionsData;
+
+      const newMoodData = {
+        mood: state.mood,
+        moodAnalysis: state.moodAnalysis,
+        suggestions: suggestions,
+      };
+
+      // Update session storage
+      sessionStorage.setItem("moodData", JSON.stringify(newMoodData));
+
+      // Update state
+      setState((prev) => ({
+        ...prev,
+        suggestions: suggestions,
+        currentTrack: null,
+        isLoading: false,
+      }));
+
+      // Save to history as a retry
+      saveToHistory(newMoodData, true);
+    } catch (error) {
+      console.error("Error getting new suggestions:", error);
+      setState((prev) => ({
+        ...prev,
+        error: "Failed to get new suggestions. Please try again.",
+        isLoading: false,
+      }));
+    }
+  }, [state.mood, state.moodAnalysis, state.suggestions, saveToHistory]);
+
   const handleTrackSelect = useCallback((track) => {
     // Preserve scroll position before state update
     const scrollTop = scrollContainerRef.current?.scrollTop || 0;
@@ -213,11 +288,30 @@ export default function SuggestionsPage() {
           <span className="text-sm">Curated for you</span>
         </div>
         <Button
-          onClick={handleStartOver}
-          className="w-full bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 hover:from-purple-600 hover:via-pink-600 hover:to-blue-600 text-white font-semibold text-sm py-3 rounded-xl shadow-xl hover:shadow-purple-500/25 transition-all duration-300 transform cursor-pointer"
+          onClick={handleGetNewSongs}
+          disabled={state.isLoading}
+          className="w-full bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 hover:from-purple-600 hover:via-pink-600 hover:to-blue-600 text-white font-semibold text-sm py-3 rounded-xl shadow-xl hover:shadow-purple-500/25 transition-all duration-300 transform cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <RefreshCw className="w-4 h-4 mr-2" />
-          Get New Suggestions
+          {state.isLoading ? (
+            <>
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              Finding new songs...
+            </>
+          ) : (
+            <>
+              <RefreshCw className="w-4 h-4 mr-2" />
+              Get New Suggestions
+            </>
+          )}
+        </Button>
+        <Button
+          onClick={handleStartOver}
+          variant="outline"
+          size="sm"
+          className="w-full mt-2 bg-transparent border-white/20 text-white/70 hover:bg-white/5 hover:text-white hover:border-white/40 text-xs py-6 cursor-pointer"
+        >
+          <Home className="w-3 h-3 mr-1" />
+          Start Over with New Mood
         </Button>
       </CardContent>
     </Card>

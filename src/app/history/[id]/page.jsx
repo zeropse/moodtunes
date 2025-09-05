@@ -303,14 +303,6 @@ export default function HistoryDetailPage() {
                       <Star className="w-4 h-4 text-yellow-400" />
                       <span className="text-sm">Curated for you</span>
                     </div>
-
-                    <Button
-                      onClick={handleStartOver}
-                      className="w-full bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 hover:from-purple-600 hover:via-pink-600 hover:to-blue-600 text-white font-semibold text-sm py-3 rounded-xl shadow-xl hover:shadow-purple-500/25 transition-all duration-300 transform cursor-pointer"
-                    >
-                      <RefreshCw className="w-4 h-4 mr-2" />
-                      Get New Suggestions
-                    </Button>
                   </CardContent>
                 </Card>
               </div>

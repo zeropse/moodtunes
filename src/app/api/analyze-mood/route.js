@@ -74,7 +74,36 @@ export async function POST(request) {
     }
 
     // Perform mood analysis
-    const analysisResult = analyzeMoodFromText(sanitizedText);
+    let analysisResult;
+    try {
+      analysisResult = analyzeMoodFromText(sanitizedText);
+
+      // Double-check that we got a valid result
+      if (!analysisResult || !analysisResult.mood || !analysisResult.genres) {
+        throw new Error("Invalid analysis result returned");
+      }
+    } catch (analysisError) {
+      console.warn("Mood analysis failed, defaulting to chill mood", {
+        requestId,
+        error: analysisError.message,
+        inputText: sanitizedText.substring(0, 50) + "...",
+      });
+
+      // Default to chill mood if analysis fails
+      analysisResult = {
+        mood: "chill",
+        confidence: 0.7,
+        genres: ["lo-fi", "chillhop", "indie", "alternative", "chillout"],
+        energy: 0.5,
+        valence: 0.6,
+        tempo: { min: 80, max: 110 },
+        detectedKeywords: ["default"],
+        analysis: {
+          fallback: true,
+          error: `Analysis failed: ${analysisError.message}`,
+        },
+      };
+    }
 
     const processingTime = Date.now() - startTime;
     console.log("Advanced mood analysis completed", {
@@ -120,10 +149,35 @@ export async function POST(request) {
       processingTime,
     });
 
-    return createErrorResponse(
-      "We had trouble understanding your mood. Try rephrasing your description.",
-      500
-    );
+    // Instead of returning an error, default to chill mood
+    console.warn("Defaulting to chill mood due to unexpected error", {
+      requestId,
+    });
+
+    return NextResponse.json({
+      success: true,
+      data: {
+        mood: "chill",
+        confidence: 0.7,
+        genres: ["lo-fi", "chillhop", "indie", "alternative", "chillout"],
+        energy: 0.5,
+        valence: 0.6,
+        tempo: { min: 80, max: 110 },
+        analysis: {
+          detectedKeywords: ["default"],
+          inputText: "Error fallback",
+          fallback: true,
+          error: `Unexpected error: ${error.message}`,
+        },
+      },
+      meta: {
+        requestId,
+        processingTime,
+        analysisMethod: "fallback_chill",
+        version: "4.0.0",
+        fallback: true,
+      },
+    });
   }
 }
 

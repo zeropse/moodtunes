@@ -80,16 +80,31 @@ export async function POST(request) {
       return createErrorResponse(validation.errors[0], 400);
     }
 
-    const { mood, genres, moodText } = body;
+    const {
+      mood,
+      genres,
+      moodText,
+      retryAttempt = 0,
+      excludeTrackIds = [],
+    } = body;
 
     const moodAnalysis = {
       mood,
       genres: genres.slice(0, 5),
     };
 
+    // Pass retry attempt and excluded tracks to generate different results
+    const suggestionOptions = {
+      retryAttempt,
+      excludeTrackIds,
+    };
+
     let suggestionsData;
     try {
-      suggestionsData = await generateSongSuggestions(moodAnalysis);
+      suggestionsData = await generateSongSuggestions(
+        moodAnalysis,
+        suggestionOptions
+      );
     } catch (spotifyError) {
       const fallbackSuggestions = {
         id: "fallback-suggestions",

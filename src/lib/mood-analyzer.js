@@ -275,6 +275,38 @@ const MOOD_PATTERNS = {
     valence: 0.5,
     tempo: { min: 70, max: 110 },
   },
+  chill: {
+    keywords: [
+      "chill",
+      "chilling",
+      "laid-back",
+      "easy-going",
+      "casual",
+      "cool",
+      "whatever",
+      "alright",
+      "fine",
+      "okay",
+      "simple",
+      "basic",
+      "normal",
+      "regular",
+      "standard",
+      "moderate",
+      "balanced",
+    ],
+    genres: [
+      "lo-fi",
+      "chillhop",
+      "indie",
+      "alternative",
+      "chillout",
+      "downtempo",
+    ],
+    energy: 0.5,
+    valence: 0.6,
+    tempo: { min: 80, max: 110 },
+  },
 };
 
 // Sentiment analysis patterns for proper sentence analysis
@@ -500,69 +532,147 @@ const CONTEXT_PATTERNS = {
 };
 
 /**
+ * Gets the default chill mood when analysis fails
+ * @returns {Object} Default chill mood analysis result
+ */
+function getDefaultChillMood() {
+  return {
+    mood: "chill",
+    confidence: 0.7,
+    genres: ["lo-fi", "chillhop", "indie", "alternative", "chillout"],
+    energy: 0.5,
+    valence: 0.6,
+    tempo: { min: 80, max: 110 },
+    detectedKeywords: ["chill"],
+    analysis: {
+      sentimentScore: {
+        positive: 0,
+        negative: 0,
+        neutral: 1,
+        overall: 0,
+        intensity: 1,
+        hasNegation: false,
+      },
+      contextFactors: {
+        temporal: { past: 0, present: 1, future: 0 },
+        intensity: { high: 0, medium: 1, low: 0 },
+      },
+      linguisticFeatures: {
+        wordCount: 1,
+        sentenceCount: 1,
+        avgWordsPerSentence: 1,
+        hasExclamation: false,
+        hasQuestion: false,
+        hasEmoji: false,
+        repetition: 0,
+        capsUsage: 0,
+      },
+      sentences: 1,
+      complexity: { avgWordLength: 5, avgSentenceLength: 1, complexity: 3 },
+      fallback: true,
+      error: "Used default chill mood due to analysis error",
+    },
+  };
+}
+
+/**
  * Analyzes mood from text using advanced sentence analysis and sentiment scoring
  * @param {string} text - The input text to analyze
  * @returns {Object} Analysis result with mood, confidence, genres, energy, valence, tempo, and analysis details
  */
 export function analyzeMoodFromText(text) {
-  const normalizedText = text.toLowerCase();
-  const sentences = splitIntoSentences(normalizedText);
+  try {
+    // Input validation
+    if (!text || typeof text !== "string") {
+      console.warn("Invalid input text provided, defaulting to chill mood");
+      return getDefaultChillMood();
+    }
 
-  // Perform comprehensive analysis
-  const sentimentScore = analyzeSentiment(normalizedText);
-  const contextAnalysis = analyzeContext(normalizedText);
-  const linguisticFeatures = extractLinguisticFeatures(normalizedText);
-  const keywordMatches = analyzeKeywordMatches(normalizedText);
+    const trimmedText = text.trim();
+    if (trimmedText.length === 0) {
+      console.warn("Empty text provided, defaulting to chill mood");
+      return getDefaultChillMood();
+    }
 
-  // Calculate mood scores using multiple factors
-  const moodScores = calculateMoodScores(
-    sentimentScore,
-    contextAnalysis,
-    linguisticFeatures,
-    keywordMatches
-  );
+    if (trimmedText.length > 5000) {
+      console.warn("Text too long, truncating and continuing with analysis");
+      text = trimmedText.substring(0, 5000);
+    } else {
+      text = trimmedText;
+    }
 
-  // Find the best matching mood
-  const sortedMoods = Object.entries(moodScores)
-    .sort(([, a], [, b]) => b.score - a.score)
-    .filter(([, data]) => data.score > 0);
+    const normalizedText = text.toLowerCase();
+    const sentences = splitIntoSentences(normalizedText);
 
-  if (sortedMoods.length === 0) {
-    return analyzeGeneralSentiment(normalizedText);
-  }
+    // Perform comprehensive analysis
+    const sentimentScore = analyzeSentiment(normalizedText);
+    const contextAnalysis = analyzeContext(normalizedText);
+    const linguisticFeatures = extractLinguisticFeatures(normalizedText);
+    const keywordMatches = analyzeKeywordMatches(normalizedText);
 
-  const [primaryMood, moodData] = sortedMoods[0];
-  const moodPattern = MOOD_PATTERNS[primaryMood];
-
-  // Calculate confidence based on multiple factors
-  const confidence = calculateConfidence(
-    moodData,
-    sentimentScore,
-    contextAnalysis,
-    linguisticFeatures,
-    normalizedText
-  );
-
-  return {
-    mood: primaryMood,
-    confidence: parseFloat(confidence.toFixed(2)),
-    genres: [...moodPattern.genres],
-    energy: adjustEnergyLevel(
-      moodPattern.energy,
+    // Calculate mood scores using multiple factors
+    const moodScores = calculateMoodScores(
+      sentimentScore,
       contextAnalysis,
-      linguisticFeatures
-    ),
-    valence: adjustValenceLevel(moodPattern.valence, sentimentScore),
-    tempo: { ...moodPattern.tempo },
-    detectedKeywords: moodData.keywords.slice(0, 5),
-    analysis: {
-      sentimentScore: sentimentScore,
-      contextFactors: contextAnalysis,
-      linguisticFeatures: linguisticFeatures,
-      sentences: sentences.length,
-      complexity: calculateTextComplexity(normalizedText),
-    },
-  };
+      linguisticFeatures,
+      keywordMatches
+    );
+
+    // Find the best matching mood
+    const sortedMoods = Object.entries(moodScores)
+      .sort(([, a], [, b]) => b.score - a.score)
+      .filter(([, data]) => data.score > 0);
+
+    if (sortedMoods.length === 0) {
+      const generalAnalysis = analyzeGeneralSentiment(normalizedText);
+      return generalAnalysis || getDefaultChillMood();
+    }
+
+    const [primaryMood, moodData] = sortedMoods[0];
+    const moodPattern = MOOD_PATTERNS[primaryMood];
+
+    if (!moodPattern) {
+      console.warn(`Unknown mood pattern: ${primaryMood}, defaulting to chill`);
+      return getDefaultChillMood();
+    }
+
+    // Calculate confidence based on multiple factors
+    const confidence = calculateConfidence(
+      moodData,
+      sentimentScore,
+      contextAnalysis,
+      linguisticFeatures,
+      normalizedText
+    );
+
+    return {
+      mood: primaryMood,
+      confidence: parseFloat(confidence.toFixed(2)),
+      genres: [...moodPattern.genres],
+      energy: adjustEnergyLevel(
+        moodPattern.energy,
+        contextAnalysis,
+        linguisticFeatures
+      ),
+      valence: adjustValenceLevel(moodPattern.valence, sentimentScore),
+      tempo: { ...moodPattern.tempo },
+      detectedKeywords: moodData.keywords.slice(0, 5),
+      analysis: {
+        sentimentScore: sentimentScore,
+        contextFactors: contextAnalysis,
+        linguisticFeatures: linguisticFeatures,
+        sentences: sentences.length,
+        complexity: calculateTextComplexity(normalizedText),
+      },
+    };
+  } catch (error) {
+    console.error("Error analyzing mood from text:", error);
+    console.warn("Defaulting to chill mood due to analysis error");
+
+    const defaultMood = getDefaultChillMood();
+    defaultMood.analysis.error = `Analysis failed: ${error.message}`;
+    return defaultMood;
+  }
 }
 
 /**
@@ -579,77 +689,100 @@ function splitIntoSentences(text) {
  * Analyzes sentiment using multiple approaches
  */
 function analyzeSentiment(text) {
-  let positiveScore = 0;
-  let negativeScore = 0;
-  let neutralScore = 0;
-  let intensityMultiplier = 1;
-  let hasNegation = false;
-
-  // Check for negation words
-  CONTEXT_PATTERNS.negation.forEach((neg) => {
-    if (text.includes(neg)) {
-      hasNegation = true;
+  try {
+    if (!text || typeof text !== "string") {
+      return {
+        positive: 0,
+        negative: 0,
+        neutral: 1,
+        overall: 0,
+        intensity: 1,
+        hasNegation: false,
+      };
     }
-  });
 
-  // Check for intensity modifiers
-  SENTIMENT_PATTERNS.positive.intensity.forEach((intensity) => {
-    if (text.includes(intensity)) {
-      intensityMultiplier += 0.3;
+    let positiveScore = 0;
+    let negativeScore = 0;
+    let neutralScore = 0;
+    let intensityMultiplier = 1;
+    let hasNegation = false;
+
+    // Check for negation words
+    CONTEXT_PATTERNS.negation.forEach((neg) => {
+      if (text.includes(neg)) {
+        hasNegation = true;
+      }
+    });
+
+    // Check for intensity modifiers
+    SENTIMENT_PATTERNS.positive.intensity.forEach((intensity) => {
+      if (text.includes(intensity)) {
+        intensityMultiplier += 0.3;
+      }
+    });
+
+    // Analyze positive sentiment
+    SENTIMENT_PATTERNS.positive.words.forEach((word) => {
+      const regex = new RegExp(`\\b${word}\\b`, "i");
+      if (regex.test(text)) {
+        positiveScore += 1 * intensityMultiplier;
+      }
+    });
+
+    SENTIMENT_PATTERNS.positive.phrases.forEach((phrase) => {
+      if (text.includes(phrase)) {
+        positiveScore += 2 * intensityMultiplier;
+      }
+    });
+
+    // Analyze negative sentiment
+    SENTIMENT_PATTERNS.negative.words.forEach((word) => {
+      const regex = new RegExp(`\\b${word}\\b`, "i");
+      if (regex.test(text)) {
+        negativeScore += 1 * intensityMultiplier;
+      }
+    });
+
+    SENTIMENT_PATTERNS.negative.phrases.forEach((phrase) => {
+      if (text.includes(phrase)) {
+        negativeScore += 2 * intensityMultiplier;
+      }
+    });
+
+    // Analyze neutral sentiment
+    SENTIMENT_PATTERNS.neutral.words.forEach((word) => {
+      const regex = new RegExp(`\\b${word}\\b`, "i");
+      if (regex.test(text)) {
+        neutralScore += 1;
+      }
+    });
+
+    // Apply negation effects
+    if (hasNegation) {
+      const temp = positiveScore;
+      positiveScore = negativeScore * 0.7;
+      negativeScore = temp * 0.7;
     }
-  });
 
-  // Analyze positive sentiment
-  SENTIMENT_PATTERNS.positive.words.forEach((word) => {
-    const regex = new RegExp(`\\b${word}\\b`, "i");
-    if (regex.test(text)) {
-      positiveScore += 1 * intensityMultiplier;
-    }
-  });
-
-  SENTIMENT_PATTERNS.positive.phrases.forEach((phrase) => {
-    if (text.includes(phrase)) {
-      positiveScore += 2 * intensityMultiplier;
-    }
-  });
-
-  // Analyze negative sentiment
-  SENTIMENT_PATTERNS.negative.words.forEach((word) => {
-    const regex = new RegExp(`\\b${word}\\b`, "i");
-    if (regex.test(text)) {
-      negativeScore += 1 * intensityMultiplier;
-    }
-  });
-
-  SENTIMENT_PATTERNS.negative.phrases.forEach((phrase) => {
-    if (text.includes(phrase)) {
-      negativeScore += 2 * intensityMultiplier;
-    }
-  });
-
-  // Analyze neutral sentiment
-  SENTIMENT_PATTERNS.neutral.words.forEach((word) => {
-    const regex = new RegExp(`\\b${word}\\b`, "i");
-    if (regex.test(text)) {
-      neutralScore += 1;
-    }
-  });
-
-  // Apply negation effects
-  if (hasNegation) {
-    const temp = positiveScore;
-    positiveScore = negativeScore * 0.7;
-    negativeScore = temp * 0.7;
+    return {
+      positive: positiveScore,
+      negative: negativeScore,
+      neutral: neutralScore,
+      overall: positiveScore - negativeScore,
+      intensity: intensityMultiplier,
+      hasNegation: hasNegation,
+    };
+  } catch (error) {
+    console.error("Error in sentiment analysis:", error);
+    return {
+      positive: 0,
+      negative: 0,
+      neutral: 1,
+      overall: 0,
+      intensity: 1,
+      hasNegation: false,
+    };
   }
-
-  return {
-    positive: positiveScore,
-    negative: negativeScore,
-    neutral: neutralScore,
-    overall: positiveScore - negativeScore,
-    intensity: intensityMultiplier,
-    hasNegation: hasNegation,
-  };
 }
 
 /**
@@ -931,75 +1064,82 @@ function calculateTextComplexity(text) {
  * @returns {Object} Sentiment analysis result
  */
 function analyzeGeneralSentiment(text) {
-  // Use the new advanced sentiment analysis
-  const sentimentScore = analyzeSentiment(text);
-  const contextAnalysis = analyzeContext(text);
-  const linguisticFeatures = extractLinguisticFeatures(text);
+  try {
+    // Use the new advanced sentiment analysis
+    const sentimentScore = analyzeSentiment(text);
+    const contextAnalysis = analyzeContext(text);
+    const linguisticFeatures = extractLinguisticFeatures(text);
 
-  // Determine mood based on comprehensive sentiment analysis
-  if (
-    sentimentScore.positive > sentimentScore.negative &&
-    sentimentScore.positive > sentimentScore.neutral
-  ) {
-    const intensity = contextAnalysis.intensity.high > 0 ? 0.8 : 0.6;
-    return {
-      mood: "happy",
-      confidence: Math.min(0.85, 0.6 + sentimentScore.positive * 0.05),
-      genres: ["pop", "indie", "folk", "acoustic"],
-      energy: intensity,
-      valence: Math.min(0.9, 0.7 + sentimentScore.positive * 0.03),
-      tempo: { min: 100, max: 130 },
-      detectedKeywords: SENTIMENT_PATTERNS.positive.words
-        .filter((word) => new RegExp(`\\b${word}\\b`, "i").test(text))
-        .slice(0, 3),
-      analysis: {
-        sentimentScore: sentimentScore,
-        contextFactors: contextAnalysis,
-        linguisticFeatures: linguisticFeatures,
-        sentences: splitIntoSentences(text).length,
-        complexity: calculateTextComplexity(text),
-      },
-    };
-  } else if (sentimentScore.negative > sentimentScore.positive) {
-    const intensity = contextAnalysis.intensity.high > 0 ? 0.2 : 0.4;
-    return {
-      mood: "sad",
-      confidence: Math.min(0.85, 0.6 + sentimentScore.negative * 0.05),
-      genres: ["indie", "alternative", "folk", "blues"],
-      energy: intensity,
-      valence: Math.max(0.1, 0.3 - sentimentScore.negative * 0.03),
-      tempo: { min: 70, max: 100 },
-      detectedKeywords: SENTIMENT_PATTERNS.negative.words
-        .filter((word) => new RegExp(`\\b${word}\\b`, "i").test(text))
-        .slice(0, 3),
-      analysis: {
-        sentimentScore: sentimentScore,
-        contextFactors: contextAnalysis,
-        linguisticFeatures: linguisticFeatures,
-        sentences: splitIntoSentences(text).length,
-        complexity: calculateTextComplexity(text),
-      },
-    };
-  } else {
-    // Default to thoughtful/neutral mood with analysis
-    return {
-      mood: "thoughtful",
-      confidence: Math.min(0.8, 0.6 + sentimentScore.neutral * 0.05),
-      genres: ["indie", "alternative", "folk", "jazz"],
-      energy: 0.5,
-      valence: 0.5,
-      tempo: { min: 80, max: 120 },
-      detectedKeywords: SENTIMENT_PATTERNS.neutral.words
-        .filter((word) => new RegExp(`\\b${word}\\b`, "i").test(text))
-        .slice(0, 3),
-      analysis: {
-        sentimentScore: sentimentScore,
-        contextFactors: contextAnalysis,
-        linguisticFeatures: linguisticFeatures,
-        sentences: splitIntoSentences(text).length,
-        complexity: calculateTextComplexity(text),
-      },
-    };
+    // Determine mood based on comprehensive sentiment analysis
+    if (
+      sentimentScore.positive > sentimentScore.negative &&
+      sentimentScore.positive > sentimentScore.neutral
+    ) {
+      const intensity = contextAnalysis.intensity.high > 0 ? 0.8 : 0.6;
+      return {
+        mood: "happy",
+        confidence: Math.min(0.85, 0.6 + sentimentScore.positive * 0.05),
+        genres: ["pop", "indie", "folk", "acoustic"],
+        energy: intensity,
+        valence: Math.min(0.9, 0.7 + sentimentScore.positive * 0.03),
+        tempo: { min: 100, max: 130 },
+        detectedKeywords: SENTIMENT_PATTERNS.positive.words
+          .filter((word) => new RegExp(`\\b${word}\\b`, "i").test(text))
+          .slice(0, 3),
+        analysis: {
+          sentimentScore: sentimentScore,
+          contextFactors: contextAnalysis,
+          linguisticFeatures: linguisticFeatures,
+          sentences: splitIntoSentences(text).length,
+          complexity: calculateTextComplexity(text),
+        },
+      };
+    } else if (sentimentScore.negative > sentimentScore.positive) {
+      const intensity = contextAnalysis.intensity.high > 0 ? 0.2 : 0.4;
+      return {
+        mood: "sad",
+        confidence: Math.min(0.85, 0.6 + sentimentScore.negative * 0.05),
+        genres: ["indie", "alternative", "folk", "blues"],
+        energy: intensity,
+        valence: Math.max(0.1, 0.3 - sentimentScore.negative * 0.03),
+        tempo: { min: 70, max: 100 },
+        detectedKeywords: SENTIMENT_PATTERNS.negative.words
+          .filter((word) => new RegExp(`\\b${word}\\b`, "i").test(text))
+          .slice(0, 3),
+        analysis: {
+          sentimentScore: sentimentScore,
+          contextFactors: contextAnalysis,
+          linguisticFeatures: linguisticFeatures,
+          sentences: splitIntoSentences(text).length,
+          complexity: calculateTextComplexity(text),
+        },
+      };
+    } else {
+      // Default to chill mood for neutral/unclear sentiment
+      return {
+        mood: "chill",
+        confidence: Math.min(0.8, 0.6 + sentimentScore.neutral * 0.05),
+        genres: ["lo-fi", "chillhop", "indie", "alternative", "chillout"],
+        energy: 0.5,
+        valence: 0.6,
+        tempo: { min: 80, max: 110 },
+        detectedKeywords: SENTIMENT_PATTERNS.neutral.words
+          .filter((word) => new RegExp(`\\b${word}\\b`, "i").test(text))
+          .slice(0, 3),
+        analysis: {
+          sentimentScore: sentimentScore,
+          contextFactors: contextAnalysis,
+          linguisticFeatures: linguisticFeatures,
+          sentences: splitIntoSentences(text).length,
+          complexity: calculateTextComplexity(text),
+          generalSentiment: true,
+        },
+      };
+    }
+  } catch (error) {
+    console.error("Error in general sentiment analysis:", error);
+    console.warn("Defaulting to chill mood from general sentiment analysis");
+    return getDefaultChillMood();
   }
 }
 
@@ -1069,6 +1209,7 @@ function getMoodDescription(moodName) {
     anxious: "Worried, nervous, stressed emotions",
     confident: "Bold, powerful, successful emotions",
     thoughtful: "Contemplative, introspective, focused emotions",
+    chill: "Laid-back, easy-going, casual emotions",
   };
 
   return descriptions[moodName] || "Unknown mood";

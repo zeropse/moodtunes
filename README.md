@@ -6,6 +6,7 @@ Transform your feelings into perfect song suggestions. MoodTunes analyzes your e
 
 - **Advanced Mood Analysis**: Sophisticated sentiment analysis with keyword detection and contextual understanding
 - **Intelligent Music Matching**: Maps emotions to musical characteristics (energy, valence, tempo, genres)
+- **Smart Duplicate Prevention**: Automatically generates fresh song suggestions for repeated moods using intelligent search strategies
 - **Dynamic Visual Experience**: Beautiful particle-based animations with the Vortex background component
 - **Spotify Integration**: Direct links to songs with album art, artist info, and external Spotify links
 - **Mood History**: Track your emotional journey with persistent local storage

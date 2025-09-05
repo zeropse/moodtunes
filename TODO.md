@@ -1,3 +1,4 @@
 - [ ] Add Clerk Auth
-- [ ] Fix songs.. if history already there add new songs...
-- [ ] add a shareable link 
+- [x] Fix songs.. if history already there add new songs...
+- [ ] add a shareable link
+- [ ] Add a button to save as playlist
