@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";
 import {
   analyzeMoodFromText,
   sanitizeInput,
@@ -31,6 +32,13 @@ export async function POST(request) {
   const startTime = Date.now();
 
   try {
+    // Check authentication
+    const { userId } = await auth();
+
+    if (!userId) {
+      return createErrorResponse("Authentication required", 401);
+    }
+
     let body;
     try {
       body = await request.json();

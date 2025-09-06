@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useAuth, useUser } from "@clerk/nextjs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Music, Clock, Trash2, MessageSquare, ArrowRight } from "lucide-react";
@@ -9,10 +10,19 @@ import { useRouter } from "next/navigation";
 import { Vortex } from "@/components/ui/vortex";
 
 export default function History() {
+  const { userId, isLoaded } = useAuth();
+  const { user } = useUser();
   const [moodHistory, setMoodHistory] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [hoveredCard, setHoveredCard] = useState(null);
   const router = useRouter();
+
+  // Check authentication
+  useEffect(() => {
+    if (isLoaded && !userId) {
+      router.push("/sign-in");
+    }
+  }, [isLoaded, userId, router]);
 
   useEffect(() => {
     const loadHistory = () => {
@@ -74,6 +84,22 @@ export default function History() {
         </div>
       </Vortex>
     );
+  }
+
+  // Show loading while checking auth
+  if (!isLoaded) {
+    return (
+      <Vortex>
+        <div className="flex min-h-screen items-center justify-center">
+          <div className="text-white">Loading...</div>
+        </div>
+      </Vortex>
+    );
+  }
+
+  // Redirect if not authenticated
+  if (!userId) {
+    return null;
   }
 
   return (

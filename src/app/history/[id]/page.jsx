@@ -2,6 +2,7 @@
 
 import { useRouter, useParams } from "next/navigation";
 import { useEffect, useState, useCallback, useRef } from "react";
+import { useAuth, useUser } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import {
@@ -16,6 +17,8 @@ import {
 import { Vortex } from "@/components/ui/vortex";
 
 export default function HistoryDetailPage() {
+  const { userId, isLoaded } = useAuth();
+  const { user } = useUser();
   const router = useRouter();
   const params = useParams();
   const [historyEntry, setHistoryEntry] = useState(null);
@@ -23,6 +26,13 @@ export default function HistoryDetailPage() {
   const [error, setError] = useState(null);
   const [currentTrack, setCurrentTrack] = useState(null);
   const scrollContainerRef = useRef(null);
+
+  // Check authentication
+  useEffect(() => {
+    if (isLoaded && !userId) {
+      router.push("/sign-in");
+    }
+  }, [isLoaded, userId, router]);
 
   useEffect(() => {
     const loadHistoryEntry = () => {
@@ -185,6 +195,22 @@ export default function HistoryDetailPage() {
       </CardContent>
     </Card>
   );
+
+  // Show loading while checking auth
+  if (!isLoaded) {
+    return (
+      <Vortex>
+        <div className="flex min-h-screen items-center justify-center">
+          <div className="text-white">Loading...</div>
+        </div>
+      </Vortex>
+    );
+  }
+
+  // Redirect if not authenticated
+  if (!userId) {
+    return null;
+  }
 
   if (isLoading) {
     return (

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";
 import {
   generateSongSuggestions,
   validateSpotifyConfig,
@@ -52,6 +53,13 @@ export async function POST(request) {
   const startTime = Date.now();
 
   try {
+    // Check authentication
+    const { userId } = await auth();
+
+    if (!userId) {
+      return createErrorResponse("Authentication required", 401);
+    }
+
     if (!validateSpotifyConfig()) {
       console.error("Spotify API credentials not configured", { requestId });
       return createErrorResponse(
