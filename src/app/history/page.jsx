@@ -8,6 +8,7 @@ import { Music, Clock, Trash2, MessageSquare, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Vortex } from "@/components/ui/vortex";
+import { toast } from "sonner";
 
 export default function History() {
   const { userId, isLoaded } = useAuth();
@@ -37,6 +38,9 @@ export default function History() {
         }
       } catch (error) {
         console.error("Error loading mood history:", error);
+        toast.error("Failed to load mood history", {
+          style: { background: "#ef4444", color: "#fff", border: "none" },
+        });
       } finally {
         setTimeout(() => setIsLoading(false), 800);
       }
@@ -54,6 +58,9 @@ export default function History() {
       sessionStorage.removeItem("moodData");
 
       setMoodHistory([]);
+      toast.success("Mood history cleared successfully", {
+        style: { background: "#22c55e", color: "#fff", border: "none" },
+      });
     }
   };
 

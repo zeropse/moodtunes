@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Music, Sparkles, Heart, Zap } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Vortex } from "@/components/ui/vortex";
+import { toast } from "sonner";
 import {
   getPreviousTrackIds,
   getRetryAttempt,
@@ -23,6 +24,9 @@ export default function Home() {
 
     if (!moodText.trim()) {
       setError("Please tell us how you're feeling");
+      toast.error("Please tell us how you're feeling", {
+        style: { background: "#ef4444", color: "#fff", border: "none" },
+      });
       return;
     }
 
@@ -37,9 +41,15 @@ export default function Home() {
         body: JSON.stringify({ moodText: moodText.trim() }),
       });
 
-      if (!moodResponse.ok) throw new Error("Failed to analyze mood");
+      if (!moodResponse.ok) {
+        throw new Error("Failed to analyze mood");
+      }
       const moodData = await moodResponse.json();
       const analysisData = moodData.success ? moodData.data : moodData;
+
+      toast.success("Mood analyzed successfully!", {
+        style: { background: "#22c55e", color: "#fff", border: "none" },
+      });
 
       // Check for previous similar moods and get retry attempt
       const previousTrackIds = getPreviousTrackIds();
@@ -69,12 +79,20 @@ export default function Home() {
         }),
       });
 
-      if (!suggestionsResponse.ok)
+      if (!suggestionsResponse.ok) {
+        toast.error("Failed to generate song suggestions", {
+          style: { background: "#ef4444", color: "#fff", border: "none" },
+        });
         throw new Error("Failed to generate suggestions");
+      }
       const suggestionsData = await suggestionsResponse.json();
       const suggestions = suggestionsData.success
         ? suggestionsData.suggestions
         : suggestionsData;
+
+      toast.success("Perfect songs found for your mood!", {
+        style: { background: "#22c55e", color: "#fff", border: "none" },
+      });
 
       // Store and navigate
       sessionStorage.setItem(
@@ -88,7 +106,9 @@ export default function Home() {
 
       router.push("/suggestions");
     } catch (err) {
-      setError("Something went wrong. Please try again.");
+      toast.error("Something went wrong. Please try again.", {
+        style: { background: "#ef4444", color: "#fff", border: "none" },
+      });
     } finally {
       setIsLoading(false);
     }

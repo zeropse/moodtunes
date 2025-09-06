@@ -15,6 +15,7 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { Vortex } from "@/components/ui/vortex";
+import { toast } from "sonner";
 
 export default function HistoryDetailPage() {
   const { userId, isLoaded } = useAuth();
@@ -63,6 +64,9 @@ export default function HistoryDetailPage() {
       } catch (err) {
         console.error("Error loading history entry:", err);
         setError("Failed to load history entry");
+        toast.error("Failed to load history entry", {
+          style: { background: "#ef4444", color: "#fff", border: "none" },
+        });
       } finally {
         setIsLoading(false);
       }
@@ -85,6 +89,10 @@ export default function HistoryDetailPage() {
     const scrollTop = scrollContainerRef.current?.scrollTop || 0;
 
     setCurrentTrack(track);
+
+    toast.success(`Now playing: ${track.name}`, {
+      style: { background: "#22c55e", color: "#fff", border: "none" },
+    });
 
     // Restore scroll position after state update
     requestAnimationFrame(() => {

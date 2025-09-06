@@ -15,6 +15,7 @@ import {
   Play,
 } from "lucide-react";
 import { Vortex } from "@/components/ui/vortex";
+import { toast } from "sonner";
 import { getPreviousTrackIds, getRetryAttempt } from "@/lib/history-utils";
 
 export default function SuggestionsPage() {
@@ -112,6 +113,12 @@ export default function SuggestionsPage() {
               "No suggestions data found. Please start from the home page.",
             isInitialized: true,
           }));
+          toast.error(
+            "No suggestions data found. Please start from the home page.",
+            {
+              style: { background: "#ef4444", color: "#fff", border: "none" },
+            }
+          );
         }
       } catch (err) {
         console.error("Error loading suggestions data:", err);
@@ -120,6 +127,9 @@ export default function SuggestionsPage() {
           error: "Failed to load suggestions data",
           isInitialized: true,
         }));
+        toast.error("Failed to load suggestions data", {
+          style: { background: "#ef4444", color: "#fff", border: "none" },
+        });
       }
     };
 
@@ -169,12 +179,21 @@ export default function SuggestionsPage() {
         }),
       });
 
-      if (!response.ok) throw new Error("Failed to get new suggestions");
+      if (!response.ok) {
+        toast.error("Failed to get new suggestions", {
+          style: { background: "#ef4444", color: "#fff", border: "none" },
+        });
+        throw new Error("Failed to get new suggestions");
+      }
 
       const suggestionsData = await response.json();
       const suggestions = suggestionsData.success
         ? suggestionsData.suggestions
         : suggestionsData;
+
+      toast.success("New songs found for your mood!", {
+        style: { background: "#22c55e", color: "#fff", border: "none" },
+      });
 
       const newMoodData = {
         mood: state.mood,
@@ -202,6 +221,9 @@ export default function SuggestionsPage() {
         error: "Failed to get new suggestions. Please try again.",
         isLoading: false,
       }));
+      toast.error("Failed to get new suggestions. Please try again.", {
+        style: { background: "#ef4444", color: "#fff", border: "none" },
+      });
     }
   }, [state.mood, state.moodAnalysis, state.suggestions, saveToHistory]);
 
@@ -210,6 +232,10 @@ export default function SuggestionsPage() {
     const scrollTop = scrollContainerRef.current?.scrollTop || 0;
 
     setState((prev) => ({ ...prev, currentTrack: track }));
+
+    toast.success(`Now playing: ${track.name}`, {
+      style: { background: "#22c55e", color: "#fff", border: "none" },
+    });
 
     // Restore scroll position after state update
     requestAnimationFrame(() => {
