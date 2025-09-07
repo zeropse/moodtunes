@@ -21,8 +21,8 @@ export function NavbarMain() {
   const navItems = [
     { name: "Home", link: "/" },
     { name: "About", link: "/about" },
-    { name: "History", link: "/history" },
     { name: "FAQ", link: "/faq" },
+    { name: "History", link: "/history" },
   ];
 
   return (

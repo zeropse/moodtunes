@@ -1,5 +1,4 @@
 - [x] Add Clerk Auth
 - [x] Fix songs.. if history already there add new songs...
 - [x] Add sonner toast all over app
-- [ ] add a shareable link
-- [ ] Add a button to save as playlist
+- [ ] Generate art based on mood...
