@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { IconMusic, IconMenu2, IconX } from "@tabler/icons-react";
 import { useRouter, usePathname } from "next/navigation";
-import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
+import { SignedIn, SignedOut, UserButton, useAuth } from "@clerk/nextjs";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,6 +13,7 @@ import {
   DrawerTitle,
   DrawerClose,
 } from "@/components/ui/drawer";
+import { toast } from "sonner";
 
 // Logo Component
 const Logo = () => (
@@ -25,11 +26,32 @@ const Logo = () => (
 );
 
 // Navigation Link Component
-const NavLink = ({ href, children, onClick, isActive, isMobile = false }) => {
+const NavLink = ({
+  href,
+  children,
+  onClick,
+  isActive,
+  isMobile = false,
+  requiresAuth = false,
+  userId,
+}) => {
   const router = useRouter();
 
   const handleClick = (e) => {
     e.preventDefault();
+
+    // Check if route requires authentication
+    if (requiresAuth && !userId) {
+      toast.error("Please sign in to access this feature", {
+        style: { background: "#ef4444", color: "#fff", border: "none" },
+        action: {
+          label: "Sign In",
+          onClick: () => router.push("/sign-in"),
+        },
+      });
+      return;
+    }
+
     router.push(href);
     if (onClick) onClick();
   };
@@ -72,7 +94,7 @@ const NavLink = ({ href, children, onClick, isActive, isMobile = false }) => {
 };
 
 // Mobile Menu Component
-const MobileDrawer = ({ isOpen, onClose, navItems, router }) => {
+const MobileDrawer = ({ isOpen, onClose, navItems, router, userId }) => {
   const pathname = usePathname();
 
   return (
@@ -101,6 +123,8 @@ const MobileDrawer = ({ isOpen, onClose, navItems, router }) => {
                 onClick={onClose}
                 isActive={pathname === item.link}
                 isMobile={true}
+                requiresAuth={item.requiresAuth}
+                userId={userId}
               >
                 {item.name}
               </NavLink>
@@ -145,77 +169,81 @@ const MobileDrawer = ({ isOpen, onClose, navItems, router }) => {
 };
 
 // Main Navbar Component
-export function Navbar() {
+export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
+  const { userId } = useAuth();
 
   const navItems = [
     { name: "Home", link: "/" },
     { name: "About", link: "/about" },
     { name: "FAQ", link: "/faq" },
-    { name: "History", link: "/history" },
+    { name: "History", link: "/history", requiresAuth: true },
   ];
 
   return (
     <>
       <nav className="sticky top-0 z-30 w-full bg-black/90 backdrop-blur-xl border-b border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-3 items-center h-16 md:h-20">
+          <div className="flex items-center justify-between h-16 md:h-20">
             {/* Logo - Left Section */}
-            <div className="flex justify-start">
+            <div className="flex items-center">
               <Logo />
             </div>
 
             {/* Desktop Navigation - Center Section */}
-            <div className="hidden md:flex justify-center">
-              <div className="flex items-center space-x-8">
-                {navItems.map((item, idx) => (
-                  <NavLink
-                    key={idx}
-                    href={item.link}
-                    isActive={pathname === item.link}
-                  >
-                    {item.name}
-                  </NavLink>
-                ))}
+            <div className="hidden md:flex items-center space-x-8">
+              {navItems.map((item, idx) => (
+                <NavLink
+                  key={idx}
+                  href={item.link}
+                  isActive={pathname === item.link}
+                  requiresAuth={item.requiresAuth}
+                  userId={userId}
+                >
+                  {item.name}
+                </NavLink>
+              ))}
+            </div>
+
+            {/* Right Section - Desktop Auth / Mobile Menu */}
+            <div className="flex items-center">
+              {/* Desktop Auth */}
+              <div className="hidden md:flex items-center">
+                <SignedOut>
+                  <div className="flex items-center space-x-4">
+                    <Button
+                      onClick={() => router.push("/sign-in")}
+                      variant="outline"
+                      className="cursor-pointer border-purple-500 text-purple-400 hover:bg-purple-500  hover:text-purple-400"
+                    >
+                      Sign In
+                    </Button>
+                    <Button
+                      onClick={() => router.push("/sign-up")}
+                      className="cursor-pointer bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 hover:from-purple-600 hover:via-pink-600 hover:to-blue-600 text-white shadow-lg hover:shadow-purple-500/25"
+                    >
+                      Sign Up
+                    </Button>
+                  </div>
+                </SignedOut>
+                <SignedIn>
+                  <UserButton forceRedirectUrl="/" />
+                </SignedIn>
               </div>
-            </div>
 
-            {/* Desktop Auth - Right Section */}
-            <div className="hidden md:flex justify-end items-center">
-              <SignedOut>
-                <div className="flex items-center space-x-4">
-                  <Button
-                    onClick={() => router.push("/sign-in")}
-                    variant="outline"
-                    className="cursor-pointer border-purple-500 text-purple-400 hover:bg-purple-500  hover:text-purple-400"
-                  >
-                    Sign In
-                  </Button>
-                  <Button
-                    onClick={() => router.push("/sign-up")}
-                    className="cursor-pointer bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 hover:from-purple-600 hover:via-pink-600 hover:to-blue-600 text-white shadow-lg hover:shadow-purple-500/25"
-                  >
-                    Sign Up
-                  </Button>
-                </div>
-              </SignedOut>
-              <SignedIn>
-                <UserButton forceRedirectUrl="/" />
-              </SignedIn>
-            </div>
-
-            {/* Mobile Menu Button */}
-            <div className="lg:hidden">
-              <Button
-                onClick={() => setIsMobileMenuOpen(true)}
-                variant="ghost"
-                size="icon"
-                className="hover:bg-gray-800"
-              >
-                <IconMenu2 size={24} className="text-gray-400" />
-              </Button>
+              {/* Mobile Menu Button */}
+              <div className="md:hidden">
+                <Button
+                  onClick={() => setIsMobileMenuOpen(true)}
+                  variant="ghost"
+                  size="icon"
+                  className="hover:bg-gray-800"
+                >
+                  <IconMenu2 size={24} className="text-gray-400" />
+                </Button>
+              </div>
             </div>
           </div>
         </div>
@@ -227,6 +255,7 @@ export function Navbar() {
         onClose={() => setIsMobileMenuOpen(false)}
         navItems={navItems}
         router={router}
+        userId={userId}
       />
     </>
   );

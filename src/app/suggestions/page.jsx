@@ -34,6 +34,7 @@ export default function SuggestionsPage() {
   });
 
   const scrollContainerRef = useRef(null);
+  const nowPlayingRef = useRef(null);
 
   const saveToHistory = useCallback((moodData, isRetry = false) => {
     try {
@@ -84,6 +85,13 @@ export default function SuggestionsPage() {
   // Check authentication
   useEffect(() => {
     if (isLoaded && !userId) {
+      toast.error("Please sign in to view song suggestions", {
+        style: { background: "#ef4444", color: "#fff", border: "none" },
+        action: {
+          label: "Sign In",
+          onClick: () => router.push("/sign-in"),
+        },
+      });
       router.push("/sign-in");
     }
   }, [isLoaded, userId, router]);
@@ -180,6 +188,16 @@ export default function SuggestionsPage() {
       });
 
       if (!response.ok) {
+        if (response.status === 401) {
+          toast.error("Please sign in to get new song suggestions", {
+            style: { background: "#ef4444", color: "#fff", border: "none" },
+            action: {
+              label: "Sign In",
+              onClick: () => router.push("/sign-in"),
+            },
+          });
+          return;
+        }
         toast.error("Failed to get new suggestions", {
           style: { background: "#ef4444", color: "#fff", border: "none" },
         });
@@ -230,17 +248,17 @@ export default function SuggestionsPage() {
   const handleTrackSelect = useCallback((track) => {
     // Preserve scroll position before state update
     const scrollTop = scrollContainerRef.current?.scrollTop || 0;
-
     setState((prev) => ({ ...prev, currentTrack: track }));
-
-    toast.success(`Now playing: ${track.name}`, {
-      style: { background: "#22c55e", color: "#fff", border: "none" },
-    });
-
-    // Restore scroll position after state update
     requestAnimationFrame(() => {
       if (scrollContainerRef.current) {
         scrollContainerRef.current.scrollTop = scrollTop;
+      }
+      // Scroll to NowPlaying component after track selection
+      if (nowPlayingRef.current) {
+        nowPlayingRef.current.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
       }
     });
   }, []);
@@ -440,7 +458,10 @@ export default function SuggestionsPage() {
   );
 
   const NowPlaying = () => (
-    <Card className="bg-black/30 backdrop-blur-xl border-white/20 shadow-2xl">
+    <Card
+      ref={nowPlayingRef}
+      className="bg-black/30 backdrop-blur-xl border-white/20 shadow-2xl"
+    >
       <CardContent className="p-4">
         {state.currentTrack ? (
           <div className="rounded-lg overflow-hidden">

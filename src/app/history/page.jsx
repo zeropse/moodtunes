@@ -31,6 +31,13 @@ export default function History() {
   // Check authentication
   useEffect(() => {
     if (isLoaded && !userId) {
+      toast.error("Please sign in to view your mood history", {
+        style: { background: "#ef4444", color: "#fff", border: "none" },
+        action: {
+          label: "Sign In",
+          onClick: () => router.push("/sign-in"),
+        },
+      });
       router.push("/sign-in");
     }
   }, [isLoaded, userId, router]);

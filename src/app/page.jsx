@@ -42,6 +42,16 @@ export default function Home() {
       });
 
       if (!moodResponse.ok) {
+        if (moodResponse.status === 401) {
+          toast.error("Please sign in to analyze your mood", {
+            style: { background: "#ef4444", color: "#fff", border: "none" },
+            action: {
+              label: "Sign In",
+              onClick: () => router.push("/sign-in"),
+            },
+          });
+          return;
+        }
         throw new Error("Failed to analyze mood");
       }
       const moodData = await moodResponse.json();
@@ -80,6 +90,16 @@ export default function Home() {
       });
 
       if (!suggestionsResponse.ok) {
+        if (suggestionsResponse.status === 401) {
+          toast.error("Please sign in to get song suggestions", {
+            style: { background: "#ef4444", color: "#fff", border: "none" },
+            action: {
+              label: "Sign In",
+              onClick: () => router.push("/sign-in"),
+            },
+          });
+          return;
+        }
         toast.error("Failed to generate song suggestions", {
           style: { background: "#ef4444", color: "#fff", border: "none" },
         });
