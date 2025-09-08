@@ -9,6 +9,16 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Vortex } from "@/components/ui/vortex";
 import { toast } from "sonner";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { DialogClose } from "@radix-ui/react-dialog";
 
 export default function History() {
   const { userId, isLoaded } = useAuth();
@@ -50,18 +60,14 @@ export default function History() {
   }, []);
 
   const clearHistory = () => {
-    if (
-      window.confirm("Are you sure you want to clear all your mood history?")
-    ) {
-      localStorage.removeItem("moodMusicHistory");
-      sessionStorage.removeItem("selectedHistoryEntry");
-      sessionStorage.removeItem("moodData");
+    localStorage.removeItem("moodMusicHistory");
+    sessionStorage.removeItem("selectedHistoryEntry");
+    sessionStorage.removeItem("moodData");
 
-      setMoodHistory([]);
-      toast.success("Mood history cleared successfully", {
-        style: { background: "#22c55e", color: "#fff", border: "none" },
-      });
-    }
+    setMoodHistory([]);
+    toast.success("Mood history cleared successfully", {
+      style: { background: "#22c55e", color: "#fff", border: "none" },
+    });
   };
 
   const viewDetail = (index) => {
@@ -119,15 +125,54 @@ export default function History() {
           </h1>
 
           {moodHistory.length > 0 && (
-            <Button
-              size="sm"
-              variant="destructive"
-              onClick={clearHistory}
-              className="text-white rounded-lg cursor-pointer"
-            >
-              <Trash2 className="w-4 h-4 mr-2" />
-              Clear All History
-            </Button>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  className="bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 border-0 cursor-pointer"
+                >
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Clear All History
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="bg-gradient-to-br from-gray-900 via-purple-900/20 to-pink-900/20 border border-white/10 backdrop-blur-xl text-white shadow-2xl max-w-md">
+                <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 via-transparent to-pink-500/5 rounded-lg"></div>
+                <div className="relative">
+                  <DialogHeader className="text-center space-y-4 pb-6">
+                    <div className="w-16 h-16 bg-gradient-to-br from-red-500/20 to-pink-500/20 rounded-full flex items-center justify-center mx-auto shadow-lg">
+                      <Trash2 className="w-8 h-8 text-red-400" />
+                    </div>
+                    <DialogTitle className="text-xl font-bold bg-gradient-to-r from-red-400 to-pink-400 bg-clip-text text-transparent">
+                      Clear Your Journey?
+                    </DialogTitle>
+                    <DialogDescription className="text-white/70 leading-relaxed">
+                      This action will permanently delete all your mood history
+                      and musical memories. This cannot be undone.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <DialogFooter className="flex flex-col-reverse sm:flex-row gap-3">
+                    <DialogClose asChild>
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        className="bg-white/10 hover:bg-white/20 text-white border-white/20 rounded-xl flex-1 cursor-pointer"
+                      >
+                        Keep History
+                      </Button>
+                    </DialogClose>
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      onClick={clearHistory}
+                      className="bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white rounded-xl shadow-lg flex-1 border-0 cursor-pointer"
+                    >
+                      Yes, Clear All
+                    </Button>
+                  </DialogFooter>
+                </div>
+              </DialogContent>
+            </Dialog>
           )}
         </div>
 

@@ -2,7 +2,7 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
-import { NavbarMain } from "@/components/Navbar";
+import { Navbar } from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Toaster } from "@/components/ui/sonner";
@@ -34,7 +34,7 @@ export default function RootLayout({ children }) {
         <body className="antialiased">
           <ThemeProvider attribute="class" defaultTheme="dark">
             <div className="sticky top-0 z-50">
-              <NavbarMain />
+              <Navbar />
             </div>
             <main>{children}</main>
             <Footer />
