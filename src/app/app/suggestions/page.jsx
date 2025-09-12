@@ -13,6 +13,7 @@ import {
   Star,
   Home,
   Play,
+  Share2,
 } from "lucide-react";
 import { Vortex } from "@/components/ui/vortex";
 import { toast } from "sonner";
@@ -245,6 +246,64 @@ export default function SuggestionsPage() {
     }
   }, [state.mood, state.moodAnalysis, state.suggestions, saveToHistory]);
 
+  const handleShare = useCallback(async () => {
+    if (!state.mood || !state.moodAnalysis || !state.suggestions) {
+      toast.error("No mood data to share", {
+        style: { background: "#ef4444", color: "#fff", border: "none" },
+      });
+      return;
+    }
+
+    try {
+      const shareData = {
+        mood: state.mood,
+        moodAnalysis: state.moodAnalysis,
+        suggestions: state.suggestions,
+        sharedBy: user?.firstName
+          ? `${user.firstName} ${user.lastName || ""}`.trim()
+          : user?.username || "Anonymous",
+      };
+
+      toast.promise(
+        fetch("/api/share", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(shareData),
+        })
+          .then(async (response) => {
+            if (!response.ok) {
+              const errorData = await response.json();
+              throw new Error(errorData.error || "Failed to create share link");
+            }
+            return response.json();
+          })
+          .then((result) => {
+            if (result.success) {
+              navigator.clipboard.writeText(result.shareUrl);
+              return result;
+            }
+            throw new Error(result.error || "Failed to create share link");
+          }),
+        {
+          loading: "Creating shareable link...",
+          success: () => ({
+            message: "Link copied to clipboard!",
+            style: { background: "#22c55e", color: "#fff", border: "none" },
+          }),
+          error: (err) => ({
+            message: err.message || "Failed to create share link",
+            style: { background: "#ef4444", color: "#fff", border: "none" },
+          }),
+        }
+      );
+    } catch (error) {
+      console.error("Error sharing mood:", error);
+      toast.error("Failed to create share link. Please try again.", {
+        style: { background: "#ef4444", color: "#fff", border: "none" },
+      });
+    }
+  }, [state.mood, state.moodAnalysis, state.suggestions, user]);
+
   const handleTrackSelect = useCallback((track) => {
     // Preserve scroll position before state update
     const scrollTop = scrollContainerRef.current?.scrollTop || 0;
@@ -357,6 +416,15 @@ export default function SuggestionsPage() {
               Get New Suggestions
             </>
           )}
+        </Button>
+        <Button
+          onClick={handleShare}
+          variant="outline"
+          size="sm"
+          className="w-full mt-2 bg-transparent border-green-400/20 text-green-400/70 hover:bg-green-400/5 hover:text-green-400 hover:border-green-400/40 text-xs py-6 cursor-pointer"
+        >
+          <Share2 className="w-3 h-3 mr-1" />
+          Share This Mood
         </Button>
         <Button
           onClick={handleStartOver}

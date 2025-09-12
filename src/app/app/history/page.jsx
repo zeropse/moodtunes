@@ -4,7 +4,14 @@ import { useState, useEffect } from "react";
 import { useAuth, useUser } from "@clerk/nextjs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Music, Clock, Trash2, MessageSquare, ArrowRight } from "lucide-react";
+import {
+  Music,
+  Clock,
+  Trash2,
+  MessageSquare,
+  ArrowRight,
+  Share2,
+} from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Vortex } from "@/components/ui/vortex";
@@ -81,6 +88,67 @@ export default function History() {
     const entry = moodHistory[index];
     sessionStorage.setItem("selectedHistoryEntry", JSON.stringify(entry));
     router.push(`/app/history/${index}`);
+  };
+
+  const handleShare = async (entry, event) => {
+    // Prevent the card click event from firing
+    event.stopPropagation();
+
+    if (!entry.mood || !entry.moodAnalysis || !entry.suggestions) {
+      toast.error("This entry cannot be shared", {
+        style: { background: "#ef4444", color: "#fff", border: "none" },
+      });
+      return;
+    }
+
+    try {
+      const shareData = {
+        mood: entry.mood,
+        moodAnalysis: entry.moodAnalysis,
+        suggestions: entry.suggestions,
+        sharedBy: user?.firstName
+          ? `${user.firstName} ${user.lastName || ""}`.trim()
+          : user?.username || "Anonymous",
+      };
+
+      toast.promise(
+        fetch("/api/share", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(shareData),
+        })
+          .then(async (response) => {
+            if (!response.ok) {
+              const errorData = await response.json();
+              throw new Error(errorData.error || "Failed to create share link");
+            }
+            return response.json();
+          })
+          .then((result) => {
+            if (result.success) {
+              navigator.clipboard.writeText(result.shareUrl);
+              return result;
+            }
+            throw new Error(result.error || "Failed to create share link");
+          }),
+        {
+          loading: "Creating shareable link...",
+          success: () => ({
+            message: "Link copied to clipboard!",
+            style: { background: "#22c55e", color: "#fff", border: "none" },
+          }),
+          error: (err) => ({
+            message: err.message || "Failed to create share link",
+            style: { background: "#ef4444", color: "#fff", border: "none" },
+          }),
+        }
+      );
+    } catch (error) {
+      console.error("Error sharing mood:", error);
+      toast.error("Failed to create share link.", {
+        style: { background: "#ef4444", color: "#fff", border: "none" },
+      });
+    }
   };
 
   if (isLoading) {
@@ -240,57 +308,122 @@ export default function History() {
               </CardContent>
             </Card>
           ) : (
-            <div className="w-full max-w-4xl">
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                {moodHistory.map((entry, index) => (
-                  <Card
-                    key={index}
-                    className="bg-white/5 backdrop-blur-xl border-white/10 text-white hover:bg-white/10 transition-all duration-300 shadow-md hover:shadow-xl transform hover:-translate-y-1 cursor-pointer group"
-                    onClick={() => viewDetail(index)}
-                    onMouseEnter={() => setHoveredCard(index)}
-                    onMouseLeave={() => setHoveredCard(null)}
-                  >
-                    <CardContent className="p-4 sm:p-6 space-y-4 relative">
-                      <div>
-                        <div className="flex items-center gap-2 mb-1">
+            <div className="w-full max-w-3xl space-y-6">
+              {moodHistory.map((entry, index) => (
+                <Card
+                  key={index}
+                  className="bg-white/5 backdrop-blur-xl border-white/10 text-white hover:bg-white/10 transition-all duration-300 shadow-md hover:shadow-xl transform hover:-translate-y-1 cursor-pointer group"
+                  onClick={() => viewDetail(index)}
+                  onMouseEnter={() => setHoveredCard(index)}
+                  onMouseLeave={() => setHoveredCard(null)}
+                >
+                  <CardContent className="p-6 space-y-6">
+                    {/* Header with timestamp */}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-3 h-3 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full"></div>
+                        <span className="text-sm font-medium text-white/60">
+                          {new Date(entry.timestamp).toLocaleDateString(
+                            "en-US",
+                            {
+                              month: "short",
+                              day: "numeric",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            }
+                          )}
+                        </span>
+                      </div>
+                      <div className="text-xs text-white/40">
+                        #{String(index + 1).padStart(2, "0")}
+                      </div>
+                    </div>
+
+                    {/* Main content - side by side layout */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {/* Your Mood */}
+                      <div className="space-y-3">
+                        <div className="flex items-center gap-2">
                           <MessageSquare className="w-4 h-4 text-blue-400" />
                           <span className="text-sm font-medium text-white/80">
                             Your Mood
                           </span>
                         </div>
-                        <div className="bg-blue-500/10 border-l-4 border-blue-400 p-3 rounded-md">
-                          <p className="text-sm">"{entry.mood}"</p>
+                        <div className="bg-blue-500/10 border border-blue-400/20 p-4 rounded-lg">
+                          <p className="text-sm leading-relaxed text-blue-100 italic">
+                            "{entry.mood}"
+                          </p>
                         </div>
                       </div>
 
+                      {/* Mood Analysis */}
                       {entry.moodAnalysis && (
-                        <div>
-                          <div className="flex items-center gap-2 mb-1">
+                        <div className="space-y-3">
+                          <div className="flex items-center gap-2">
                             <Music className="w-4 h-4 text-green-400" />
                             <span className="text-sm font-medium text-white/80">
                               Analysis
                             </span>
                           </div>
-                          <div className="bg-green-500/10 p-3 rounded-md">
-                            <p className="text-lg font-bold text-green-300">
+                          <div className="bg-green-500/10 border border-green-400/20 p-4 rounded-lg">
+                            <p className="text-lg font-bold text-green-300 mb-2">
                               {entry.moodAnalysis.mood}
                             </p>
+                            {entry.moodAnalysis.genres && (
+                              <div className="flex flex-wrap gap-1">
+                                {entry.moodAnalysis.genres
+                                  .slice(0, 3)
+                                  .map((genre, idx) => (
+                                    <span
+                                      key={idx}
+                                      className="text-xs bg-green-400/20 text-green-200 px-2 py-1 rounded-full"
+                                    >
+                                      {genre}
+                                    </span>
+                                  ))}
+                              </div>
+                            )}
                           </div>
                         </div>
                       )}
+                    </div>
 
-                      <div className="pt-2 border-t border-white/10 text-xs text-white/50 group-hover:text-white/80 flex justify-center items-center gap-2">
-                        View Details
+                    {/* Songs count indicator */}
+                    {entry.suggestions?.tracks && (
+                      <div className="flex items-center justify-center py-2">
+                        <div className="flex items-center gap-2 text-white/60 text-sm">
+                          <Music className="w-4 h-4" />
+                          <span>
+                            {entry.suggestions.tracks.length} songs curated
+                          </span>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Action buttons */}
+                    <div className="flex items-center justify-between pt-4 border-t border-white/10">
+                      <Button
+                        onClick={(e) => handleShare(entry, e)}
+                        variant="outline"
+                        size="sm"
+                        className="bg-transparent border-green-400/20 text-green-400/70 hover:bg-green-400/5 hover:text-green-400 hover:border-green-400/40 transition-colors"
+                      >
+                        <Share2 className="w-4 h-4 mr-2" />
+                        Share Mood
+                      </Button>
+
+                      <div className="flex items-center gap-2 text-white/50 group-hover:text-white/80 transition-colors">
+                        <span className="text-sm">View Full Details</span>
                         <ArrowRight
                           className={`w-4 h-4 transition-transform ${
                             hoveredCard === index ? "translate-x-1" : ""
                           }`}
                         />
                       </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
           )}
         </div>
