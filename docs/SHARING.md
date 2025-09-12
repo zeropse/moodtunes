@@ -33,7 +33,6 @@ Each shared entry contains:
   "sharedBy": "User Name",
   "sharedAt": "2025-09-13T10:30:00.000Z",
   "appName": "MoodTunes",
-  "version": "1.0"
 }
 ```
 
@@ -48,14 +47,6 @@ Each shared entry contains:
    ```bash
    JSONBIN_API_KEY=your_api_key_here
    NEXT_PUBLIC_APP_URL=https://yourdomain.com
-   ```
-
-### 2. Optional: Create Collection
-
-1. In JSONBin dashboard, create a collection for organization
-2. Add collection ID to `.env.local`:
-   ```bash
-   JSONBIN_COLLECTION_ID=your_collection_id
    ```
 
 ## Usage

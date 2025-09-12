@@ -28,11 +28,9 @@ export async function POST(request) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "X-Master-Key":
-          process.env.JSONBIN_API_KEY ||
-          "$2a$10$8GUdAY5M9Zp9pMZpOQZY0.vxHpJvKQZY0L6Q5L6Q5L6Q5L6Q5L6Q5",
+        "X-Master-Key": process.env.JSONBIN_API_KEY,
         "X-Bin-Name": `moodtunes-share-${Date.now()}`,
-        "X-Bin-Private": "false", // Make it public for sharing
+        "X-Bin-Private": "false",
       },
       body: JSON.stringify(shareData),
     });
@@ -47,9 +45,7 @@ export async function POST(request) {
     const shareId = result.metadata.id;
 
     // Build share URL
-    const shareUrl = `${
-      process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
-    }/share/${shareId}`;
+    const shareUrl = `${process.env.NEXT_PUBLIC_APP_URL}/share/${shareId}`;
 
     return NextResponse.json({
       success: true,
@@ -84,9 +80,7 @@ export async function GET(request) {
     // Fetch shared data from jsonbin.io
     const response = await fetch(`https://api.jsonbin.io/v3/b/${shareId}`, {
       headers: {
-        "X-Master-Key":
-          process.env.JSONBIN_API_KEY ||
-          "$2a$10$8GUdAY5M9Zp9pMZpOQZY0.vxHpJvKQZY0L6Q5L6Q5L6Q5L6Q5L6Q5",
+        "X-Master-Key": process.env.JSONBIN_API_KEY,
       },
     });
 

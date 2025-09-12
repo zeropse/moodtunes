@@ -114,36 +114,12 @@ export async function POST(request) {
         suggestionOptions
       );
     } catch (spotifyError) {
-      const fallbackSuggestions = {
-        id: "fallback-suggestions",
-        mood: body.moodText || body.mood || "Unknown",
-        tracks: [
-          {
-            id: "sample-1",
-            name: "Sample Track 1",
-            artists: ["Sample Artist"],
-            preview_url: null,
-            external_urls: { spotify: "#" },
-            duration_ms: 180000,
-            popularity: 75,
-          },
-          {
-            id: "sample-2",
-            name: "Sample Track 2",
-            artists: ["Sample Artist"],
-            preview_url: null,
-            external_urls: { spotify: "#" },
-            duration_ms: 200000,
-            popularity: 70,
-          },
-        ],
-        totalTracks: 2,
-        seedGenres: body.genres?.slice(0, 3) || ["pop"],
-        shareUrl: "#",
-        createdAt: new Date().toISOString(),
-        fallback: true,
-        message: "Sample song suggestions - Spotify connection unavailable",
-      };
+      console.error("Spotify API error", {
+        requestId,
+        message: spotifyError.message,
+        statusCode: spotifyError.statusCode,
+        processingTime,
+      });
 
       return NextResponse.json({
         success: true,
@@ -199,36 +175,12 @@ export async function POST(request) {
       });
 
       if (error.statusCode >= 500 || error.statusCode === 408) {
-        const fallbackSuggestions = {
-          id: "fallback-suggestions",
-          mood: body?.moodText || body?.mood || "Unknown",
-          tracks: [
-            {
-              id: "sample-1",
-              name: "Sample Track 1",
-              artists: ["Sample Artist"],
-              preview_url: null,
-              external_urls: { spotify: "#" },
-              duration_ms: 180000,
-              popularity: 75,
-            },
-            {
-              id: "sample-2",
-              name: "Sample Track 2",
-              artists: ["Sample Artist"],
-              preview_url: null,
-              external_urls: { spotify: "#" },
-              duration_ms: 200000,
-              popularity: 70,
-            },
-          ],
-          totalTracks: 2,
-          seedGenres: body?.genres?.slice(0, 3) || ["pop"],
-          shareUrl: "#",
-          createdAt: new Date().toISOString(),
-          fallback: true,
-          message: "Sample song suggestions - Spotify connection unavailable",
-        };
+        console.log("Spotify API error", {
+          requestId,
+          message: error.message,
+          statusCode: error.statusCode,
+          processingTime,
+        });
 
         // Return fallback response instead of error
         return NextResponse.json({

@@ -291,18 +291,15 @@ export async function generateSongSuggestions(moodAnalysis, options = {}) {
       id: track.id,
       name: track.name,
       artists: track.artists.map((artist) => artist.name),
-      preview_url: track.preview_url,
-      external_urls: track.external_urls,
       duration_ms: track.duration_ms,
-      popularity: track.popularity,
-      sourceGenre: track.sourceGenre,
-      album: {
-        id: track.album.id,
-        name: track.album.name,
-        images: track.album.images,
-        release_date: track.album.release_date,
-        total_tracks: track.album.total_tracks,
+      external_urls: {
+        spotify: track.external_urls.spotify, // Only keep Spotify URL
       },
+      album: {
+        images: track.album.images, // Only keep images array for album art
+      },
+      // Removed unused fields: preview_url, popularity, sourceGenre,
+      // album.id, album.name, album.release_date, album.total_tracks
     }));
 
     console.log(
