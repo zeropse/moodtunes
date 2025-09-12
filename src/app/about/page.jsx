@@ -4,12 +4,16 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Zap, Sparkles, Heart } from "lucide-react";
 import Link from "next/link";
-import { Vortex } from "@/components/ui/vortex";
 
 export default function About() {
   return (
-    <Vortex>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900/10 to-slate-900">
       <div className="min-h-screen overflow-hidden">
+        {/* Background Elements */}
+        <div className="absolute inset-0 bg-gradient-to-r from-purple-500/5 via-pink-500/5 to-blue-500/5"></div>
+        <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-purple-500/10 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-pink-500/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+
         <div className="relative z-10 container mx-auto px-4 py-8">
           {/* Header */}
           <div className="flex flex-col items-center justify-center mb-8">
@@ -140,6 +144,6 @@ export default function About() {
           </div>
         </div>
       </div>
-    </Vortex>
+    </div>
   );
 }

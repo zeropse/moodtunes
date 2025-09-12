@@ -1,5 +1,4 @@
 "use client";
-import { Vortex } from "@/components/ui/vortex";
 import {
   Accordion,
   AccordionContent,
@@ -63,9 +62,14 @@ const FAQ = () => {
   ];
 
   return (
-    <Vortex>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900/10 to-slate-900">
       <div className="min-h-screen py-10">
-        <div className="max-w-4xl mx-auto space-y-8 px-6">
+        {/* Background Elements */}
+        <div className="absolute inset-0 bg-gradient-to-r from-purple-500/5 via-pink-500/5 to-blue-500/5"></div>
+        <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-purple-500/10 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-pink-500/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+
+        <div className="relative z-10 max-w-4xl mx-auto space-y-8 px-6">
           <header className="text-center space-y-4">
             <h1 className="text-4xl font-bold text-white">
               Frequently Asked Questions
@@ -103,7 +107,7 @@ const FAQ = () => {
           </Accordion>
         </div>
       </div>
-    </Vortex>
+    </div>
   );
 };
 
