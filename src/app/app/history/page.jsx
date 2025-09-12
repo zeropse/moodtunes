@@ -80,7 +80,7 @@ export default function History() {
   const viewDetail = (index) => {
     const entry = moodHistory[index];
     sessionStorage.setItem("selectedHistoryEntry", JSON.stringify(entry));
-    router.push(`/history/${index}`);
+    router.push(`/app/history/${index}`);
   };
 
   if (isLoading) {
@@ -202,7 +202,7 @@ export default function History() {
                   discover the perfect soundtrack.
                 </p>
 
-                <Link href="/">
+                <Link href="/app">
                   <Button
                     size="sm"
                     className="bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 hover:from-purple-600 hover:via-pink-600 hover:to-blue-600 text-white text-sm py-3 px-6 rounded-xl shadow-md cursor-pointer"

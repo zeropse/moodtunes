@@ -6,6 +6,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { SignedIn, SignedOut, UserButton, useAuth } from "@clerk/nextjs";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Drawer,
   DrawerContent,
@@ -16,8 +17,11 @@ import {
 import { toast } from "sonner";
 
 // Logo Component
-const Logo = () => (
-  <div className="flex items-center gap-2">
+const Logo = ({ userId, router }) => (
+  <div
+    className="flex items-center gap-2 cursor-pointer"
+    onClick={() => router.push(userId ? "/app" : "/")}
+  >
     <IconMusic size={38} className="text-purple-500" />
     <span className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 bg-clip-text text-transparent">
       MoodTunes
@@ -94,7 +98,14 @@ const NavLink = ({
 };
 
 // Mobile Menu Component
-const MobileDrawer = ({ isOpen, onClose, navItems, router, userId }) => {
+const MobileDrawer = ({
+  isOpen,
+  onClose,
+  navItems,
+  router,
+  userId,
+  isLoaded,
+}) => {
   const pathname = usePathname();
 
   return (
@@ -103,7 +114,7 @@ const MobileDrawer = ({ isOpen, onClose, navItems, router, userId }) => {
         <DrawerHeader className="border-b border-gray-800">
           <div className="flex items-center justify-between">
             <DrawerTitle>
-              <Logo />
+              <Logo userId={userId} router={router} />
             </DrawerTitle>
             <DrawerClose asChild>
               <Button variant="ghost" size="icon" className="hover:bg-gray-800">
@@ -133,34 +144,44 @@ const MobileDrawer = ({ isOpen, onClose, navItems, router, userId }) => {
 
           {/* Auth Section - Full Width Buttons */}
           <div className="mt-auto pt-6 border-t border-gray-800">
-            <SignedOut>
+            {!isLoaded ? (
+              // Loading placeholder for mobile
               <div className="flex flex-col space-y-4">
-                <Button
-                  onClick={() => {
-                    router.push("/sign-in");
-                    onClose();
-                  }}
-                  variant="outline"
-                  className="w-full border-purple-500 text-purple-400 hover:bg-purple-500 hover:text-white"
-                >
-                  Sign In
-                </Button>
-                <Button
-                  onClick={() => {
-                    router.push("/sign-up");
-                    onClose();
-                  }}
-                  className="w-full bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 hover:from-purple-600 hover:via-pink-600 hover:to-blue-600 text-white shadow-lg hover:shadow-purple-500/25"
-                >
-                  Sign Up
-                </Button>
+                <Skeleton className="w-full h-[40px]" />
+                <Skeleton className="w-full h-[40px]" />
               </div>
-            </SignedOut>
-            <SignedIn>
-              <div className="flex justify-center">
-                <UserButton forceRedirectUrl="/" />
-              </div>
-            </SignedIn>
+            ) : (
+              <>
+                <SignedOut>
+                  <div className="flex flex-col space-y-4">
+                    <Button
+                      onClick={() => {
+                        router.push("/sign-in");
+                        onClose();
+                      }}
+                      variant="outline"
+                      className="w-full border-purple-500 text-purple-400 hover:bg-purple-500 hover:text-white"
+                    >
+                      Sign In
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        router.push("/sign-up");
+                        onClose();
+                      }}
+                      className="w-full bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 hover:from-purple-600 hover:via-pink-600 hover:to-blue-600 text-white shadow-lg hover:shadow-purple-500/25"
+                    >
+                      Sign Up
+                    </Button>
+                  </div>
+                </SignedOut>
+                <SignedIn>
+                  <div className="flex justify-center">
+                    <UserButton forceRedirectUrl="/" />
+                  </div>
+                </SignedIn>
+              </>
+            )}
           </div>
         </div>
       </DrawerContent>
@@ -173,13 +194,12 @@ export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
-  const { userId } = useAuth();
+  const { userId, isLoaded } = useAuth();
 
   const navItems = [
-    { name: "Home", link: "/" },
     { name: "About", link: "/about" },
     { name: "FAQ", link: "/faq" },
-    { name: "History", link: "/history", requiresAuth: true },
+    { name: "History", link: "/app/history", requiresAuth: true },
   ];
 
   return (
@@ -189,7 +209,7 @@ export default function Navbar() {
           <div className="flex items-center justify-between h-16 md:h-20">
             {/* Logo - Left Section */}
             <div className="flex items-center">
-              <Logo />
+              <Logo userId={userId} router={router} />
             </div>
 
             {/* Desktop Navigation - Center Section */}
@@ -210,27 +230,37 @@ export default function Navbar() {
             {/* Right Section - Desktop Auth / Mobile Menu */}
             <div className="flex items-center">
               {/* Desktop Auth */}
-              <div className="hidden md:flex items-center">
-                <SignedOut>
+              <div className="hidden md:flex items-center w-[200px] justify-end">
+                {!isLoaded ? (
+                  // Loading placeholder to prevent layout shift
                   <div className="flex items-center space-x-4">
-                    <Button
-                      onClick={() => router.push("/sign-in")}
-                      variant="outline"
-                      className="cursor-pointer border-purple-500 text-purple-400 hover:bg-purple-500  hover:text-purple-400"
-                    >
-                      Sign In
-                    </Button>
-                    <Button
-                      onClick={() => router.push("/sign-up")}
-                      className="cursor-pointer bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 hover:from-purple-600 hover:via-pink-600 hover:to-blue-600 text-white shadow-lg hover:shadow-purple-500/25"
-                    >
-                      Sign Up
-                    </Button>
+                    <Skeleton className="w-[70px] h-[36px]" />
+                    <Skeleton className="w-[80px] h-[36px]" />
                   </div>
-                </SignedOut>
-                <SignedIn>
-                  <UserButton forceRedirectUrl="/" />
-                </SignedIn>
+                ) : (
+                  <>
+                    <SignedOut>
+                      <div className="flex items-center space-x-4">
+                        <Button
+                          onClick={() => router.push("/sign-in")}
+                          variant="outline"
+                          className="cursor-pointer border-purple-500 text-purple-400 hover:bg-purple-500  hover:text-purple-400"
+                        >
+                          Sign In
+                        </Button>
+                        <Button
+                          onClick={() => router.push("/sign-up")}
+                          className="cursor-pointer bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 hover:from-purple-600 hover:via-pink-600 hover:to-blue-600 text-white shadow-lg hover:shadow-purple-500/25"
+                        >
+                          Sign Up
+                        </Button>
+                      </div>
+                    </SignedOut>
+                    <SignedIn>
+                      <UserButton forceRedirectUrl="/" />
+                    </SignedIn>
+                  </>
+                )}
               </div>
 
               {/* Mobile Menu Button */}
@@ -256,6 +286,7 @@ export default function Navbar() {
         navItems={navItems}
         router={router}
         userId={userId}
+        isLoaded={isLoaded}
       />
     </>
   );

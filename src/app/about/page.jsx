@@ -128,7 +128,7 @@ export default function About() {
 
             {/* Call to Action */}
             <div className="text-center py-8">
-              <Link href="/">
+              <Link href="/app">
                 <Button
                   size="lg"
                   className="bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 hover:from-purple-600 hover:via-pink-600 hover:to-blue-600 text-white font-semibold text-lg px-8 py-3 rounded-xl shadow-xl hover:shadow-purple-500/25 transition-all duration-300 transform cursor-pointer"

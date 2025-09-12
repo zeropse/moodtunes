@@ -117,11 +117,11 @@ export default function HistoryDetailPage() {
   }, []);
 
   const handleGoBack = () => {
-    router.push("/history");
+    router.push("/app/history");
   };
 
   const handleStartOver = () => {
-    router.push("/");
+    router.push("/app");
   };
 
   const TrackItem = ({ track, index, isCurrentTrack }) => (
@@ -224,6 +224,7 @@ export default function HistoryDetailPage() {
 
   // Redirect if not authenticated
   if (!userId) {
+    router.push("/sign-in");
     return null;
   }
 

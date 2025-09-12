@@ -146,7 +146,7 @@ export default function SuggestionsPage() {
 
   const handleStartOver = useCallback(() => {
     sessionStorage.removeItem("moodData");
-    router.push("/");
+    router.push("/app");
   }, [router]);
 
   const handleGetNewSongs = useCallback(async () => {
@@ -505,6 +505,7 @@ export default function SuggestionsPage() {
 
   // Redirect if not authenticated
   if (!userId) {
+    router.push("/sign-in");
     return null;
   }
 

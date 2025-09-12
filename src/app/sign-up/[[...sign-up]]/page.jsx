@@ -6,7 +6,7 @@ export default function Page() {
   return (
     <Vortex>
       <div className="flex min-h-screen items-center justify-center">
-        <SignUp />
+        <SignUp forceRedirectUrl="/app" signInUrl="/sign-in" />
       </div>
     </Vortex>
   );
