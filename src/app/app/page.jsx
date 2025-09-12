@@ -231,6 +231,34 @@ export default function AppHome() {
             </form>
           </Card>
 
+          {/* Quick Mood Buttons */}
+          <div className="flex flex-wrap justify-center gap-4 mt-6">
+            <Button
+              onClick={() => router.push("/app/demo/happy")}
+              variant="outline"
+              className="bg-white/10 border-white/30 text-white hover:bg-white/20 hover:border-white/50 cursor-pointer"
+            >
+              <Heart className="w-4 h-4 mr-2" />
+              I'm Feeling Happy
+            </Button>
+            <Button
+              onClick={() => router.push("/app/demo/nostalgic")}
+              variant="outline"
+              className="bg-white/10 border-white/30 text-white hover:bg-white/20 hover:border-white/50 cursor-pointer"
+            >
+              <Music className="w-4 h-4 mr-2" />
+              I'm Feeling Nostalgic
+            </Button>
+            <Button
+              onClick={() => router.push("/app/demo/chill")}
+              variant="outline"
+              className="bg-white/10 border-white/30 text-white hover:bg-white/20 hover:border-white/50 cursor-pointer"
+            >
+              <Zap className="w-4 h-4 mr-2" />
+              I'm Feeling Chill
+            </Button>
+          </div>
+
           {/* Feature Icons */}
           <div className="flex justify-center gap-8 mt-8 text-gray-300">
             <div className="flex items-center gap-2">
