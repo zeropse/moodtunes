@@ -131,6 +131,31 @@ export default function History() {
             Mood History
           </h1>
 
+          {/* History Info */}
+          <div className="max-w-2xl mx-auto bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-6 shadow-lg">
+            <div className="flex items-center justify-center space-x-2 mb-3">
+              <div className="w-2 h-2 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full"></div>
+              <p className="text-white/80 text-sm font-medium">
+                History Storage Info
+              </p>
+              <div className="w-2 h-2 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full"></div>
+            </div>
+            <p className="text-white/70 text-sm leading-relaxed">
+              MoodTunes automatically saves your last{" "}
+              <span className="text-purple-400 font-semibold">
+                3 mood analysis sessions
+              </span>
+              . When you create a new mood analysis, the oldest entry is
+              automatically removed to keep your history fresh and relevant.
+            </p>
+            <div className="mt-3 flex items-center justify-center space-x-1 text-xs text-white/50">
+              <span>Current entries:</span>
+              <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent font-bold">
+                {moodHistory.length}/3
+              </span>
+            </div>
+          </div>
+
           {moodHistory.length > 0 && (
             <Dialog>
               <DialogTrigger asChild>

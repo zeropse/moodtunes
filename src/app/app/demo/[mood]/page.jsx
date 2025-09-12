@@ -1,21 +1,71 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState, useCallback, useRef, use } from "react";
+import { useAuth } from "@clerk/nextjs";
+import { useState, useCallback, useRef, use, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Music, Star, Home, Play } from "lucide-react";
+import { Music, Star, Home, Play, Loader2 } from "lucide-react";
 import { Vortex } from "@/components/ui/vortex";
-import { demoMoodData } from "@/lib/demo-mood-data";
+import { notFound } from "next/navigation";
 
 export default function DemoPage({ params }) {
   const router = useRouter();
+  const { userId, isLoaded } = useAuth();
   const [currentTrack, setCurrentTrack] = useState(null);
+  const [currentMoodData, setCurrentMoodData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
   const scrollContainerRef = useRef(null);
   const nowPlayingRef = useRef(null);
 
   const { mood } = use(params);
-  const currentMoodData = demoMoodData[mood];
+
+  // Handle authentication redirect
+  useEffect(() => {
+    if (isLoaded && !userId) {
+      router.push("/sign-in");
+    }
+  }, [isLoaded, userId, router]);
+
+  // Show loading while checking auth
+  if (!isLoaded) {
+    return (
+      <Vortex>
+        <div className="flex min-h-screen items-center justify-center">
+          <div className="text-white">Loading...</div>
+        </div>
+      </Vortex>
+    );
+  }
+
+  // Return null while redirecting to sign-in
+  if (!userId) {
+    return null;
+  }
+
+  // Lazy load the demo mood data
+  useEffect(() => {
+    const loadMoodData = async () => {
+      setIsLoading(true);
+      try {
+        const { demoMoodData } = await import("@/lib/demo-mood-data");
+        const moodData = demoMoodData[mood];
+
+        if (!moodData) {
+          notFound();
+        }
+
+        setCurrentMoodData(moodData);
+      } catch (error) {
+        console.error("Failed to load mood data:", error);
+        notFound();
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadMoodData();
+  }, [mood]);
 
   const handleStartOver = useCallback(() => {
     router.push("/app");
@@ -36,6 +86,39 @@ export default function DemoPage({ params }) {
       }
     });
   }, []);
+
+  // Loading state component
+  const LoadingState = () => (
+    <div className="flex items-center justify-center min-h-[50vh]">
+      <Card className="bg-white/5 backdrop-blur-xl border-white/10 text-white shadow-2xl max-w-sm w-full mx-4">
+        <CardContent className="flex flex-col items-center justify-center space-y-4 py-12 px-6">
+          <div className="relative">
+            <div className="w-16 h-16 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 animate-pulse"></div>
+            <Loader2 className="w-8 h-8 animate-spin text-white absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" />
+          </div>
+          <div className="text-center space-y-2">
+            <h3 className="text-xl font-bold text-white">Loading Demo...</h3>
+            <p className="text-white/60 text-sm">
+              Preparing your {mood} mood playlist...
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+
+  // Show loading state while data is being loaded
+  if (isLoading || !currentMoodData) {
+    return (
+      <Vortex>
+        <div className="min-h-screen">
+          <div className="container mx-auto px-4 py-6 max-w-6xl">
+            <LoadingState />
+          </div>
+        </div>
+      </Vortex>
+    );
+  }
 
   const MoodInfo = () => (
     <Card
