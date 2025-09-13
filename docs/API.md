@@ -359,41 +359,6 @@ curl -X POST http://localhost:3000/api/suggest-songs \
 }
 ```
 
-### Fallback Responses
-
-When Spotify API is unavailable, the `/api/suggest-songs` endpoint returns sample data:
-
-```json
-{
-  "success": true,
-  "suggestions": {
-    "id": "fallback-suggestions",
-    "mood": "happy",
-    "tracks": [
-      {
-        "id": "sample-1",
-        "name": "Sample Track 1",
-        "artists": ["Sample Artist"],
-        "preview_url": null,
-        "external_urls": { "spotify": "#" },
-        "duration_ms": 180000,
-        "popularity": 75
-      }
-    ],
-    "totalTracks": 2,
-    "seedGenres": ["pop"],
-    "fallback": true,
-    "message": "Sample song suggestions - Spotify connection unavailable"
-  },
-  "warning": "Spotify is temporarily unavailable. Here are some sample suggestions.",
-  "meta": {
-    "requestId": "suggestions_1704123456789_fallback",
-    "processingTime": 15,
-    "fallback": true
-  }
-}
-```
-
 ## Sharing API
 
 ### Create Share Link

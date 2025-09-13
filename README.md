@@ -464,7 +464,7 @@ Generates personalized song recommendations from Spotify.
 
 ### Error Handling
 
-Both APIs include comprehensive error handling with fallback responses:
+Both APIs include comprehensive error handling:
 
 ```javascript
 // Error Response
@@ -479,15 +479,16 @@ Both APIs include comprehensive error handling with fallback responses:
   }
 }
 
-// Fallback Response (when Spotify is unavailable)
+// Server Error Response (when Spotify is unavailable)
 {
-  "success": true,
-  "suggestions": {
-    "tracks": [/* sample tracks */],
-    "fallback": true,
-    "message": "Sample song suggestions - Spotify connection unavailable"
+  "success": false,
+  "error": {
+    "message": "We're having trouble connecting to Spotify. Please try again later.",
+    "code": "API_ERROR"
   },
-  "warning": "Spotify is temporarily unavailable. Here are some sample suggestions."
+  "meta": {
+    "timestamp": "2024-01-15T10:30:00.000Z"
+  }
 }
 ```
 

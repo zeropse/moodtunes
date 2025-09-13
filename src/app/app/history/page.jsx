@@ -366,39 +366,13 @@ export default function History() {
                             </span>
                           </div>
                           <div className="bg-green-500/10 border border-green-400/20 p-4 rounded-lg">
-                            <p className="text-lg font-bold text-green-300 mb-2">
+                            <p className="text-lg font-bold text-green-300">
                               {entry.moodAnalysis.mood}
                             </p>
-                            {entry.moodAnalysis.genres && (
-                              <div className="flex flex-wrap gap-1">
-                                {entry.moodAnalysis.genres
-                                  .slice(0, 3)
-                                  .map((genre, idx) => (
-                                    <span
-                                      key={idx}
-                                      className="text-xs bg-green-400/20 text-green-200 px-2 py-1 rounded-full"
-                                    >
-                                      {genre}
-                                    </span>
-                                  ))}
-                              </div>
-                            )}
                           </div>
                         </div>
                       )}
                     </div>
-
-                    {/* Songs count indicator */}
-                    {entry.suggestions?.tracks && (
-                      <div className="flex items-center justify-center py-2">
-                        <div className="flex items-center gap-2 text-white/60 text-sm">
-                          <Music className="w-4 h-4" />
-                          <span>
-                            {entry.suggestions.tracks.length} songs curated
-                          </span>
-                        </div>
-                      </div>
-                    )}
 
                     {/* Action buttons */}
                     <div className="flex items-center justify-between pt-4 border-t border-white/10">

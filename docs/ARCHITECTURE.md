@@ -226,7 +226,7 @@ POST /api/suggest-songs
 - **Token Caching**: Reduces Spotify API calls
 - **Request Deduplication**: Prevents duplicate API requests
 - **Error Boundaries**: Graceful error handling
-- **Fallback Responses**: Sample data when APIs are unavailable
+- **Retry Mechanisms**: Smart retry logic for failed requests
 
 ### 3. Animation Performance
 
@@ -271,7 +271,7 @@ POST /api/suggest-songs
 
 ### 1. Graceful Degradation
 
-- **Fallback Responses**: Sample data when APIs fail
+- **Retry Logic**: Multiple search strategies for song discovery
 - **Progressive Enhancement**: Core functionality works without JavaScript
 - **Error Boundaries**: Prevent application crashes
 - **User Feedback**: Clear error messages and recovery options

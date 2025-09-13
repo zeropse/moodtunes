@@ -1,3 +1,5 @@
+import spotifyCache from "./spotify-cache.js";
+
 class SpotifyAPIClient {
   constructor() {
     this.clientId = process.env.SPOTIFY_CLIENT_ID;
@@ -116,9 +118,11 @@ class SpotifyAPIClient {
   async searchTracks(query, options = {}) {
     const { limit = 20, offset = 0 } = options;
 
-    // Check cache first
-    const cacheKey = `search:${query}:${limit}:${offset}`;
-    const cached = this.getCachedResult(cacheKey);
+    // Generate cache key using the proper cache system
+    const cacheKey = spotifyCache.generateCacheKey(query, { limit, offset });
+
+    // Check cache first - use server-side cache instead of localStorage
+    const cached = spotifyCache.getCached(cacheKey);
     if (cached) {
       return cached;
     }
@@ -132,72 +136,17 @@ class SpotifyAPIClient {
 
     const endpoint = `/search?${queryParams.toString()}`;
 
-    // Use rate-limited request
-    const result = await this.makeRateLimitedRequest(endpoint);
+    // Use rate-limited request through the cache system
+    const result = await spotifyCache.queueRequest(async () => {
+      return this.makeRequest(endpoint);
+    });
 
-    // Cache successful results
+    // Cache successful results using the proper cache system
     if (result && result.tracks) {
-      this.setCachedResult(cacheKey, result);
+      spotifyCache.setCached(cacheKey, result);
     }
 
     return result;
-  }
-
-  getCachedResult(key) {
-    if (typeof window !== "undefined") {
-      try {
-        const cached = localStorage.getItem(`spotify_cache_${key}`);
-        if (cached) {
-          const parsed = JSON.parse(cached);
-          const now = Date.now();
-          if (now < parsed.expiry) {
-            console.log(`Cache hit: ${key}`);
-            return parsed.data;
-          } else {
-            localStorage.removeItem(`spotify_cache_${key}`);
-          }
-        }
-      } catch (error) {
-        console.warn("Cache read error:", error);
-      }
-    }
-    return null;
-  }
-
-  setCachedResult(key, data) {
-    if (typeof window !== "undefined") {
-      try {
-        const cacheEntry = {
-          data,
-          expiry: Date.now() + 30 * 60 * 1000, // 30 minutes
-          created: Date.now(),
-        };
-        localStorage.setItem(
-          `spotify_cache_${key}`,
-          JSON.stringify(cacheEntry)
-        );
-        console.log(`Cached: ${key}`);
-      } catch (error) {
-        console.warn("Cache write error:", error);
-      }
-    }
-  }
-
-  async makeRateLimitedRequest(endpoint, options = {}) {
-    // Simple rate limiting - wait if we made a request recently
-    const now = Date.now();
-    const lastRequest = this.lastRequestTime || 0;
-    const timeSinceLastRequest = now - lastRequest;
-    const minInterval = 100; // 100ms between requests
-
-    if (timeSinceLastRequest < minInterval) {
-      await new Promise((resolve) =>
-        setTimeout(resolve, minInterval - timeSinceLastRequest)
-      );
-    }
-
-    this.lastRequestTime = Date.now();
-    return this.makeRequest(endpoint, options);
   }
 }
 
@@ -452,92 +401,3 @@ function removeDuplicatesAndSelect(tracks) {
 export function validateSpotifyConfig() {
   return !!(process.env.SPOTIFY_CLIENT_ID && process.env.SPOTIFY_CLIENT_SECRET);
 }
-
-// Fallback suggestions when Spotify is unavailable
-export const fallbackSuggestions = {
-  tracks: [
-    {
-      id: "fallback_1",
-      name: "Happy",
-      artists: ["Pharrell Williams"],
-      duration_ms: 232560,
-      external_urls: { spotify: "#" },
-      album: { images: [] },
-    },
-    {
-      id: "fallback_2",
-      name: "Can't Stop the Feeling!",
-      artists: ["Justin Timberlake"],
-      duration_ms: 236000,
-      external_urls: { spotify: "#" },
-      album: { images: [] },
-    },
-    {
-      id: "fallback_3",
-      name: "Uptown Funk",
-      artists: ["Mark Ronson", "Bruno Mars"],
-      duration_ms: 270000,
-      external_urls: { spotify: "#" },
-      album: { images: [] },
-    },
-    {
-      id: "fallback_4",
-      name: "Good as Hell",
-      artists: ["Lizzo"],
-      duration_ms: 219000,
-      external_urls: { spotify: "#" },
-      album: { images: [] },
-    },
-    {
-      id: "fallback_5",
-      name: "Shake It Off",
-      artists: ["Taylor Swift"],
-      duration_ms: 219000,
-      external_urls: { spotify: "#" },
-      album: { images: [] },
-    },
-    {
-      id: "fallback_6",
-      name: "Don't Stop Me Now",
-      artists: ["Queen"],
-      duration_ms: 210000,
-      external_urls: { spotify: "#" },
-      album: { images: [] },
-    },
-    {
-      id: "fallback_7",
-      name: "Walking on Sunshine",
-      artists: ["Katrina and the Waves"],
-      duration_ms: 239000,
-      external_urls: { spotify: "#" },
-      album: { images: [] },
-    },
-    {
-      id: "fallback_8",
-      name: "I Want It That Way",
-      artists: ["Backstreet Boys"],
-      duration_ms: 213000,
-      external_urls: { spotify: "#" },
-      album: { images: [] },
-    },
-    {
-      id: "fallback_9",
-      name: "Mr. Blue Sky",
-      artists: ["Electric Light Orchestra"],
-      duration_ms: 302000,
-      external_urls: { spotify: "#" },
-      album: { images: [] },
-    },
-    {
-      id: "fallback_10",
-      name: "Good Vibrations",
-      artists: ["The Beach Boys"],
-      duration_ms: 218000,
-      external_urls: { spotify: "#" },
-      album: { images: [] },
-    },
-  ],
-  totalTracks: 10,
-  seedGenres: ["pop", "rock", "dance"],
-  fallback: true,
-};

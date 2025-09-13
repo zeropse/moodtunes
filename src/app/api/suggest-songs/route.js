@@ -4,7 +4,6 @@ import {
   generateSongSuggestions,
   validateSpotifyConfig,
   SpotifyAPIError,
-  fallbackSuggestions,
 } from "@/lib/spotify-api";
 import spotifyCache from "@/lib/spotify-cache.js";
 
@@ -103,6 +102,13 @@ export async function POST(request) {
       genres: genres.slice(0, 5),
     };
 
+    // Log cache statistics before making requests
+    const cacheStatsBefore = spotifyCache.getStats();
+    console.log("Cache statistics before suggestions:", {
+      requestId,
+      ...cacheStatsBefore,
+    });
+
     // Pass retry attempt and excluded tracks to generate different results
     const suggestionOptions = {
       retryAttempt,
@@ -120,20 +126,18 @@ export async function POST(request) {
         requestId,
         message: spotifyError.message,
         statusCode: spotifyError.statusCode,
-        processingTime,
+        processingTime: Date.now() - startTime,
       });
 
-      return NextResponse.json({
-        success: true,
-        suggestions: fallbackSuggestions,
-        warning:
-          "Spotify is temporarily unavailable. Here are some sample suggestions.",
-        meta: {
-          requestId,
-          processingTime: Date.now() - startTime,
-          fallback: true,
-        },
-      });
+      const statusCode =
+        spotifyError.statusCode >= 400 && spotifyError.statusCode < 600
+          ? spotifyError.statusCode
+          : 500;
+
+      return createErrorResponse(
+        "We're having trouble connecting to Spotify. Please try again later.",
+        statusCode
+      );
     }
 
     const suggestionsResponse = {
@@ -147,6 +151,14 @@ export async function POST(request) {
     };
 
     const processingTime = Date.now() - startTime;
+
+    // Log cache statistics after making requests
+    const cacheStatsAfter = spotifyCache.getStats();
+    console.log("Cache statistics after suggestions:", {
+      requestId,
+      ...cacheStatsAfter,
+    });
+
     console.log("Song suggestions success", {
       requestId,
       mood,
@@ -177,25 +189,17 @@ export async function POST(request) {
       });
 
       if (error.statusCode >= 500 || error.statusCode === 408) {
-        console.log("Spotify API error", {
+        console.log("Spotify API server error", {
           requestId,
           message: error.message,
           statusCode: error.statusCode,
           processingTime,
         });
 
-        // Return fallback response instead of error
-        return NextResponse.json({
-          success: true,
-          suggestions: fallbackSuggestions,
-          warning:
-            "Spotify is temporarily unavailable. Please try again later for personalized recommendations.",
-          meta: {
-            requestId,
-            processingTime,
-            fallback: true,
-          },
-        });
+        return createErrorResponse(
+          "Spotify is temporarily unavailable. Please try again later.",
+          error.statusCode
+        );
       }
 
       const statusCode =
