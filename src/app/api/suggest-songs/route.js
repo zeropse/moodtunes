@@ -4,7 +4,9 @@ import {
   generateSongSuggestions,
   validateSpotifyConfig,
   SpotifyAPIError,
+  fallbackSuggestions,
 } from "@/lib/spotify-api";
+import spotifyCache from "@/lib/spotify-cache.js";
 
 function generateRequestId() {
   return `suggestions_${Date.now()}_${Math.random()

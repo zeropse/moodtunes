@@ -394,30 +394,106 @@ When Spotify API is unavailable, the `/api/suggest-songs` endpoint returns sampl
 }
 ```
 
-## Rate Limiting
+## Sharing API
 
-The API includes built-in rate limiting and timeout protection:
+### Create Share Link
+
+**POST** `/api/share`
+
+Creates a shareable link for mood analysis and song suggestions.
+
+```javascript
+// Request
+{
+  "mood": "I'm feeling absolutely amazing today!",
+  "moodAnalysis": {
+    "mood": "happy",
+    "confidence": 0.85,
+    "genres": ["pop", "dance", "funk"],
+    "energy": 0.8,
+    "valence": 0.9
+  },
+  "suggestions": {
+    "tracks": [/* array of track objects */],
+    "totalTracks": 15
+  },
+  "sharedBy": "John Doe"
+}
+
+// Response
+{
+  "success": true,
+  "shareId": "64f8a9b2c1d2e3f4a5b6c7d8",
+  "shareUrl": "https://moodtunes.app/share/64f8a9b2c1d2e3f4a5b6c7d8",
+  "message": "Mood shared successfully!"
+}
+```
+
+### Get Shared Mood
+
+**GET** `/api/share?id={shareId}`
+
+Retrieves shared mood data by ID.
+
+```javascript
+// Response
+{
+  "success": true,
+  "data": {
+    "mood": "I'm feeling absolutely amazing today!",
+    "moodAnalysis": {
+      "mood": "happy",
+      "confidence": 0.85,
+      "genres": ["pop", "dance", "funk"]
+    },
+    "suggestions": {
+      "tracks": [/* array of track objects */]
+    },
+    "sharedBy": "John Doe",
+    "sharedAt": "2024-01-15T10:30:00.000Z",
+    "appName": "MoodTunes"
+  }
+}
+```
+
+## Rate Limiting & Performance
+
+The API includes comprehensive performance optimizations:
 
 - **Request Timeout**: 5 seconds for external API calls
-- **Token Caching**: Spotify tokens are cached to reduce API calls
-- **Retry Logic**: Automatic retries for transient failures
+- **Token Caching**: Spotify tokens cached for 1 hour to reduce API calls
+- **Response Caching**: 30-minute caching for Spotify search results
+- **Rate Limiting**: 100ms delays between Spotify requests
+- **Retry Logic**: Exponential backoff for transient failures
+- **Circuit Breakers**: Prevents cascade failures with automatic recovery
+- **Fallback System**: Sample data when external services unavailable
 
 ## Mood Categories
 
-The API recognizes 10 distinct mood categories:
+The API recognizes 11 distinct mood categories with advanced analysis:
 
-| Mood       | Energy | Valence | Tempo Range | Primary Genres                  |
-| ---------- | ------ | ------- | ----------- | ------------------------------- |
-| happy      | 0.8    | 0.9     | 120-140 BPM | pop, dance, funk, disco         |
-| sad        | 0.3    | 0.2     | 60-90 BPM   | blues, indie, folk, alternative |
-| energetic  | 0.95   | 0.7     | 128-160 BPM | electronic, edm, techno, house  |
-| relaxed    | 0.4    | 0.6     | 60-100 BPM  | ambient, chillout, lo-fi, jazz  |
-| angry      | 0.9    | 0.1     | 140-180 BPM | rock, metal, punk, hardcore     |
-| romantic   | 0.5    | 0.8     | 80-120 BPM  | r&b, soul, jazz, indie-pop      |
-| nostalgic  | 0.5    | 0.6     | 90-130 BPM  | classic-rock, oldies, folk      |
-| anxious    | 0.6    | 0.3     | 100-130 BPM | indie, alternative, ambient     |
-| confident  | 0.8    | 0.8     | 110-140 BPM | hip-hop, rap, trap, funk        |
-| thoughtful | 0.4    | 0.5     | 70-110 BPM  | jazz, classical, post-rock      |
+| Mood       | Energy | Valence | Tempo Range | Primary Genres                  | Keywords (Sample)                   |
+| ---------- | ------ | ------- | ----------- | ------------------------------- | ----------------------------------- |
+| happy      | 0.8    | 0.9     | 120-140 BPM | pop, dance, funk, disco         | happy, joy, excited, amazing, great |
+| sad        | 0.3    | 0.2     | 60-90 BPM   | blues, indie, folk, alternative | sad, depressed, heartbroken, lonely |
+| energetic  | 0.95   | 0.7     | 128-160 BPM | electronic, edm, techno, house  | energetic, pumped, motivated, hyper |
+| relaxed    | 0.4    | 0.6     | 60-100 BPM  | ambient, chillout, lo-fi, jazz  | relaxed, calm, peaceful, tranquil   |
+| angry      | 0.9    | 0.1     | 140-180 BPM | rock, metal, punk, hardcore     | angry, mad, furious, frustrated     |
+| romantic   | 0.5    | 0.8     | 80-120 BPM  | r&b, soul, jazz, indie-pop      | love, romantic, crush, valentine    |
+| nostalgic  | 0.5    | 0.6     | 90-130 BPM  | classic-rock, oldies, folk      | nostalgic, memories, past, vintage  |
+| anxious    | 0.6    | 0.3     | 100-130 BPM | indie, alternative, ambient     | anxious, nervous, worried, stressed |
+| confident  | 0.8    | 0.8     | 110-140 BPM | hip-hop, rap, trap, funk        | confident, bold, strong, powerful   |
+| thoughtful | 0.4    | 0.5     | 70-110 BPM  | jazz, classical, post-rock      | thinking, philosophical, reflecting |
+| chill      | 0.5    | 0.6     | 80-110 BPM  | lo-fi, chillhop, indie          | chill, laid-back, cool, whatever    |
+
+### Advanced Analysis Features
+
+- **200+ Keywords**: Comprehensive emotion vocabulary across all categories
+- **Contextual Understanding**: Processes negation, intensity, and temporal context
+- **Confidence Scoring**: 0.6-0.95 reliability range based on analysis quality
+- **Multi-language Support**: Basic support for common emotions in multiple languages
+- **Edge Case Handling**: Mixed emotions, contradictions, and poetic expressions
+  | thoughtful | 0.4 | 0.5 | 70-110 BPM | jazz, classical, post-rock |
 
 ## Usage Examples
 

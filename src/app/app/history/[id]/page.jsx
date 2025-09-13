@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { Vortex } from "@/components/ui/vortex";
 import { toast } from "sonner";
+import { findEntryByMoodId, isValidMoodId } from "@/lib/mood-id-utils";
 
 export default function HistoryDetailPage() {
   const { userId, isLoaded } = useAuth();
@@ -49,21 +50,36 @@ export default function HistoryDetailPage() {
         const selectedEntry = sessionStorage.getItem("selectedHistoryEntry");
 
         if (selectedEntry) {
-          setHistoryEntry(JSON.parse(selectedEntry));
-          setIsLoading(false);
-          return;
+          const entry = JSON.parse(selectedEntry);
+          // Verify the entry matches the URL moodId
+          if (entry.moodId === params.id || !entry.moodId) {
+            setHistoryEntry(entry);
+            setIsLoading(false);
+            return;
+          }
         }
 
-        // Fallback: get from localStorage and find by index
+        // Fallback: get from localStorage and find by mood ID
         const savedHistory = localStorage.getItem("moodMusicHistory");
         if (savedHistory && params.id) {
           const history = JSON.parse(savedHistory);
-          const index = parseInt(params.id);
 
-          if (index >= 0 && index < history.length) {
-            setHistoryEntry(history[index]);
+          // Check if params.id is a valid mood ID
+          if (isValidMoodId(params.id)) {
+            const entry = findEntryByMoodId(history, params.id);
+            if (entry) {
+              setHistoryEntry(entry);
+            } else {
+              setError("History entry not found");
+            }
           } else {
-            setError("History entry not found");
+            // Legacy support: try to parse as array index
+            const index = parseInt(params.id);
+            if (!isNaN(index) && index >= 0 && index < history.length) {
+              setHistoryEntry(history[index]);
+            } else {
+              setError("Invalid history entry ID");
+            }
           }
         } else {
           setError("No history data found");

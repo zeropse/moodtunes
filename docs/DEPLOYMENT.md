@@ -345,20 +345,52 @@ Example task definition:
 SPOTIFY_CLIENT_ID=your_spotify_client_id_here
 SPOTIFY_CLIENT_SECRET=your_spotify_client_secret_here
 
-# Application URL (Optional)
+# Clerk Authentication (Required)
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
+CLERK_SECRET_KEY=your_clerk_secret_key
+NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
+NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
+NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/app
+NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/app
+
+# Application URL (Required)
 NEXT_PUBLIC_APP_URL=https://your-domain.com
+
+# JSONBin.io for Sharing (Optional)
+JSONBIN_API_KEY=your_jsonbin_api_key_here
 ```
 
-### Spotify App Configuration
+### API Service Configuration
+
+#### Spotify App Setup
 
 1. **Go to** [Spotify Developer Dashboard](https://developer.spotify.com/dashboard)
-2. **Create a new app** or use existing one
-3. **Configure app settings**:
+2. **Create a new app** with these settings:
    - App name: MoodTunes
    - App description: AI-powered mood-based music recommendations
    - Website: Your deployment URL
-   - Redirect URIs: Not required for client credentials flow
-4. **Copy credentials** to environment variables
+   - Redirect URIs: Not required (using client credentials flow)
+3. **Copy Client ID and Client Secret** to environment variables
+
+#### Clerk Authentication Setup
+
+1. **Go to** [Clerk Dashboard](https://dashboard.clerk.com/)
+2. **Create a new application**:
+   - Application name: MoodTunes
+   - Sign-in options: Email, Google, GitHub (recommended)
+3. **Configure authentication**:
+   - Sign-in URL: `/sign-in`
+   - Sign-up URL: `/sign-up`
+   - After sign-in URL: `/app`
+   - After sign-up URL: `/app`
+4. **Copy publishable key and secret key** to environment variables
+
+#### JSONBin.io Setup (Optional - for sharing feature)
+
+1. **Go to** [JSONBin.io](https://jsonbin.io)
+2. **Create a free account** (100,000 requests/month)
+3. **Get API key** from dashboard
+4. **Add to environment variables** for sharing functionality
 
 ### Security Considerations
 

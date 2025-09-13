@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vortex Animation Performance Test</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 20px;
+        background: #000;
+        color: white;
+        font-family: Arial, sans-serif;
+      }
+
+      .test-container {
+        position: relative;
+        width: 100%;
+        height: 400px;
+        border: 1px solid #333;
+        margin: 20px 0;
+        overflow: hidden;
+      }
+
+      canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+      }
+
+      .overlay {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 10;
+        text-align: center;
+        background: rgba(0, 0, 0, 0.7);
+        padding: 20px;
+        border-radius: 10px;
+      }
+
+      .stats {
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        background: rgba(0, 0, 0, 0.8);
+        padding: 10px;
+        border-radius: 5px;
+        font-family: monospace;
+        font-size: 12px;
+      }
+
+      .controls {
+        margin: 20px 0;
+      }
+
+      button {
+        background: #333;
+        color: white;
+        border: 1px solid #666;
+        padding: 10px 20px;
+        margin: 5px;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
+      button:hover {
+        background: #555;
+      }
+
+      input[type="range"] {
+        width: 200px;
+        margin: 0 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🌀 Vortex Animation Performance Test</h1>
+
+    <div class="controls">
+      <label>
+        Particle Count: <span id="particleCountDisplay">700</span>
+        <input
+          type="range"
+          id="particleCount"
+          min="100"
+          max="2000"
+          value="700"
+          step="100"
+        />
+      </label>
+      <br />
+      <label>
+        Animation Speed: <span id="speedDisplay">1.0</span>
+        <input
+          type="range"
+          id="speed"
+          min="0.1"
+          max="3.0"
+          value="1.0"
+          step="0.1"
+        />
+      </label>
+      <br />
+      <button onclick="startAnimation()">Start Animation</button>
+      <button onclick="stopAnimation()">Stop Animation</button>
+      <button onclick="resetAnimation()">Reset</button>
+      <button onclick="toggleStats()">Toggle Stats</button>
+    </div>
+
+    <div class="test-container">
+      <canvas id="vortexCanvas"></canvas>
+      <div class="overlay">
+        <h2>Vortex Background Test</h2>
+        <p>This tests the particle animation performance</p>
+        <p>Adjust settings above to test different configurations</p>
+      </div>
+    </div>
+
+    <div class="stats" id="stats">
+      <div>FPS: <span id="fps">0</span></div>
+      <div>Particles: <span id="particleCountStat">700</span></div>
+      <div>Frame Time: <span id="frameTime">0</span>ms</div>
+      <div>Memory: <span id="memory">0</span>MB</div>
+    </div>
+
+    <div class="test-results">
+      <h3>Performance Metrics</h3>
+      <div id="results"></div>
+    </div>
+
+    <script>
+      // Simplified Vortex implementation for testing
+      class VortexTest {
+        constructor(canvas) {
+          this.canvas = canvas;
+          this.ctx = canvas.getContext("2d");
+          this.animationId = null;
+          this.particleCount = 700;
+          this.particles = [];
+          this.time = 0;
+          this.fps = 0;
+          this.frameCount = 0;
+          this.lastTime = performance.now();
+          this.speed = 1.0;
+
+          this.resize();
+          this.initParticles();
+
+          window.addEventListener("resize", () => this.resize());
+        }
+
+        resize() {
+          const rect = this.canvas.parentElement.getBoundingClientRect();
+          this.canvas.width = rect.width;
+          this.canvas.height = rect.height;
+          this.centerX = this.canvas.width / 2;
+          this.centerY = this.canvas.height / 2;
+        }
+
+        initParticles() {
+          this.particles = [];
+          for (let i = 0; i < this.particleCount; i++) {
+            this.particles.push({
+              x: Math.random() * this.canvas.width,
+              y: Math.random() * this.canvas.height,
+              vx: (Math.random() - 0.5) * 2,
+              vy: (Math.random() - 0.5) * 2,
+              life: Math.random() * 100,
+              maxLife: 50 + Math.random() * 100,
+              hue: 220 + Math.random() * 100,
+              radius: 1 + Math.random() * 2,
+            });
+          }
+        }
+
+        updateParticles() {
+          this.particles.forEach((particle) => {
+            // Simple noise-like movement
+            const angle =
+              (particle.x * 0.01 + particle.y * 0.01 + this.time * 0.01) *
+              Math.PI *
+              2;
+            particle.vx += Math.cos(angle) * 0.1 * this.speed;
+            particle.vy += Math.sin(angle) * 0.1 * this.speed;
+
+            particle.x += particle.vx * this.speed;
+            particle.y += particle.vy * this.speed;
+            particle.life++;
+
+            // Wrap around edges
+            if (particle.x < 0) particle.x = this.canvas.width;
+            if (particle.x > this.canvas.width) particle.x = 0;
+            if (particle.y < 0) particle.y = this.canvas.height;
+            if (particle.y > this.canvas.height) particle.y = 0;
+
+            // Reset particle if it's too old
+            if (particle.life > particle.maxLife) {
+              particle.x = Math.random() * this.canvas.width;
+              particle.y = Math.random() * this.canvas.height;
+              particle.life = 0;
+              particle.vx = (Math.random() - 0.5) * 2;
+              particle.vy = (Math.random() - 0.5) * 2;
+            }
+          });
+        }
+
+        drawParticles() {
+          this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+          // Background
+          this.ctx.fillStyle = "#000000";
+          this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+          // Particles
+          this.particles.forEach((particle) => {
+            const alpha = 1 - particle.life / particle.maxLife;
+            this.ctx.save();
+            this.ctx.globalAlpha = alpha * 0.8;
+            this.ctx.strokeStyle = `hsl(${particle.hue}, 100%, 60%)`;
+            this.ctx.lineWidth = particle.radius;
+            this.ctx.lineCap = "round";
+
+            this.ctx.beginPath();
+            this.ctx.moveTo(particle.x, particle.y);
+            this.ctx.lineTo(
+              particle.x + particle.vx * 2,
+              particle.y + particle.vy * 2
+            );
+            this.ctx.stroke();
+            this.ctx.restore();
+          });
+        }
+
+        animate() {
+          const currentTime = performance.now();
+          const deltaTime = currentTime - this.lastTime;
+
+          this.updateParticles();
+          this.drawParticles();
+
+          this.time++;
+          this.frameCount++;
+
+          // Calculate FPS
+          if (this.frameCount % 60 === 0) {
+            this.fps = Math.round(1000 / deltaTime);
+            this.updateStats(deltaTime);
+          }
+
+          this.lastTime = currentTime;
+          this.animationId = requestAnimationFrame(() => this.animate());
+        }
+
+        updateStats(frameTime) {
+          document.getElementById("fps").textContent = this.fps;
+          document.getElementById("particleCountStat").textContent =
+            this.particleCount;
+          document.getElementById("frameTime").textContent =
+            frameTime.toFixed(2);
+
+          // Estimate memory usage
+          const memoryMB = (
+            (this.particleCount * 8 * 10) /
+            1024 /
+            1024
+          ).toFixed(2);
+          document.getElementById("memory").textContent = memoryMB;
+        }
+
+        start() {
+          if (!this.animationId) {
+            this.animate();
+          }
+        }
+
+        stop() {
+          if (this.animationId) {
+            cancelAnimationFrame(this.animationId);
+            this.animationId = null;
+          }
+        }
+
+        setParticleCount(count) {
+          this.particleCount = count;
+          this.initParticles();
+        }
+
+        setSpeed(speed) {
+          this.speed = speed;
+        }
+      }
+
+      // Initialize
+      const canvas = document.getElementById("vortexCanvas");
+      const vortex = new VortexTest(canvas);
+
+      // Controls
+      function startAnimation() {
+        vortex.start();
+      }
+
+      function stopAnimation() {
+        vortex.stop();
+      }
+
+      function resetAnimation() {
+        vortex.stop();
+        vortex.initParticles();
+        vortex.start();
+      }
+
+      function toggleStats() {
+        const stats = document.getElementById("stats");
+        stats.style.display = stats.style.display === "none" ? "block" : "none";
+      }
+
+      // Event listeners
+      document
+        .getElementById("particleCount")
+        .addEventListener("input", (e) => {
+          const count = parseInt(e.target.value);
+          document.getElementById("particleCountDisplay").textContent = count;
+          vortex.setParticleCount(count);
+        });
+
+      document.getElementById("speed").addEventListener("input", (e) => {
+        const speed = parseFloat(e.target.value);
+        document.getElementById("speedDisplay").textContent = speed.toFixed(1);
+        vortex.setSpeed(speed);
+      });
+
+      // Auto-start
+      vortex.start();
+
+      // Performance testing
+      function runPerformanceTest() {
+        const results = document.getElementById("results");
+        results.innerHTML = "<p>Running performance tests...</p>";
+
+        const tests = [
+          { particles: 100, duration: 5000 },
+          { particles: 500, duration: 5000 },
+          { particles: 1000, duration: 5000 },
+          { particles: 1500, duration: 5000 },
+        ];
+
+        let testIndex = 0;
+
+        function runNextTest() {
+          if (testIndex >= tests.length) {
+            results.innerHTML +=
+              "<p><strong>Performance tests complete!</strong></p>";
+            return;
+          }
+
+          const test = tests[testIndex];
+          results.innerHTML += `<p>Testing ${test.particles} particles...</p>`;
+
+          vortex.setParticleCount(test.particles);
+
+          const startTime = performance.now();
+          let frameCount = 0;
+          let totalFrameTime = 0;
+
+          const testInterval = setInterval(() => {
+            frameCount++;
+            totalFrameTime += performance.now() - startTime;
+          }, 16);
+
+          setTimeout(() => {
+            clearInterval(testInterval);
+            const avgFPS = Math.round(frameCount / (test.duration / 1000));
+            const avgFrameTime = (totalFrameTime / frameCount).toFixed(2);
+
+            results.innerHTML += `<p>Result: ${avgFPS} FPS, ${avgFrameTime}ms avg frame time</p>`;
+
+            testIndex++;
+            setTimeout(runNextTest, 1000);
+          }, test.duration);
+        }
+
+        runNextTest();
+      }
+
+      // Add performance test button
+      const controls = document.querySelector(".controls");
+      const testButton = document.createElement("button");
+      testButton.textContent = "Run Performance Test";
+      testButton.onclick = runPerformanceTest;
+      controls.appendChild(testButton);
+    </script>
+  </body>
+</html>

@@ -18,6 +18,7 @@ import {
 import { Vortex } from "@/components/ui/vortex";
 import { toast } from "sonner";
 import { getPreviousTrackIds, getRetryAttempt } from "@/lib/history-utils";
+import { generateMoodId, upsertHistoryEntry } from "@/lib/mood-id-utils";
 
 export default function SuggestionsPage() {
   const { userId, isLoaded } = useAuth();
@@ -37,51 +38,65 @@ export default function SuggestionsPage() {
   const scrollContainerRef = useRef(null);
   const nowPlayingRef = useRef(null);
 
-  const saveToHistory = useCallback((moodData, isRetry = false) => {
-    try {
-      const existingHistory = localStorage.getItem("moodMusicHistory");
-      const history = existingHistory ? JSON.parse(existingHistory) : [];
+  const saveToHistory = useCallback(
+    (moodData, isRetry = false) => {
+      try {
+        const existingHistory = localStorage.getItem("moodMusicHistory");
+        const history = existingHistory ? JSON.parse(existingHistory) : [];
 
-      const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
-      const isDuplicate = history.some(
-        (entry) =>
-          entry.mood === moodData.mood &&
-          new Date(entry.timestamp) > fiveMinutesAgo
-      );
-
-      if (isDuplicate && !isRetry) return;
-
-      const newEntry = {
-        mood: moodData.mood,
-        moodAnalysis: moodData.moodAnalysis,
-        suggestions: moodData.suggestions,
-        timestamp: new Date().toISOString(),
-      };
-
-      if (isRetry) {
-        const existingIndex = history.findIndex(
-          (entry) =>
-            entry.mood === moodData.mood &&
-            new Date(entry.timestamp) > fiveMinutesAgo
+        // Generate unique mood ID
+        const moodId = generateMoodId(
+          moodData.moodAnalysis?.mood || moodData.mood,
+          userId,
+          new Date().toISOString()
         );
-        if (existingIndex !== -1) {
+
+        const newEntry = {
+          moodId: moodId,
+          mood: moodData.mood,
+          moodAnalysis: moodData.moodAnalysis,
+          suggestions: moodData.suggestions,
+          timestamp: new Date().toISOString(),
+        };
+
+        // Check if we already have an entry with the same mood ID (for retries)
+        const existingIndex = history.findIndex(
+          (entry) => entry.moodId === moodId
+        );
+
+        if (isRetry && existingIndex !== -1) {
+          // Update existing entry for retry
           history[existingIndex] = newEntry;
+        } else if (!isRetry) {
+          // For new entries, check for recent duplicates based on mood and time
+          const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+          const isDuplicate = history.some(
+            (entry) =>
+              entry.mood === moodData.mood &&
+              new Date(entry.timestamp) > fiveMinutesAgo
+          );
+
+          if (!isDuplicate) {
+            // Add new entry at the beginning
+            history.unshift(newEntry);
+          }
         } else {
+          // New retry entry
           history.unshift(newEntry);
         }
-      } else {
-        history.unshift(newEntry);
-      }
 
-      if (history.length > 3) {
-        history.pop();
-      }
+        // Keep only the latest 3 entries
+        if (history.length > 3) {
+          history.splice(3);
+        }
 
-      localStorage.setItem("moodMusicHistory", JSON.stringify(history));
-    } catch (error) {
-      console.error("Error saving to history:", error);
-    }
-  }, []);
+        localStorage.setItem("moodMusicHistory", JSON.stringify(history));
+      } catch (error) {
+        console.error("Error saving to history:", error);
+      }
+    },
+    [userId]
+  );
 
   // Check authentication
   useEffect(() => {

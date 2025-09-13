@@ -4,34 +4,56 @@ This document provides a detailed overview of the MoodTunes application architec
 
 ## System Overview
 
-MoodTunes is a Next.js 15 application that combines advanced mood analysis with Spotify's Web API to provide personalized music recommendations based on emotional state.
+MoodTunes is a Next.js 15 application with Turbopack that combines advanced AI mood analysis, Spotify Web API integration, and modern web technologies to provide personalized music recommendations based on emotional state.
 
 ```
-┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
-│   User Input    │───▶│  Mood Analysis   │───▶│ Song Suggestions│
-│                 │    │     Engine       │    │                 │
-└─────────────────┘    └──────────────────┘    └─────────────────┘
-                                │                        │
-                                ▼                        ▼
-                       ┌──────────────────┐    ┌─────────────────┐
-                       │ Sentiment Score  │    │  Spotify API    │
-                       │ Keyword Matching │    │   Integration   │
-                       │ Context Analysis │    │                 │
-                       └──────────────────┘    └─────────────────┘
+┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   User Input    │───▶│  Authentication  │───▶│  Mood Analysis  │───▶│ Song Suggestions│
+│   (Clerk Auth)  │    │   (Clerk)        │    │    Engine       │    │   (Spotify)     │
+└─────────────────┘    └──────────────────┘    └─────────────────┘    └─────────────────┘
+                                │                        │                        │
+                                ▼                        ▼                        ▼
+                       ┌──────────────────┐    ┌──────────────────┐    ┌─────────────────┐
+                       │ User Management  │    │ 200+ Keywords    │    │ Caching System  │
+                       │ Session Storage  │    │ Sentiment Score  │    │ Rate Limiting   │
+                       │ History Tracking │    │ Context Analysis │    │ Fallback Data   │
+                       └──────────────────┘    └──────────────────┘    └─────────────────┘
+                                │                        │                        │
+                                ▼                        ▼                        ▼
+                       ┌──────────────────┐    ┌──────────────────┐    ┌─────────────────┐
+                       │ Sharing System   │    │ Visual Effects   │    │ Error Handling  │
+                       │ (JSONBin.io)     │    │ Vortex (700+)    │    │ Circuit Breaker │
+                       │ Public Links     │    │ Animations       │    │ Retry Logic     │
+                       └──────────────────┘    └──────────────────┘    └─────────────────┘
 ```
 
 ## Core Components
 
-### 1. Mood Analysis Engine (`src/lib/mood-analyzer.js`)
+### 1. Advanced Mood Analysis Engine (`src/lib/mood-analyzer.js`)
 
-The heart of the application, featuring:
+The core AI system featuring sophisticated emotion processing:
 
-#### Advanced Sentiment Analysis
+#### Multi-Factor Analysis Pipeline
 
-- **Multi-layered approach**: Combines keyword detection, sentiment scoring, and contextual analysis
-- **10 mood categories**: Happy, Sad, Energetic, Relaxed, Angry, Romantic, Nostalgic, Anxious, Confident, Thoughtful
-- **Confidence scoring**: Provides reliability metrics for mood detection
-- **Fallback system**: Handles edge cases and ambiguous inputs
+- **200+ Keywords**: Comprehensive emotion vocabulary across 11 mood categories
+- **Sentiment Analysis**: Positive, negative, neutral scoring with intensity detection
+- **Contextual Understanding**: Temporal context, negation handling, intensity modifiers
+- **Linguistic Features**: Word complexity, sentence structure, repetition patterns
+- **Confidence Scoring**: 0.6-0.95 reliability metrics based on analysis quality
+
+#### Mood Categories (11 Total)
+
+- **Primary Emotions**: Happy, Sad, Angry, Anxious
+- **Energy States**: Energetic, Relaxed, Chill
+- **Social Emotions**: Romantic, Confident, Nostalgic, Thoughtful
+- **Fallback System**: Intelligent defaults for ambiguous or mixed emotions
+
+#### Advanced Features
+
+- **Edge Case Handling**: Mixed emotions, contradictions, poetic language
+- **Multi-language Support**: Basic emotion detection in multiple languages
+- **Context Analysis**: Handles "not happy", "super excited", temporal references
+- **Performance Optimized**: Sub-50ms analysis time for most inputs
 
 #### Key Features
 
@@ -57,15 +79,33 @@ const MOOD_PATTERNS = {
 5. **Confidence Calculation**: Multi-factor reliability scoring
 6. **Musical Mapping**: Convert emotions to musical parameters
 
-### 2. Spotify API Integration (`src/lib/spotify-api.js`)
+### 2. Enhanced Spotify API Integration (`src/lib/spotify-api.js`)
 
-#### Features
+#### Advanced Features
 
-- **Client Credentials Flow**: Server-to-server authentication
-- **Token Caching**: Automatic token refresh and caching
-- **Error Handling**: Comprehensive error handling with fallbacks
-- **Rate Limiting**: Built-in request throttling
-- **Timeout Protection**: 5-second request timeouts
+- **Client Credentials Flow**: Secure server-to-server authentication
+- **Intelligent Caching**: 30-minute response caching with automatic invalidation
+- **Rate Limiting**: 100ms delays between requests with queue management
+- **Search Strategies**: 6 different search approaches for variety in repeated moods
+- **Duplicate Prevention**: Smart filtering to avoid repeated track suggestions
+- **Fallback System**: 10 sample tracks when Spotify API unavailable
+
+#### Performance Optimizations
+
+- **Token Caching**: 1-hour token caching to reduce authentication requests
+- **Request Deduplication**: Prevents duplicate API calls for same queries
+- **Circuit Breaker**: Automatic failure detection with recovery mechanisms
+- **Timeout Protection**: 5-second request timeouts with retry logic
+- **Error Classification**: Distinguishes between retryable and permanent errors
+
+### 3. Caching & Performance System (`src/lib/spotify-cache.js`)
+
+#### Intelligent Caching
+
+- **Multi-level Caching**: Memory and localStorage caching strategies
+- **Cache Invalidation**: Time-based expiry with manual cleanup
+- **Rate Limiting**: Queue-based request management
+- **Performance Monitoring**: Cache hit/miss statistics and performance metrics
 
 #### API Client Structure
 

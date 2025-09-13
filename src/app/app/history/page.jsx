@@ -16,6 +16,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Vortex } from "@/components/ui/vortex";
 import { toast } from "sonner";
+import { findEntryByMoodId } from "@/lib/mood-id-utils";
 import {
   Dialog,
   DialogContent,
@@ -84,10 +85,9 @@ export default function History() {
     });
   };
 
-  const viewDetail = (index) => {
-    const entry = moodHistory[index];
+  const viewDetail = (entry) => {
     sessionStorage.setItem("selectedHistoryEntry", JSON.stringify(entry));
-    router.push(`/app/history/${index}`);
+    router.push(`/app/history/${entry.moodId}`);
   };
 
   const handleShare = async (entry, event) => {
@@ -311,10 +311,10 @@ export default function History() {
             <div className="w-full max-w-3xl space-y-6">
               {moodHistory.map((entry, index) => (
                 <Card
-                  key={index}
+                  key={entry.moodId || index}
                   className="bg-white/5 backdrop-blur-xl border-white/10 text-white hover:bg-white/10 transition-all duration-300 shadow-md hover:shadow-xl transform hover:-translate-y-1 cursor-pointer group"
-                  onClick={() => viewDetail(index)}
-                  onMouseEnter={() => setHoveredCard(index)}
+                  onClick={() => viewDetail(entry)}
+                  onMouseEnter={() => setHoveredCard(entry.moodId || index)}
                   onMouseLeave={() => setHoveredCard(null)}
                 >
                   <CardContent className="p-6 space-y-6">
@@ -416,7 +416,9 @@ export default function History() {
                         <span className="text-sm">View Full Details</span>
                         <ArrowRight
                           className={`w-4 h-4 transition-transform ${
-                            hoveredCard === index ? "translate-x-1" : ""
+                            hoveredCard === (entry.moodId || index)
+                              ? "translate-x-1"
+                              : ""
                           }`}
                         />
                       </div>
