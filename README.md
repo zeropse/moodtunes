@@ -114,9 +114,6 @@ Transform your feelings into the perfect soundtrack. MoodTunes uses advanced AI 
    NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
    CLERK_SECRET_KEY=your_clerk_secret_key
 
-   # Application URL
-   NEXT_PUBLIC_APP_URL=http://localhost:3000
-
    # JSONBin.io (Optional - for sharing feature)
    JSONBIN_API_KEY=your_jsonbin_api_key
    ```
@@ -289,13 +286,6 @@ SPOTIFY_CLIENT_SECRET=your_spotify_client_secret
 # Clerk Authentication (Required)
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
 CLERK_SECRET_KEY=your_clerk_secret_key
-NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
-NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
-NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/app
-NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/app
-
-# Application Settings
-NEXT_PUBLIC_APP_URL=http://localhost:3000
 
 # JSONBin.io for Sharing (Optional)
 JSONBIN_API_KEY=your_jsonbin_api_key

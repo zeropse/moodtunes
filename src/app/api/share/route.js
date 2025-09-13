@@ -44,8 +44,9 @@ export async function POST(request) {
     const result = await response.json();
     const shareId = result.metadata.id;
 
-    // Build share URL
-    const shareUrl = `${process.env.NEXT_PUBLIC_APP_URL}/share/${shareId}`;
+    const url = new URL(request.url);
+    const baseUrl = `${url.protocol}//${url.host}`;
+    const shareUrl = `${baseUrl}/share/${shareId}`;
 
     return NextResponse.json({
       success: true,

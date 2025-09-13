@@ -108,7 +108,6 @@ Alternative deployment platform with good Next.js support.
    ```
    SPOTIFY_CLIENT_ID=your_client_id
    SPOTIFY_CLIENT_SECRET=your_client_secret
-   NEXT_PUBLIC_APP_URL=https://your-site.netlify.app
    ```
 
 4. **Deploy**
@@ -233,7 +232,6 @@ services:
     environment:
       - SPOTIFY_CLIENT_ID=${SPOTIFY_CLIENT_ID}
       - SPOTIFY_CLIENT_SECRET=${SPOTIFY_CLIENT_SECRET}
-      - NEXT_PUBLIC_APP_URL=http://localhost:3000
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000/api/analyze-mood"]
@@ -348,13 +346,6 @@ SPOTIFY_CLIENT_SECRET=your_spotify_client_secret_here
 # Clerk Authentication (Required)
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
 CLERK_SECRET_KEY=your_clerk_secret_key
-NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
-NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
-NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/app
-NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/app
-
-# Application URL (Required)
-NEXT_PUBLIC_APP_URL=https://your-domain.com
 
 # JSONBin.io for Sharing (Optional)
 JSONBIN_API_KEY=your_jsonbin_api_key_here

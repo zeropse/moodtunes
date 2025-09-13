@@ -46,7 +46,6 @@ Each shared entry contains:
 4. Add it to your `.env.local`:
    ```bash
    JSONBIN_API_KEY=your_api_key_here
-   NEXT_PUBLIC_APP_URL=https://yourdomain.com
    ```
 
 ## Usage

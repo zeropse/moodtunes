@@ -313,7 +313,6 @@ POST /api/suggest-songs
 # Production Environment Variables
 SPOTIFY_CLIENT_ID=production_client_id
 SPOTIFY_CLIENT_SECRET=production_client_secret
-NEXT_PUBLIC_APP_URL=https://your-domain.com
 ```
 
 ### 3. Build Optimization
