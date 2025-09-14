@@ -65,9 +65,9 @@ export default function LandingPage() {
               </p>
 
               <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-white/70 max-w-xs sm:max-w-2xl lg:max-w-4xl mx-auto leading-relaxed font-light px-4 sm:px-0">
-                Transform your feelings into the perfect playlist. Our AI
-                analyzes your mood and discovers songs that resonate with your
-                emotional state.
+                Transform your feelings into the perfect playlist. Our advanced
+                mood analysis technology analyzes your mood and discovers songs
+                that resonate with your emotional state.
               </p>
             </div>
 
@@ -119,7 +119,7 @@ export default function LandingPage() {
                 </h3>
                 <p className="text-white/70 text-base sm:text-lg leading-relaxed">
                   Get personalized music recommendations in seconds with our
-                  optimized AI engine
+                  optimized mood analysis engine
                 </p>
               </div>
             </Card>
@@ -136,8 +136,8 @@ export default function LandingPage() {
                   Mood Analysis
                 </h3>
                 <p className="text-white/70 text-base sm:text-lg leading-relaxed">
-                  Advanced emotion analysis powered by AI for perfect song
-                  matching
+                  Advanced emotion analysis using sophisticated algorithms for
+                  perfect song matching
                 </p>
               </div>
             </Card>
@@ -193,8 +193,8 @@ export default function LandingPage() {
                 Share Your Mood
               </h3>
               <p className="text-white/70 text-lg sm:text-xl leading-relaxed">
-                Tell us how you're feeling in your own words. Our AI understands
-                complex emotions and nuances.
+                Tell us how you're feeling in your own words. Our advanced mood
+                analysis understands complex emotions and nuances.
               </p>
             </div>
 
@@ -214,11 +214,11 @@ export default function LandingPage() {
                 <div className="absolute inset-0 w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-r from-pink-500 to-blue-500 rounded-3xl blur-xl opacity-30 mx-auto group-hover:opacity-50 transition-opacity duration-500"></div>
               </div>
               <h3 className="text-2xl sm:text-3xl font-bold text-white mb-4 sm:mb-6 group-hover:text-pink-200 transition-colors duration-300">
-                AI Analysis
+                Advanced Analysis
               </h3>
               <p className="text-white/70 text-lg sm:text-xl leading-relaxed">
-                Our advanced algorithms analyze your emotional state and musical
-                preferences to find perfect matches.
+                Our sophisticated algorithms analyze your emotional state and
+                musical preferences to find perfect matches.
               </p>
             </div>
 

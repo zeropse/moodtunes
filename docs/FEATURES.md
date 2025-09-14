@@ -6,7 +6,7 @@ This document provides a comprehensive overview of all features available in Moo
 
 ### 1. Advanced Mood Analysis
 
-#### AI-Powered Emotion Detection
+#### Advanced Emotion Detection
 
 - **11 Mood Categories**: Happy, Sad, Energetic, Relaxed, Angry, Romantic, Nostalgic, Anxious, Confident, Thoughtful, Chill
 - **200+ Keywords**: Comprehensive emotion vocabulary with contextual understanding

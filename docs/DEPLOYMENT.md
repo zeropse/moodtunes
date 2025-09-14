@@ -358,7 +358,7 @@ JSONBIN_API_KEY=your_jsonbin_api_key_here
 1. **Go to** [Spotify Developer Dashboard](https://developer.spotify.com/dashboard)
 2. **Create a new app** with these settings:
    - App name: MoodTunes
-   - App description: AI-powered mood-based music recommendations
+   - App description: Advanced mood-based music recommendations
    - Website: Your deployment URL
    - Redirect URIs: Not required (using client credentials flow)
 3. **Copy Client ID and Client Secret** to environment variables

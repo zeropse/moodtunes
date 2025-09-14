@@ -1,10 +1,22 @@
-# MoodTunes - AI-Powered Music Recommendations
+# MoodTunes - Mood Music Recommendations
 
-Transform your feelings into the perfect soundtrack. MoodTunes uses advanced AI mood analysis to understand your emotional state and recommends personalized songs from Spotify that perfectly match how you're feeling.
+![MoodTunes Landing Page](images/Landing.png)
+
+Transform your feelings into the perfect soundtrack. MoodTunes uses advanced mood analysis to understand your emotional state and recommends personalized songs from Spotify that perfectly match how you're feeling.
+
+## LINKS
+
+<div align="center">
+
+[![Demo Video](https://img.shields.io/badge/Demo-Coming_Soon-ff69b4)](#)
+
+**Live Site:** [moodtunes.zeropse.org](https://moodtunes.zeropse.org)
+
+</div>
 
 ## ✨ Features
 
-### 🧠 Advanced AI Analysis
+### 🧠 Advanced Mood Analysis
 
 - **Sophisticated Mood Detection**: 10+ mood categories with 200+ keywords and contextual understanding
 - **Sentiment Analysis**: Multi-layered emotion processing with confidence scoring
@@ -46,8 +58,6 @@ Transform your feelings into the perfect soundtrack. MoodTunes uses advanced AI 
 - **Dark/Light Themes**: System preference detection with manual toggle
 - **Progressive Enhancement**: Core functionality works without JavaScript
 
-## 🚀 Quick Start
-
 ### Prerequisites
 
 - **Node.js 18+** and pnpm/npm
@@ -55,78 +65,85 @@ Transform your feelings into the perfect soundtrack. MoodTunes uses advanced AI 
 - **Clerk Account** (for user authentication)
 - **JSONBin.io Account** (optional, for sharing feature)
 
-### Installation
+## 🛠️ Technology Stack
 
-1. **Clone the repository**
+### Core Framework & Build
 
-   ```bash
-   git clone https://github.com/zeropse/moodtunes.git
-   cd moodtunes
-   ```
+- **Framework**: Next.js 15.5.3 with Turbopack for ultra-fast development and builds
+- **Runtime**: React 19.1.1 with modern concurrent features
+- **Build System**: Turbopack for 10x faster builds and hot module replacement
+- **Package Manager**: pnpm for efficient dependency management
 
-2. **Install dependencies**
+### Styling & Design
 
-   ```bash
-   pnpm install
-   # or
-   npm install
-   ```
+- **CSS Framework**: Tailwind CSS 4.1.13 with custom design system
+- **UI Components**: Radix UI primitives with custom styling and full accessibility
+- **Icons**: Lucide React (544 icons) + Tabler Icons (3,000+ icons)
+- **Fonts**: Geist Sans & Geist Mono for modern typography
+- **Themes**: Dark/light mode with system preference detection
 
-3. **Set up environment variables**
+### Animation & Visual Effects
 
-   ```bash
-   cp .env.example .env.local
-   ```
+- **Animation Library**: Framer Motion 12.23.12 for smooth, performant animations
+- **Particle System**: Custom Vortex component with 700+ animated particles
+- **Noise Generation**: Simplex Noise 4.0.3 for realistic particle movement
+- **Loading States**: 4 different loading animation variants
+- **Transitions**: 7 page transition types with reduced motion support
 
-4. **Configure API Services**
+### Authentication & Security
 
-   **Spotify API Setup:**
+- **Authentication**: Clerk 6.32.0 for secure user management
+- **Input Validation**: Comprehensive XSS and injection protection
+- **Error Handling**: Custom error boundaries with retry logic
+- **Rate Limiting**: Built-in API rate limiting and caching
 
-   - Visit [Spotify Developer Dashboard](https://developer.spotify.com/dashboard)
-   - Create a new app with these settings:
-     - App name: MoodTunes
-     - App description: AI-powered mood-based music recommendations
-     - Website: Your deployment URL
-     - Redirect URIs: Not required (using client credentials flow)
-   - Copy your Client ID and Client Secret
+### API Integration & Data
 
-   **Clerk Authentication Setup:**
+- **Music API**: Spotify Web API with client credentials flow
+- **Caching**: 30-minute response caching with intelligent invalidation
+- **Sharing**: JSONBin.io for shareable mood links
+- **Storage**: Browser localStorage for mood history (privacy-first)
 
-   - Visit [Clerk Dashboard](https://dashboard.clerk.com/)
-   - Create a new application
-   - Copy your publishable key and secret key
-   - Configure sign-in/sign-up pages
+### AI & Analysis
 
-   **JSONBin.io Setup (Optional):**
+- **Mood Analysis**: Custom-built engine with 200+ keywords across 11 categories
+- **Sentiment Processing**: Multi-factor analysis with confidence scoring
+- **Context Understanding**: Handles negation, intensity, temporal context
+- **Fallback System**: Intelligent defaults for edge cases
 
-   - Visit [JSONBin.io](https://jsonbin.io)
-   - Create a free account (100k requests/month)
-   - Get your API key from dashboard
+### Development & Quality
 
-   **Add to `.env.local`:**
+- **TypeScript**: Partial TypeScript adoption for type safety
+- **Linting**: ESLint 9.35.0 with Next.js configuration
+- **Testing**: Comprehensive test suite with 100% pass rate
+- **Performance**: Hardware acceleration, lazy loading, code splitting
 
-   ```env
-   # Spotify API (Required)
-   SPOTIFY_CLIENT_ID=your_spotify_client_id
-   SPOTIFY_CLIENT_SECRET=your_spotify_client_secret
+### Deployment & Infrastructure
 
-   # Clerk Authentication (Required)
-   NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
-   CLERK_SECRET_KEY=your_clerk_secret_key
+- **Optimized for**: Vercel (recommended), Netlify, Railway, Docker
+- **CDN Ready**: Static asset optimization and caching
+- **Environment**: Production-ready with comprehensive error handling
+- **Monitoring**: Built-in performance metrics and error tracking
 
-   # JSONBin.io (Optional - for sharing feature)
-   JSONBIN_API_KEY=your_jsonbin_api_key
-   ```
+## How I Used Kiro
 
-5. **Start the development server**
+Building MoodTunes solo in 30 days wouldn’t have been possible without Kiro. Below are the main ways I used it during development.
 
-   ```bash
-   pnpm dev
-   # Uses Next.js 15 with Turbopack for fast development
-   ```
+### 1) Spec-to-Code Scaffolding
 
-6. **Open your browser**
-   Navigate to [http://localhost:3000](http://localhost:3000)
+I wrote the initial feature spec in Kiro and used the generated starter to bootstrap the project. Kiro produced a clean Next.js project with Tailwind CSS, API routes, and an organized file structure — saving hours of boilerplate work and letting me focus on features immediately.
+
+### 2) Vibe Coding for Spotify Integration
+
+I paired with Kiro to implement the Spotify Web API integration. Rather than switching constantly between docs and trial-and-error, I described desired behaviours (for example: “recommend tracks based on mood and avoid duplicates”) and Kiro returned working API call examples, retry logic, and query strategies.
+
+### 3) Debugging & Refactoring
+
+Kiro helped debug Clerk authentication issues and refine the mood analysis pipeline. It suggested clearer error handling and fallback flows for Spotify rate limits and API failures.
+
+### 4) Workflow Boost
+
+By offloading repetitive tasks — scaffolding, structuring, and routine debugging — to Kiro, I focused more on design and UX. Kiro acted as a reliable coding partner, enabling a polished, feature-rich app to be built solo and on schedule.
 
 ## 🎵 How It Works
 
@@ -138,7 +155,7 @@ Type how you're feeling in natural language. Be as descriptive as you want:
 - "Feeling a bit melancholy and nostalgic today"
 - "Super happy and want to dance!"
 
-### 2. Advanced AI Analysis
+### 2. Advanced Mood Analysis
 
 Our sophisticated mood analysis system:
 
@@ -176,7 +193,7 @@ Dynamic Vortex background with:
 
 ## 🎨 Mood Categories & Analysis
 
-Our AI recognizes 11 distinct mood categories with sophisticated multi-factor analysis:
+Our advanced mood analysis system recognizes 11 distinct mood categories with sophisticated multi-factor analysis:
 
 | Mood           | Music Genres                    | Energy | Valence | Tempo (BPM) | Key Characteristics        | Keywords (Sample)                   |
 | -------------- | ------------------------------- | ------ | ------- | ----------- | -------------------------- | ----------------------------------- |
@@ -199,99 +216,6 @@ Our AI recognizes 11 distinct mood categories with sophisticated multi-factor an
 - **Confidence Scoring**: 0.6-0.95 reliability range based on analysis quality
 - **Fallback Detection**: Handles ambiguous inputs with intelligent defaults
 - **Multi-language Support**: Basic support for common emotions in multiple languages
-
-## 🛠️ Development
-
-### Project Structure
-
-```
-moodtunes/
-├── src/
-│   ├── app/                    # Next.js 15 app directory
-│   │   ├── api/               # API routes
-│   │   │   ├── analyze-mood/  # Advanced mood analysis endpoint
-│   │   │   ├── suggest-songs/ # Intelligent song recommendations
-│   │   │   └── share/         # Mood sharing system
-│   │   ├── app/               # Main application pages
-│   │   │   ├── demo/[mood]/   # Demo mood pages
-│   │   │   ├── history/       # Mood history with detailed views
-│   │   │   ├── suggestions/   # Song display with Spotify integration
-│   │   │   └── page.jsx       # Main app interface
-│   │   ├── share/[id]/        # Shared mood viewing
-│   │   ├── sign-in/           # Clerk authentication pages
-│   │   ├── sign-up/           # User registration
-│   │   ├── about/             # About page with features
-│   │   ├── faq/               # Frequently asked questions
-│   │   ├── globals.css        # Global styles with Tailwind CSS 4
-│   │   ├── layout.js          # Root layout with providers
-│   │   └── page.jsx           # Landing page with animations
-│   ├── components/            # React components
-│   │   ├── ui/                # Reusable UI components
-│   │   │   ├── button.jsx     # Enhanced button with variants
-│   │   │   ├── card.jsx       # Card components with actions
-│   │   │   ├── dialog.jsx     # Modal dialogs
-│   │   │   ├── drawer.jsx     # Mobile-friendly drawers
-│   │   │   ├── loading-spinner.jsx # Multiple loading animations
-│   │   │   ├── page-transition.jsx # Smooth page transitions
-│   │   │   ├── textarea.jsx   # Enhanced textarea
-│   │   │   ├── vortex.jsx     # 700+ particle background
-│   │   │   └── sonner.jsx     # Toast notifications
-│   │   ├── Navbar.jsx         # Responsive navigation
-│   │   ├── Footer.jsx         # Footer with links
-│   │   └── theme-provider.tsx # Dark/light theme system
-│   └── lib/                   # Core libraries
-│       ├── mood-analyzer.js   # 200+ keyword mood analysis
-│       ├── spotify-api.js     # Cached Spotify integration
-│       ├── spotify-cache.js   # Advanced caching system
-│       ├── error-handler.js   # Comprehensive error handling
-│       ├── animation-utils.js # Performance-optimized animations
-│       ├── history-utils.js   # Mood history management
-│       └── utils.js           # Utility functions
-├── docs/                      # Comprehensive documentation
-│   ├── ARCHITECTURE.md        # System architecture guide
-│   ├── API.md                 # API reference documentation
-│   ├── DEPLOYMENT.md          # Platform deployment guides
-│   └── SHARING.md             # Sharing feature documentation
-├── test-files/                # Comprehensive test suite
-└── public/                    # Static assets and icons
-```
-
-### Available Scripts
-
-```bash
-# Development
-pnpm dev          # Start development server with Turbopack (fast HMR)
-pnpm build        # Build for production with Turbopack optimization
-pnpm start        # Start production server
-
-# Code Quality
-pnpm lint         # Run ESLint for code quality checks
-
-# Testing (Custom test files included)
-node test-mood-analyzer-standalone.mjs    # Test mood analysis engine
-node test-spotify-api.mjs                 # Test Spotify API integration
-node test-e2e-flow.mjs                    # End-to-end application testing
-node test-comprehensive.mjs               # Full test suite (30+ tests)
-```
-
-### Environment Variables
-
-Create a `.env.local` file with the following variables:
-
-```env
-# Spotify API Configuration (Required)
-SPOTIFY_CLIENT_ID=your_spotify_client_id
-SPOTIFY_CLIENT_SECRET=your_spotify_client_secret
-
-# Clerk Authentication (Required)
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
-CLERK_SECRET_KEY=your_clerk_secret_key
-
-# JSONBin.io for Sharing (Optional)
-JSONBIN_API_KEY=your_jsonbin_api_key
-```
-
-**Note**: The application uses a built-in advanced mood analysis engine with 200+ keywords and doesn't require external AI services like OpenAI or ChatGPT.
 
 ## 🧪 Testing & Quality Assurance
 
@@ -354,414 +278,9 @@ curl -X POST http://localhost:3000/api/share \
   -d '{"mood": "test", "moodAnalysis": {...}, "suggestions": {...}}'
 ```
 
-## 🎯 API Reference
-
-### Mood Analysis API
-
-**POST** `/api/analyze-mood`
-
-Analyzes mood text using advanced sentiment analysis and keyword detection.
-
-```javascript
-// Request
-{
-  "moodText": "I'm feeling happy and energetic today!"
-}
-
-// Response
-{
-  "success": true,
-  "data": {
-    "mood": "happy",
-    "confidence": 0.85,
-    "genres": ["pop", "dance", "funk", "disco"],
-    "energy": 0.8,
-    "valence": 0.9,
-    "tempo": { "min": 120, "max": 140 },
-    "detectedKeywords": ["happy", "energetic"],
-    "analysis": {
-      "sentimentScore": {
-        "positive": 2.5,
-        "negative": 0,
-        "neutral": 0,
-        "overall": 2.5
-      },
-      "contextFactors": {
-        "temporal": { "past": 0, "present": 1, "future": 0 },
-        "intensity": { "high": 0, "medium": 1, "low": 0 }
-      },
-      "sentences": 1,
-      "complexity": { "avgWordLength": 5.2, "avgSentenceLength": 8 }
-    }
-  },
-  "meta": {
-    "requestId": "req_1234567890_abc123",
-    "processingTime": 45,
-    "analysisMethod": "advanced_keyword_sentiment",
-    "version": "4.0.0"
-  }
-}
-```
-
-### Song Suggestions API
-
-**POST** `/api/suggest-songs`
-
-Generates personalized song recommendations from Spotify.
-
-```javascript
-// Request
-{
-  "mood": "happy",
-  "genres": ["pop", "dance"],
-  "moodText": "I'm feeling happy and energetic today!"
-}
-
-// Response
-{
-  "success": true,
-  "suggestions": {
-    "tracks": [
-      {
-        "id": "4iV5W9uYEdYUVa79Axb7Rh",
-        "name": "Happy",
-        "artists": ["Pharrell Williams"],
-        "album": {
-          "id": "4m2880jivSbbyEGAKfITCa",
-          "name": "G I R L",
-          "images": [{"url": "https://i.scdn.co/image/..."}],
-          "release_date": "2014-03-03"
-        },
-        "external_urls": {"spotify": "https://open.spotify.com/track/..."},
-        "duration_ms": 232560,
-        "popularity": 85,
-        "sourceGenre": "pop"
-      }
-    ],
-    "totalTracks": 15,
-    "seedGenres": ["pop", "dance"],
-    "mood": "I'm feeling happy and energetic today!",
-    "moodAnalysis": {
-      "genres": ["pop", "dance", "funk"]
-    }
-  },
-  "meta": {
-    "requestId": "suggestions_1234567890_xyz789",
-    "processingTime": 1250
-  }
-}
-```
-
-### Error Handling
-
-Both APIs include comprehensive error handling:
-
-```javascript
-// Error Response
-{
-  "success": false,
-  "error": {
-    "message": "Mood text is required",
-    "code": "API_ERROR"
-  },
-  "meta": {
-    "timestamp": "2024-01-15T10:30:00.000Z"
-  }
-}
-
-// Server Error Response (when Spotify is unavailable)
-{
-  "success": false,
-  "error": {
-    "message": "We're having trouble connecting to Spotify. Please try again later.",
-    "code": "API_ERROR"
-  },
-  "meta": {
-    "timestamp": "2024-01-15T10:30:00.000Z"
-  }
-}
-```
-
-## 🎨 Customization
-
-### Adding New Mood Categories
-
-1. **Update mood patterns** in `src/lib/mood-analyzer.js`:
-
-   ```javascript
-   const MOOD_PATTERNS = {
-     // ... existing moods
-     excited: {
-       keywords: ["excited", "thrilled", "exhilarated", "pumped"],
-       genres: ["electronic", "dance", "pop"],
-       energy: 0.9,
-       valence: 0.8,
-       tempo: { min: 130, max: 160 },
-     },
-   };
-   ```
-
-2. **Add sentiment patterns** for better detection:
-
-   ```javascript
-   // Add to SENTIMENT_PATTERNS.positive.words
-   "thrilled", "exhilarated", "pumped";
-   ```
-
-3. **Test the new mood** by running the analyzer:
-
-   ```javascript
-   import { analyzeMoodFromText } from "@/lib/mood-analyzer";
-
-   const result = analyzeMoodFromText("I'm so excited and pumped!");
-   console.log(result.mood); // Should detect 'excited'
-   ```
-
-### Customizing the Vortex Background
-
-Modify the visual experience in `src/components/ui/vortex.jsx`:
-
-```javascript
-// Customize particle system
-const particleCount = 700; // Number of particles
-const baseSpeed = 0.0; // Base movement speed
-const rangeSpeed = 1.5; // Speed variation
-const baseHue = 220; // Base color hue
-const rangeHue = 100; // Color variation
-
-// Customize visual effects
-const backgroundColor = "#000000"; // Background color
-const noiseSteps = 3; // Animation complexity
-```
-
-### Extending Spotify Integration
-
-Add new search parameters in `src/lib/spotify-api.js`:
-
-```javascript
-async searchTracks(query, options = {}) {
-  const {
-    limit = 20,
-    offset = 0,
-    market = 'US',        // Add market filtering
-    include_external = 'audio' // Include external content
-  } = options;
-
-  const queryParams = new URLSearchParams({
-    q: query,
-    type: 'track',
-    limit: limit.toString(),
-    offset: offset.toString(),
-    market,
-    include_external
-  });
-}
-```
-
-## 🚀 Deployment
-
-### Vercel (Recommended)
-
-1. **Connect your repository** to Vercel
-2. **Set environment variables** in Vercel dashboard
-3. **Deploy** - automatic deployments on push
-
-### Manual Deployment
-
-```bash
-# Build the application
-pnpm build
-
-# Start production server
-pnpm start
-```
-
-### Docker Deployment
-
-```dockerfile
-FROM node:18-alpine
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci --only=production
-COPY . .
-RUN npm run build
-EXPOSE 3000
-CMD ["npm", "start"]
-```
-
-## 🔧 Configuration
-
-### Spotify API Setup
-
-1. **Create Spotify App**:
-
-   - Go to [Spotify Developer Dashboard](https://developer.spotify.com/dashboard)
-   - Click "Create an App"
-   - Fill in app details
-   - Note your Client ID and Client Secret
-
-2. **Configure Redirect URIs**:
-
-   - Add `http://localhost:3000` for development
-   - Add your production URL for deployment
-
-3. **Set Scopes** (if using user authentication):
-   - `user-read-private` (for basic user info)
-   - `user-read-private`
-
-### Performance Optimization
-
-- **Turbopack**: Uses Next.js 15 with Turbopack for faster builds and development
-- **Client-side Caching**: Spotify access tokens are cached to reduce API calls
-- **Local Storage**: Mood history is stored locally for instant access
-- **Optimized Animations**: Vortex background uses hardware acceleration and respects motion preferences
-- **Lazy Loading**: Components and resources are loaded on demand
-- **Error Boundaries**: Graceful fallbacks prevent application crashes
-
-## 🐛 Troubleshooting
-
-### Common Issues
-
-**Spotify API Connection Issues**
-
-```
-Error: Spotify API credentials not configured
-```
-
-- Verify `SPOTIFY_CLIENT_ID` and `SPOTIFY_CLIENT_SECRET` in `.env.local`
-- Ensure your Spotify app is active in the [Developer Dashboard](https://developer.spotify.com/dashboard)
-- Check that your app has the correct settings (no redirect URIs needed for client credentials flow)
-
-**Build Errors**
-
-```
-Module not found: Can't resolve '@/components/...'
-```
-
-- Ensure you're using the correct import paths with the `@/` alias
-- Check that `jsconfig.json` is properly configured with path mapping
-
-**Animation Performance Issues**
-
-- The Vortex background automatically respects `prefers-reduced-motion`
-- On slower devices, particle count is automatically reduced
-- Hardware acceleration is enabled by default for smooth 60fps animations
-
-**Mood Analysis Not Working**
-
-- Ensure mood text is between 3-500 characters
-- The system has built-in fallbacks for unrecognized moods
-- Check browser console for detailed error messages
-
-### Debug Information
-
-The application provides detailed logging in development mode:
-
-```javascript
-// API responses include debug information
-{
-  "meta": {
-    "requestId": "req_1234567890_abc123",
-    "processingTime": 45,
-    "analysisMethod": "advanced_keyword_sentiment",
-    "version": "4.0.0"
-  }
-}
-```
-
-## 🤝 Contributing
-
-We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
-
-### Development Workflow
-
-1. **Fork** the repository
-2. **Create** a feature branch
-3. **Make** your changes
-4. **Add** tests for new functionality
-5. **Run** the test suite
-6. **Submit** a pull request
-
-### Code Style
-
-- Use Prettier for formatting
-- Follow ESLint rules
-- Write meaningful commit messages
-- Add JSDoc comments for functions
-
 ## 📄 License
 
 This project is licensed under the GPL-3.0 License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- **Spotify Web API** for music data and streaming integration
-- **Next.js 15** with Turbopack for the modern React framework
-- **Tailwind CSS 4** for utility-first styling and design system
-- **Framer Motion** for smooth, performant animations
-- **Simplex Noise** for beautiful particle system generation
-- **Radix UI** for accessible component primitives
-- **Lucide React** and **Tabler Icons** for beautiful iconography
-
-## 🛠️ Technology Stack
-
-### Core Framework & Build
-
-- **Framework**: Next.js 15.5.3 with Turbopack for ultra-fast development and builds
-- **Runtime**: React 19.1.1 with modern concurrent features
-- **Build System**: Turbopack for 10x faster builds and hot module replacement
-- **Package Manager**: pnpm for efficient dependency management
-
-### Styling & Design
-
-- **CSS Framework**: Tailwind CSS 4.1.13 with custom design system
-- **UI Components**: Radix UI primitives with custom styling and full accessibility
-- **Icons**: Lucide React (544 icons) + Tabler Icons (3,000+ icons)
-- **Fonts**: Geist Sans & Geist Mono for modern typography
-- **Themes**: Dark/light mode with system preference detection
-
-### Animation & Visual Effects
-
-- **Animation Library**: Framer Motion 12.23.12 for smooth, performant animations
-- **Particle System**: Custom Vortex component with 700+ animated particles
-- **Noise Generation**: Simplex Noise 4.0.3 for realistic particle movement
-- **Loading States**: 4 different loading animation variants
-- **Transitions**: 7 page transition types with reduced motion support
-
-### Authentication & Security
-
-- **Authentication**: Clerk 6.32.0 for secure user management
-- **Input Validation**: Comprehensive XSS and injection protection
-- **Error Handling**: Custom error boundaries with retry logic
-- **Rate Limiting**: Built-in API rate limiting and caching
-
-### API Integration & Data
-
-- **Music API**: Spotify Web API with client credentials flow
-- **Caching**: 30-minute response caching with intelligent invalidation
-- **Sharing**: JSONBin.io for shareable mood links
-- **Storage**: Browser localStorage for mood history (privacy-first)
-
-### AI & Analysis
-
-- **Mood Analysis**: Custom-built engine with 200+ keywords across 11 categories
-- **Sentiment Processing**: Multi-factor analysis with confidence scoring
-- **Context Understanding**: Handles negation, intensity, temporal context
-- **Fallback System**: Intelligent defaults for edge cases
-
-### Development & Quality
-
-- **TypeScript**: Partial TypeScript adoption for type safety
-- **Linting**: ESLint 9.35.0 with Next.js configuration
-- **Testing**: Comprehensive test suite with 100% pass rate
-- **Performance**: Hardware acceleration, lazy loading, code splitting
-
-### Deployment & Infrastructure
-
-- **Optimized for**: Vercel (recommended), Netlify, Railway, Docker
-- **CDN Ready**: Static asset optimization and caching
-- **Environment**: Production-ready with comprehensive error handling
-- **Monitoring**: Built-in performance metrics and error tracking
 
 ## 📚 Documentation
 
@@ -776,8 +295,6 @@ This project is licensed under the GPL-3.0 License - see the [LICENSE](LICENSE) 
 
 - **[Sharing System](docs/SHARING.md)**: Mood sharing feature documentation
 - **[Changelog](CHANGELOG.md)**: Version history and release notes
-- **[Optimization Report](OPTIMIZATION_REPORT.md)**: Performance and testing results
-- **[Contributing Guide](CONTRIBUTING.md)**: How to contribute to the project (coming soon)
 
 ## 📞 Support & Community
 
@@ -786,22 +303,6 @@ This project is licensed under the GPL-3.0 License - see the [LICENSE](LICENSE) 
 - **Issues**: [GitHub Issues](https://github.com/zeropse/moodtunes/issues) - Bug reports and feature requests
 - **Discussions**: [GitHub Discussions](https://github.com/zeropse/moodtunes/discussions) - Community support and ideas
 - **Documentation**: Comprehensive guides in the `docs/` folder
-- **Email**: [support@moodtunes.app](mailto:support@moodtunes.app) - Direct support
-
-### Community
-
-- **Discord**: [Join our community](https://discord.gg/moodtunes) - Real-time chat and support
-- **Twitter**: [@MoodTunesApp](https://twitter.com/moodtunesapp) - Updates and announcements
-- **Blog**: [blog.moodtunes.app](https://blog.moodtunes.app) - Development updates and tutorials
-
-### Contributing
-
-We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details on:
-
-- Code contributions and pull requests
-- Bug reports and feature requests
-- Documentation improvements
-- Community guidelines
 
 ---
 

@@ -54,7 +54,7 @@ export default function About() {
                     <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center mx-auto text-2xl font-bold">
                       2
                     </div>
-                    <h3 className="text-xl font-semibold">Fast Analysis</h3>
+                    <h3 className="text-xl font-semibold">Advanced Analysis</h3>
                     <p className="text-white/80">
                       Analyze your emotions fast and musical preferences to find
                       the perfect match.
@@ -77,13 +77,15 @@ export default function About() {
 
             {/* Features Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {/* AI Analysis */}
+              {/* Advanced Analysis */}
               <Card className="bg-white/10 backdrop-blur-md border-white/20 text-white hover:bg-white/15 transition-colors">
                 <CardHeader>
                   <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-lg flex items-center justify-center mb-4">
                     <Zap className="w-6 h-6 text-white" />
                   </div>
-                  <CardTitle className="text-xl">Fast Mood Analysis</CardTitle>
+                  <CardTitle className="text-xl">
+                    Advanced Mood Analysis
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-white/80">
@@ -123,8 +125,8 @@ export default function About() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-white/80">
-                    Seamlessly connect with Spotify to access millions of songs.
-                    Click any suggestion to open it directly in Spotify.
+                    Seamlessly connect with Spotify to access songs. Click any
+                    suggestion to open it directly in Spotify.
                   </p>
                 </CardContent>
               </Card>
