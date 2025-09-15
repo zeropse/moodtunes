@@ -8,7 +8,7 @@ Transform your feelings into the perfect soundtrack. MoodTunes uses advanced moo
 
 <div align="center">
 
-[![Demo Video](https://img.shields.io/badge/Demo-Coming_Soon-ff69b4)](#)
+[![Demo Video](https://img.shields.io/badge/Demo-Watch_Now-red)](https://youtu.be/RUkqsLs97gU)
 
 **Live Site:** [moodtunes.zeropse.org](https://moodtunes.zeropse.org)
 
