@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import {
@@ -108,8 +110,8 @@ export default function AboutPage() {
 function StepCard({ icon, title, description }) {
   return (
     <div className="p-8 rounded-3xl border border-zinc-100 hover:border-zinc-300 transition-all duration-300 shadow-sm hover:shadow-md">
-      <div className="w-12 h-12 rounded-2xl bg-zinc-50 flex items-center justify-center mb-6 text-zinc-900">
-        {icon}
+      <div className="w-16 h-16 rounded-2xl bg-zinc-200 dark:bg-zinc-50 flex items-center justify-center mb-6 text-zinc-900">
+        <div className="flex items-center justify-center">{icon}</div>
       </div>
       <h3 className="text-lg font-bold mb-3">{title}</h3>
       <p className="text-zinc-500 leading-relaxed text-sm">{description}</p>
