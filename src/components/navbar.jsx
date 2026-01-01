@@ -14,10 +14,10 @@ export default function Navbar() {
             <IconMusic className="h-4 w-4" />
           </span>
           <div className="flex flex-col leading-tight">
-            <span className="text-sm font-semibold tracking-[0.18em] uppercase text-muted-foreground">
+            <span className="text-sm font-semibold text-muted-foreground">
               MoodTunes
             </span>
-            <span className="text-[11px] text-muted-foreground/70">
+            <span className="text-[11px] text-muted-foreground/70 hidden sm:inline">
               Get tunes based on your mood
             </span>
           </div>

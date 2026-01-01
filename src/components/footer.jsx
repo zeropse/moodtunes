@@ -14,7 +14,7 @@ export default function Footer() {
   return (
     <footer className="border-t border-border/60 bg-background/80 backdrop-blur-sm">
       <div className="mx-auto flex h-12 max-w-5xl items-center justify-between px-4 text-[11px] text-muted-foreground/80">
-        <span className="uppercase">&copy; {year} Moodtunes.</span>
+        <span>&copy; {year} Moodtunes.</span>
 
         <div className="flex items-center gap-2">
           <Button
