@@ -11,6 +11,13 @@ import {
   IconMicrophone,
   IconArrowRight,
 } from "@tabler/icons-react";
+import {
+  Card,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  CardFooter,
+} from "@/components/ui/card";
 
 export default function AboutPage() {
   return (
@@ -75,32 +82,35 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Final CTA */}
-      <section className="py-16">
-        <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-2xl md:text-3xl font-bold mb-4">
-            Ready to find your soundtrack?
-          </h2>
-          <p className="text-zinc-600 mb-6">
-            Tell us how you&apos;re feeling and get personalized song
-            recommendations instantly.
-          </p>
+      <section className="py-16 px-4">
+        <div className="max-w-3xl mx-auto">
+          <Card className="border-none bg-zinc-50/50 dark:bg-zinc-700/50">
+            <CardHeader>
+              <CardTitle className="text-2xl md:text-3xl font-bold text-center">
+                Ready to find your soundtrack?
+              </CardTitle>
+              <CardDescription className="text-center text-zinc-600 dark:text-zinc-400 text-base md:text-lg mt-2">
+                Tell us how you&apos;re feeling and get personalized song
+                recommendations instantly.
+              </CardDescription>
+            </CardHeader>
 
-          <div className="flex items-center justify-center gap-4">
-            <Button
-              asChild
-              size="lg"
-              className="group inline-flex items-center gap-2 px-6 py-3 rounded-full shadow-lg transition-transform hover:shadow-xl"
-            >
-              <Link href="/" aria-label="Get started">
-                Get Started
-                <IconArrowRight
-                  size={18}
-                  className="ml-2 group-hover:translate-x-1 transition-transform"
-                />
-              </Link>
-            </Button>
-          </div>
+            <CardFooter className="flex justify-center">
+              <Button
+                asChild
+                size="lg"
+                className="group inline-flex items-center gap-2 px-8 py-6 rounded-full shadow-md transition-all hover:shadow-xl active:scale-95"
+              >
+                <Link href="/" aria-label="Get started">
+                  Get Started
+                  <IconArrowRight
+                    size={18}
+                    className="group-hover:translate-x-1 transition-transform"
+                  />
+                </Link>
+              </Button>
+            </CardFooter>
+          </Card>
         </div>
       </section>
     </div>

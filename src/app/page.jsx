@@ -11,7 +11,14 @@ import {
   IconArrowRight,
 } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import {
+  Card,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import Link from "next/link";
 
 export default function HomePage() {
   return (
@@ -140,24 +147,35 @@ export default function HomePage() {
       </section>
 
       {/* --- Final CTA --- */}
-      <section className="px-6 py-20">
-        <div className="max-w-4xl mx-auto p-12 md:p-20 rounded-[3rem] bg-slate-900 text-white text-center relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-purple-500/20 blur-[80px]" />
-          <div className="relative z-10">
-            <h2 className="text-3xl font-bold md:text-5xl mb-6">
-              Ready to discover your soundtrack?
-            </h2>
-            <p className="text-slate-400 text-lg mb-10 max-w-xl mx-auto">
-              Join thousands of users who have found their perfect music match.
-              Start your emotional journey today.
-            </p>
-            <Button
-              size="lg"
-              className="px-10 py-4 bg-white text-slate-900 rounded-full font-bold hover:bg-slate-100 transition-colors shadow-xl"
-            >
-              Create My Playlist Now
-            </Button>
-          </div>
+      <section className="py-16 px-4">
+        <div className="max-w-3xl mx-auto">
+          <Card className="border-none bg-zinc-50/50 dark:bg-zinc-700/50">
+            <CardHeader>
+              <CardTitle className="text-2xl md:text-3xl font-bold text-center">
+                Ready to find your soundtrack?
+              </CardTitle>
+              <CardDescription className="text-center text-zinc-600 dark:text-zinc-400 text-base md:text-lg mt-2">
+                Tell us how you&apos;re feeling and get personalized song
+                recommendations instantly.
+              </CardDescription>
+            </CardHeader>
+
+            <CardFooter className="flex justify-center">
+              <Button
+                asChild
+                size="lg"
+                className="group inline-flex items-center gap-2 px-8 py-6 rounded-full shadow-md transition-all hover:shadow-xl active:scale-95"
+              >
+                <Link href="/" aria-label="Get started">
+                  Get Started
+                  <IconArrowRight
+                    size={18}
+                    className="group-hover:translate-x-1 transition-transform"
+                  />
+                </Link>
+              </Button>
+            </CardFooter>
+          </Card>
         </div>
       </section>
     </div>
