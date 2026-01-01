@@ -5,12 +5,12 @@
   "tsx": false,
   "tailwind": {
     "config": "",
-    "css": "src/app/globals.css",
+    "css": "src/style/globals.css",
     "baseColor": "neutral",
     "cssVariables": true,
     "prefix": ""
   },
-  "iconLibrary": "lucide",
+  "iconLibrary": "tabler",
   "aliases": {
     "components": "@/components",
     "utils": "@/lib/utils",

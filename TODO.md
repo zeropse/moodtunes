@@ -1,0 +1,2 @@
+- update faq & about (at last)
+- add motion
