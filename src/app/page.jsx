@@ -13,30 +13,24 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import CTA from "@/components/cta";
 
-const ICONS = {
-  IconMessageCircle,
-  IconSearch,
-  IconMusic,
-};
-
 const howItWorksSteps = [
   {
     title: "Share Your Mood",
     description:
       "Tell us how you're feeling in your own words. Our advanced mood analysis understands complex emotions.",
-    icon: "IconMessageCircle",
+    icon: IconMessageCircle,
   },
   {
     title: "Advanced Analysis",
     description:
       "Our sophisticated algorithms analyze your emotional state and musical preferences to find perfect matches.",
-    icon: "IconSearch",
+    icon: IconSearch,
   },
   {
     title: "Discover Music",
     description:
       "Get a curated playlist of songs that perfectly match your current emotional state and energy level.",
-    icon: "IconMusic",
+    icon: IconMusic,
   },
 ];
 
@@ -78,29 +72,35 @@ export default function HomePage() {
   return (
     <div className="min-h-screen">
       {/* --- Hero Section --- */}
-      <section className="relative px-6 pt-32 pb-20 text-center lg:pt-48 lg:pb-32 overflow-hidden">
-        <div className="max-w-5xl mx-auto">
-          <h1 className="mb-8 text-6xl font-black tracking-tighter md:text-8xl lg:leading-[1.1]">
+      <section className="relative px-6 pt-24 pb-16 md:pt-40 md:pb-32 overflow-hidden">
+        <div className="max-w-4xl mx-auto text-center">
+          <h1 className="mb-6 text-5xl font-extrabold tracking-tight md:text-7xl lg:text-8xl lg:leading-[1.05]">
             Your emotions, <br />
-            <span className="text-transparent bg-clip-text bg-linear-to-r from-primary to-primary/60">
-              your soundtrack
-            </span>
+            <span className="text-primary">your soundtrack</span>
           </h1>
 
-          <p className="mb-12 text-lg text-muted-foreground md:text-xl max-w-2xl mx-auto leading-relaxed font-medium">
-            Transform your feelings into the perfect playlist. Our AI-driven
-            technology discovers songs that resonate with your unique emotional
-            state.
+          <p className="mb-10 text-lg text-muted-foreground md:text-xl max-w-xl mx-auto leading-relaxed">
+            Transform your feelings into the perfect playlist. Our advanced mood
+            analysis technology analyzes your mood and discovers songs that
+            resonate with your emotional state.
           </p>
 
-          <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4 justify-center items-center">
-            <Button className="px-8 h-12 text-base shadow-lg shadow-primary/20 hover:shadow-xl cursor-pointer">
-              Get Started <IconArrowRight size={18} />
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <Button
+              size="lg"
+              className="px-8 h-14 text-base font-semibold shadow-xl transition-all cursor-pointer inline-flex items-center justify-center group"
+            >
+              Get Started
+              <IconArrowRight
+                className="group-hover:translate-x-1 transition-transform"
+                size={20}
+              />
             </Button>
 
             <Button
               variant="outline"
-              className="px-8 h-12 text-base cursor-pointer"
+              size="lg"
+              className="px-8 h-14 text-base font-medium cursor-pointer"
               onClick={handleScrollToAbout}
             >
               Learn More
@@ -110,31 +110,27 @@ export default function HomePage() {
       </section>
 
       {/* --- How It Works --- */}
-      <section className="px-6 py-36">
-        <div className="max-w-7xl mx-auto">
-          <div className="mb-20">
-            <h3 className="text-4xl font-bold tracking-tight md:text-5xl">
+      <section className="px-6 py-24 bg-secondary/50">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold tracking-tight md:text-4xl">
               How It Works
-            </h3>
+            </h2>
           </div>
 
-          <div className="grid gap-8 md:grid-cols-3">
-            {howItWorksSteps.map((step) => {
-              const Icon = ICONS[step.icon];
+          <div className="grid gap-6 md:grid-cols-3">
+            {howItWorksSteps.map((step, idx) => {
+              const Icon = step.icon;
               return (
                 <Card
                   key={step.title}
-                  className="relative overflow-hidden border-none shadow-md"
+                  className="group border-none shadow-sm hover:shadow-md transition-all duration-300"
                 >
                   <CardHeader>
-                    <div className="w-12 h-12 mb-4 flex items-center justify-center rounded-xl bg-primary/10 transition-colors">
-                      <Icon
-                        size={24}
-                        strokeWidth={2}
-                        className="text-primary"
-                      />
+                    <div className="w-14 h-14 mb-4 flex items-center justify-center rounded-2xl bg-muted shadow-inner text-primary group-hover:scale-110 transition-transform duration-300">
+                      <Icon size={28} strokeWidth={1.5} />
                     </div>
-                    <CardTitle className="text-xl font-bold">
+                    <CardTitle className="text-xl font-bold flex items-center">
                       {step.title}
                     </CardTitle>
                   </CardHeader>
@@ -150,39 +146,56 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ---  Features --- */}
+      {/* --- Features --- */}
       <section id="about" className="px-6 py-24">
-        <div className="max-w-6xl mx-auto">
-          <div className="space-y-32">
+        <div className="max-w-5xl mx-auto">
+          <div className="space-y-24 md:space-y-40">
             {FEATURES.map(
-              (
-                { title, description, icon: Icon, reverse, iconBg, iconColor },
-                index
-              ) => (
+              ({
+                title,
+                description,
+                icon: Icon,
+                reverse,
+                iconBg,
+                iconColor,
+              }) => (
                 <div
                   key={title}
-                  className={`flex flex-col items-center gap-12 lg:gap-24 ${
+                  className={`flex flex-col items-center justify-between gap-12 md:gap-20 ${
                     reverse ? "md:flex-row-reverse" : "md:flex-row"
                   }`}
                 >
                   {/* Text Content */}
-                  <div className="flex-1 space-y-6 w-full">
-                    <h3 className="text-3xl font-bold tracking-tight md:text-4xl leading-tight">
+                  <div
+                    className={`flex-1 space-y-5 text-center ${
+                      reverse ? "md:text-right" : "md:text-left"
+                    }`}
+                  >
+                    <h3 className="text-3xl font-bold tracking-tight md:text-4xl">
                       {title}
                     </h3>
-                    <p className="text-muted-foreground text-lg leading-relaxed max-w-lg">
+                    <p
+                      className={`text-muted-foreground text-lg leading-relaxed md:max-w-md ${
+                        reverse ? "md:ml-auto" : "md:mr-auto"
+                      }`}
+                    >
                       {description}
                     </p>
                   </div>
 
-                  <div className="flex-1 flex justify-center w-full">
+                  {/* Icon Visual */}
+                  <div
+                    className={`flex-1 flex ${
+                      reverse ? "md:justify-start" : "md:justify-end"
+                    }`}
+                  >
                     <div
-                      className={`group relative h-48 w-48 md:h-64 md:w-64 rounded-4xl flex items-center justify-center shadow-xl border-2 transition-transform hover:scale-105 ${iconBg}`}
+                      className={`relative aspect-square w-full max-w-70 rounded-[3rem] flex items-center justify-center shadow-2xl transition-all duration-1500 hover:rotate-360 ${iconBg}`}
                     >
                       <Icon
-                        size={120}
-                        strokeWidth={1.25}
-                        className={`${iconColor}`}
+                        size={100}
+                        strokeWidth={1}
+                        className={`${iconColor} drop-shadow-sm`}
                       />
                     </div>
                   </div>

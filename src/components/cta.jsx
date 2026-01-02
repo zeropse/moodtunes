@@ -22,7 +22,7 @@ const ctaData = [
 
 export default function CTA() {
   return (
-    <section className="py-16 px-4">
+    <section className="py-24 px-6">
       <div className="max-w-3xl mx-auto">
         {ctaData.map((cta, index) => (
           <Card key={index} className="border-none bg-muted-foreground/20">
@@ -39,7 +39,7 @@ export default function CTA() {
               <Button
                 asChild
                 size="lg"
-                className="group inline-flex items-center gap-2 px-8 py-6 rounded-full shadow-md transition-all hover:shadow-xl active:scale-95"
+                className="group inline-flex items-center gap-2 px-8 py-6 shadow-md transition-all hover:shadow-xl active:scale-95"
               >
                 <Link href={cta.href} aria-label="Get started">
                   Get Started
