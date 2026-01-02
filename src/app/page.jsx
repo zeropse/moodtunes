@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useCallback } from "react";
 import {
   IconBrandSpotify,
   IconMessageCircle,
@@ -12,7 +12,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import CTA from "@/components/cta";
-import Link from "next/link";
 
 const ICONS = {
   IconMessageCircle,
@@ -70,17 +69,16 @@ const FEATURES = [
 ];
 
 export default function HomePage() {
+  const handleScrollToAbout = useCallback(() => {
+    const el = document.getElementById("about");
+    if (!el) return;
+    el.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, []);
+
   return (
-    <div className="min-h-screen bg-background selection:bg-primary/10">
+    <div className="min-h-screen">
       {/* --- Hero Section --- */}
       <section className="relative px-6 pt-32 pb-20 text-center lg:pt-48 lg:pb-32 overflow-hidden">
-        <div
-          className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full -z-10 opacity-30 blur-3xl"
-          aria-hidden="true"
-        >
-          <div className="aspect-square w-[60%] rounded-full bg-linear-to-tr from-primary/20 to-secondary/20 mx-auto" />
-        </div>
-
         <div className="max-w-5xl mx-auto">
           <h1 className="mb-8 text-6xl font-black tracking-tighter md:text-8xl lg:leading-[1.1]">
             Your emotions, <br />
@@ -96,28 +94,23 @@ export default function HomePage() {
           </p>
 
           <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4 justify-center items-center">
-            <Button
-              size="lg"
-              className="px-8 h-12 text-base rounded-full shadow-lg shadow-primary/20 hover:shadow-xl transition-all"
-            >
-              Get Started Free <IconArrowRight className="ml-2" size={18} />
+            <Button className="px-8 h-12 text-base shadow-lg shadow-primary/20 hover:shadow-xl cursor-pointer">
+              Get Started <IconArrowRight size={18} />
             </Button>
 
-            <Link href="#about">
-              <Button
-                variant="ghost"
-                size="lg"
-                className="px-8 h-12 text-base rounded-full"
-              >
-                Learn More
-              </Button>
-            </Link>
+            <Button
+              variant="outline"
+              className="px-8 h-12 text-base cursor-pointer"
+              onClick={handleScrollToAbout}
+            >
+              Learn More
+            </Button>
           </div>
         </div>
       </section>
 
       {/* --- How It Works --- */}
-      <section className="px-6 py-32 bg-secondary/50">
+      <section className="px-6 py-36">
         <div className="max-w-7xl mx-auto">
           <div className="mb-20">
             <h3 className="text-4xl font-bold tracking-tight md:text-5xl">
@@ -131,7 +124,7 @@ export default function HomePage() {
               return (
                 <Card
                   key={step.title}
-                  className="relative overflow-hidden border-none shadow-md bg-background"
+                  className="relative overflow-hidden border-none shadow-md"
                 >
                   <CardHeader>
                     <div className="w-12 h-12 mb-4 flex items-center justify-center rounded-xl bg-primary/10 transition-colors">
@@ -157,31 +150,23 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* --- About / Features --- */}
-      <section id="about" className="px-6 py-32">
+      {/* ---  Features --- */}
+      <section id="about" className="px-6 py-24">
         <div className="max-w-6xl mx-auto">
           <div className="space-y-32">
             {FEATURES.map(
-              ({
-                title,
-                description,
-                icon: Icon,
-                reverse,
-                iconBg,
-                iconColor,
-              }) => (
+              (
+                { title, description, icon: Icon, reverse, iconBg, iconColor },
+                index
+              ) => (
                 <div
                   key={title}
-                  className={`flex flex-col md:flex-row items-center gap-12 lg:gap-24 ${
-                    reverse ? "md:flex-row-reverse" : ""
+                  className={`flex flex-col items-center gap-12 lg:gap-24 ${
+                    reverse ? "md:flex-row-reverse" : "md:flex-row"
                   }`}
                 >
-                  <div className="flex-1 space-y-6">
-                    <div
-                      className={`inline-flex p-3 rounded-2xl ${iconBg} ${iconColor} mb-2`}
-                    >
-                      <Icon size={32} />
-                    </div>
+                  {/* Text Content */}
+                  <div className="flex-1 space-y-6 w-full">
                     <h3 className="text-3xl font-bold tracking-tight md:text-4xl leading-tight">
                       {title}
                     </h3>
@@ -190,18 +175,15 @@ export default function HomePage() {
                     </p>
                   </div>
 
-                  <div className="flex-1 w-full aspect-square max-w-96 relative group">
-                    <div className="absolute inset-0 bg-linear-to-br from-primary/10 to-transparent rounded-3xl -rotate-3 group-hover:rotate-0 transition-transform" />
-                    <div className="relative h-full w-full bg-background border-2 rounded-3xl flex items-center justify-center shadow-2xl overflow-hidden">
+                  <div className="flex-1 flex justify-center w-full">
+                    <div
+                      className={`group relative h-48 w-48 md:h-64 md:w-64 rounded-4xl flex items-center justify-center shadow-xl border-2 transition-transform hover:scale-105 ${iconBg}`}
+                    >
                       <Icon
                         size={120}
-                        strokeWidth={0.5}
-                        className={`${iconColor} opacity-20`}
+                        strokeWidth={1.25}
+                        className={`${iconColor}`}
                       />
-                      <div className="absolute bottom-6 left-6 right-6 p-4 rounded-xl bg-background/80 backdrop-blur-md border shadow-sm">
-                        <div className="h-2 w-24 bg-muted rounded-full mb-2" />
-                        <div className="h-2 w-16 bg-muted/60 rounded-full" />
-                      </div>
                     </div>
                   </div>
                 </div>
