@@ -11,13 +11,9 @@ import {
   IconArrowRight,
 } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import CTA from "@/components/cta";
+import Link from "next/link";
 
 const ICONS = {
   IconBolt,
@@ -37,7 +33,6 @@ const featureCards = [
     icon: "IconBolt",
     iconBg: "bg-amber-100",
     iconColor: "text-amber-600",
-    hoverShadow: "hover:shadow-purple-50",
   },
   {
     id: "mood-analysis",
@@ -47,7 +42,6 @@ const featureCards = [
     icon: "IconBrain",
     iconBg: "bg-blue-100",
     iconColor: "text-blue-600",
-    hoverShadow: "hover:shadow-blue-50",
   },
   {
     id: "spotify-integration",
@@ -57,7 +51,6 @@ const featureCards = [
     icon: "IconBrandSpotify",
     iconBg: "bg-emerald-100",
     iconColor: "text-emerald-600",
-    hoverShadow: "hover:shadow-emerald-50",
   },
 ];
 
@@ -66,7 +59,7 @@ const howItWorksSteps = [
     step: 1,
     title: "Share Your Mood",
     description:
-      "Tell us how you're feeling in your own words. Our advanced mood analysis understands complex emotions and nuances.",
+      "Tell us how you're feeling in your own words. Our advanced mood analysis understands complex emotions.",
     icon: "IconMessageCircle",
   },
   {
@@ -90,40 +83,25 @@ export default function HomePage() {
     <div className="min-h-screen">
       {/* --- Hero Section --- */}
       <section className="relative px-6 pt-24 pb-16 text-center md:pt-32 md:pb-24 overflow-hidden">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full -z-10 opacity-30">
-          <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-purple-300 blur-[120px]" />
-          <div className="absolute bottom-[10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-blue-300 blur-[120px]" />
-        </div>
-
         <div className="max-w-4xl mx-auto">
           <h1 className="mb-6 text-5xl font-extrabold tracking-tight md:text-7xl">
-            Your emotions,{" "}
-            <span className="text-transparent bg-clip-text bg-linear-to-r from-purple-600 to-blue-600">
-              your soundtrack
-            </span>
+            Your emotions, <span>your soundtrack</span>
           </h1>
 
-          <p className="mb-10 text-lg text-slate-600 md:text-xl max-w-2xl mx-auto leading-relaxed">
+          <p className="mb-10 text-lg text-muted-foreground md:text-xl max-w-2xl mx-auto leading-relaxed">
             Transform your feelings into the perfect playlist. Our advanced mood
             analysis technology analyzes your mood and discovers songs that
             resonate with your emotional state.
           </p>
 
           <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4 justify-center">
-            <Button
-              size="lg"
-              className="px-8 py-4 text-white bg-slate-900 rounded-xl font-semibold hover:bg-slate-800 transition-all flex items-center gap-2 shadow-lg shadow-slate-200"
-            >
+            <Button>
               Get Started Free <IconArrowRight size={20} />
             </Button>
 
-            <Button
-              variant="outline"
-              size="lg"
-              className="px-8 py-4 bg-white border border-slate-200 rounded-xl font-semibold hover:bg-slate-50 transition-all shadow-sm"
-            >
-              View Demo
-            </Button>
+            <Link href="/about">
+              <Button variant="outline">Learn More</Button>
+            </Link>
           </div>
         </div>
       </section>
@@ -137,22 +115,24 @@ export default function HomePage() {
             return (
               <Card
                 key={feature.id}
-                className={`p-8 border border-slate-100 rounded-3xl  hover:shadow-xl ${feature.hoverShadow} transition-all duration-300 group`}
+                className={`relative overflow-hidden border-none shadow-md transition-all duration-300 group hover:shadow-xl`}
               >
-                <div
-                  className={`w-12 h-12 flex items-center justify-center rounded-2xl ${feature.iconBg} ${feature.iconColor} group-hover:scale-110 transition-transform`}
-                >
-                  <Icon size={28} stroke={2} />
-                </div>
-
-                <CardHeader className="p-0">
-                  <CardTitle className="text-xl font-bold">
+                <CardHeader className="relative">
+                  <div
+                    className={`w-14 h-14 flex items-center justify-center rounded-2xl ${feature.iconBg} ${feature.iconColor} group-hover:scale-110 transition-transform`}
+                  >
+                    <Icon size={28} strokeWidth={2.5} />
+                  </div>
+                  <CardTitle className="text-xl font-bold pt-2">
                     {feature.title}
                   </CardTitle>
-                  <CardDescription className="leading-relaxed">
-                    {feature.description}
-                  </CardDescription>
                 </CardHeader>
+
+                <CardContent>
+                  <p className="text-muted-foreground leading-relaxed">
+                    {feature.description}
+                  </p>
+                </CardContent>
               </Card>
             );
           })}
@@ -161,26 +141,44 @@ export default function HomePage() {
 
       {/* --- How It Works --- */}
       <section className="px-6 py-24">
-        <h2 className="text-3xl font-bold md:text-4xl">How It Works</h2>
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold tracking-tight md:text-4xl mb-4">
+              How It Works
+            </h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Get started in minutes with our streamlined process designed for
+              efficiency.
+            </p>
+          </div>
 
-        <div className="max-w-6xl mx-auto grid gap-12 md:grid-cols-3">
-          {howItWorksSteps.map((step) => {
-            const Icon = ICONS[step.icon];
+          <div className="grid gap-8 md:grid-cols-3">
+            {howItWorksSteps.map((step, index) => {
+              const Icon = ICONS[step.icon];
 
-            return (
-              <div
-                key={step.step}
-                className="flex flex-col items-center text-center"
-              >
-                <div className="w-16 h-16 mb-6 flex items-center justify-center rounded-full bg-white border-4">
-                  <Icon size={32} className="text-purple-500" />
-                </div>
+              return (
+                <Card
+                  key={step.step}
+                  className="relative overflow-hidden border-none shadow-md transition-all hover:shadow-xl"
+                >
+                  <CardHeader className="relative">
+                    <div className="w-14 h-14 mb-2 flex items-center justify-center rounded-2xl bg-secondary text-secondary-foreground">
+                      <Icon size={28} strokeWidth={2.5} />
+                    </div>
+                    <CardTitle className="text-xl font-bold pt-2">
+                      {step.title}
+                    </CardTitle>
+                  </CardHeader>
 
-                <h4 className="text-xl font-bold mb-3">{step.title}</h4>
-                <p className="text-slate-600">{step.description}</p>
-              </div>
-            );
-          })}
+                  <CardContent className="relative">
+                    <p className="text-muted-foreground leading-relaxed">
+                      {step.description}
+                    </p>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
         </div>
       </section>
 
