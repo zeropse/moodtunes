@@ -2,12 +2,11 @@
 
 import React from "react";
 import {
-  IconBolt,
-  IconBrain,
   IconBrandSpotify,
   IconMessageCircle,
   IconSearch,
   IconMusic,
+  IconMessageHeart,
   IconArrowRight,
 } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
@@ -16,61 +15,25 @@ import CTA from "@/components/cta";
 import Link from "next/link";
 
 const ICONS = {
-  IconBolt,
-  IconBrain,
-  IconBrandSpotify,
   IconMessageCircle,
   IconSearch,
   IconMusic,
 };
 
-const featureCards = [
-  {
-    id: "lightning-fast",
-    title: "Lightning Fast",
-    description:
-      "Get personalized music recommendations in seconds with our optimized mood analysis engine.",
-    icon: "IconBolt",
-    iconBg: "bg-amber-100",
-    iconColor: "text-amber-600",
-  },
-  {
-    id: "mood-analysis",
-    title: "Mood Analysis",
-    description:
-      "Advanced emotion analysis using sophisticated algorithms for perfect song matching.",
-    icon: "IconBrain",
-    iconBg: "bg-blue-100",
-    iconColor: "text-blue-600",
-  },
-  {
-    id: "spotify-integration",
-    title: "Spotify Integration",
-    description:
-      "Seamlessly play and save playlists to Spotify with one click.",
-    icon: "IconBrandSpotify",
-    iconBg: "bg-emerald-100",
-    iconColor: "text-emerald-600",
-  },
-];
-
 const howItWorksSteps = [
   {
-    step: 1,
     title: "Share Your Mood",
     description:
       "Tell us how you're feeling in your own words. Our advanced mood analysis understands complex emotions.",
     icon: "IconMessageCircle",
   },
   {
-    step: 2,
     title: "Advanced Analysis",
     description:
       "Our sophisticated algorithms analyze your emotional state and musical preferences to find perfect matches.",
     icon: "IconSearch",
   },
   {
-    step: 3,
     title: "Discover Music",
     description:
       "Get a curated playlist of songs that perfectly match your current emotional state and energy level.",
@@ -78,99 +41,111 @@ const howItWorksSteps = [
   },
 ];
 
+const FEATURES = [
+  {
+    title: "Advanced Mood Analysis",
+    description:
+      "Our sophisticated system understands the nuances of human emotion, analyzing your mood description to identify the perfect musical match.",
+    icon: IconMessageHeart,
+    iconBg: "bg-amber-100",
+    iconColor: "text-amber-600",
+  },
+  {
+    title: "Personalized Suggestions",
+    description:
+      "Every recommendation is tailored to your specific emotional state, ensuring you get music that truly resonates with how you feel.",
+    icon: IconMusic,
+    iconBg: "bg-blue-100",
+    iconColor: "text-blue-600",
+    reverse: true,
+  },
+  {
+    title: "Spotify Integration",
+    description:
+      "Seamlessly connect with Spotify to access songs. Click any suggestion to open it directly in Spotify.",
+    icon: IconBrandSpotify,
+    iconBg: "bg-emerald-100",
+    iconColor: "text-emerald-600",
+  },
+];
+
 export default function HomePage() {
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-background selection:bg-primary/10">
       {/* --- Hero Section --- */}
-      <section className="relative px-6 pt-24 pb-16 text-center md:pt-32 md:pb-24 overflow-hidden">
-        <div className="max-w-4xl mx-auto">
-          <h1 className="mb-6 text-5xl font-extrabold tracking-tight md:text-7xl">
-            Your emotions, <span>your soundtrack</span>
+      <section className="relative px-6 pt-32 pb-20 text-center lg:pt-48 lg:pb-32 overflow-hidden">
+        <div
+          className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full -z-10 opacity-30 blur-3xl"
+          aria-hidden="true"
+        >
+          <div className="aspect-square w-[60%] rounded-full bg-linear-to-tr from-primary/20 to-secondary/20 mx-auto" />
+        </div>
+
+        <div className="max-w-5xl mx-auto">
+          <h1 className="mb-8 text-6xl font-black tracking-tighter md:text-8xl lg:leading-[1.1]">
+            Your emotions, <br />
+            <span className="text-transparent bg-clip-text bg-linear-to-r from-primary to-primary/60">
+              your soundtrack
+            </span>
           </h1>
 
-          <p className="mb-10 text-lg text-muted-foreground md:text-xl max-w-2xl mx-auto leading-relaxed">
-            Transform your feelings into the perfect playlist. Our advanced mood
-            analysis technology analyzes your mood and discovers songs that
-            resonate with your emotional state.
+          <p className="mb-12 text-lg text-muted-foreground md:text-xl max-w-2xl mx-auto leading-relaxed font-medium">
+            Transform your feelings into the perfect playlist. Our AI-driven
+            technology discovers songs that resonate with your unique emotional
+            state.
           </p>
 
-          <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4 justify-center">
-            <Button>
-              Get Started Free <IconArrowRight size={20} />
+          <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4 justify-center items-center">
+            <Button
+              size="lg"
+              className="px-8 h-12 text-base rounded-full shadow-lg shadow-primary/20 hover:shadow-xl transition-all"
+            >
+              Get Started Free <IconArrowRight className="ml-2" size={18} />
             </Button>
 
-            <Link href="/about">
-              <Button variant="outline">Learn More</Button>
+            <Link href="#about">
+              <Button
+                variant="ghost"
+                size="lg"
+                className="px-8 h-12 text-base rounded-full"
+              >
+                Learn More
+              </Button>
             </Link>
           </div>
         </div>
       </section>
 
-      {/* --- Feature Cards --- */}
-      <section className="px-6 py-20">
-        <div className="max-w-6xl mx-auto grid gap-8 md:grid-cols-3">
-          {featureCards.map((feature) => {
-            const Icon = ICONS[feature.icon];
-
-            return (
-              <Card
-                key={feature.id}
-                className={`relative overflow-hidden border-none shadow-md transition-all duration-300 group hover:shadow-xl`}
-              >
-                <CardHeader className="relative">
-                  <div
-                    className={`w-14 h-14 flex items-center justify-center rounded-2xl ${feature.iconBg} ${feature.iconColor} group-hover:scale-110 transition-transform`}
-                  >
-                    <Icon size={28} strokeWidth={2.5} />
-                  </div>
-                  <CardTitle className="text-xl font-bold pt-2">
-                    {feature.title}
-                  </CardTitle>
-                </CardHeader>
-
-                <CardContent>
-                  <p className="text-muted-foreground leading-relaxed">
-                    {feature.description}
-                  </p>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
-      </section>
-
       {/* --- How It Works --- */}
-      <section className="px-6 py-24">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold tracking-tight md:text-4xl mb-4">
+      <section className="px-6 py-32 bg-secondary/50">
+        <div className="max-w-7xl mx-auto">
+          <div className="mb-20">
+            <h3 className="text-4xl font-bold tracking-tight md:text-5xl">
               How It Works
-            </h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              Get started in minutes with our streamlined process designed for
-              efficiency.
-            </p>
+            </h3>
           </div>
 
           <div className="grid gap-8 md:grid-cols-3">
-            {howItWorksSteps.map((step, index) => {
+            {howItWorksSteps.map((step) => {
               const Icon = ICONS[step.icon];
-
               return (
                 <Card
-                  key={step.step}
-                  className="relative overflow-hidden border-none shadow-md transition-all hover:shadow-xl"
+                  key={step.title}
+                  className="relative overflow-hidden border-none shadow-md bg-background"
                 >
-                  <CardHeader className="relative">
-                    <div className="w-14 h-14 mb-2 flex items-center justify-center rounded-2xl bg-secondary text-secondary-foreground">
-                      <Icon size={28} strokeWidth={2.5} />
+                  <CardHeader>
+                    <div className="w-12 h-12 mb-4 flex items-center justify-center rounded-xl bg-primary/10 transition-colors">
+                      <Icon
+                        size={24}
+                        strokeWidth={2}
+                        className="text-primary"
+                      />
                     </div>
-                    <CardTitle className="text-xl font-bold pt-2">
+                    <CardTitle className="text-xl font-bold">
                       {step.title}
                     </CardTitle>
                   </CardHeader>
-
-                  <CardContent className="relative">
+                  <CardContent>
                     <p className="text-muted-foreground leading-relaxed">
                       {step.description}
                     </p>
@@ -178,6 +153,60 @@ export default function HomePage() {
                 </Card>
               );
             })}
+          </div>
+        </div>
+      </section>
+
+      {/* --- About / Features --- */}
+      <section id="about" className="px-6 py-32">
+        <div className="max-w-6xl mx-auto">
+          <div className="space-y-32">
+            {FEATURES.map(
+              ({
+                title,
+                description,
+                icon: Icon,
+                reverse,
+                iconBg,
+                iconColor,
+              }) => (
+                <div
+                  key={title}
+                  className={`flex flex-col md:flex-row items-center gap-12 lg:gap-24 ${
+                    reverse ? "md:flex-row-reverse" : ""
+                  }`}
+                >
+                  <div className="flex-1 space-y-6">
+                    <div
+                      className={`inline-flex p-3 rounded-2xl ${iconBg} ${iconColor} mb-2`}
+                    >
+                      <Icon size={32} />
+                    </div>
+                    <h3 className="text-3xl font-bold tracking-tight md:text-4xl leading-tight">
+                      {title}
+                    </h3>
+                    <p className="text-muted-foreground text-lg leading-relaxed max-w-lg">
+                      {description}
+                    </p>
+                  </div>
+
+                  <div className="flex-1 w-full aspect-square max-w-96 relative group">
+                    <div className="absolute inset-0 bg-linear-to-br from-primary/10 to-transparent rounded-3xl -rotate-3 group-hover:rotate-0 transition-transform" />
+                    <div className="relative h-full w-full bg-background border-2 rounded-3xl flex items-center justify-center shadow-2xl overflow-hidden">
+                      <Icon
+                        size={120}
+                        strokeWidth={0.5}
+                        className={`${iconColor} opacity-20`}
+                      />
+                      <div className="absolute bottom-6 left-6 right-6 p-4 rounded-xl bg-background/80 backdrop-blur-md border shadow-sm">
+                        <div className="h-2 w-24 bg-muted rounded-full mb-2" />
+                        <div className="h-2 w-16 bg-muted/60 rounded-full" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )
+            )}
           </div>
         </div>
       </section>

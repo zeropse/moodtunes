@@ -44,9 +44,9 @@ export default function Navbar() {
             size="sm"
             className="text-xs font-medium text-muted-foreground hover:text-primary px-3"
           >
-            <Link href="/about" className="inline-flex items-center gap-1.5">
+            <Link href="/faqs" className="inline-flex items-center gap-1.5">
               <IconInfoCircle className="h-3.5 w-3.5" />
-              <span>About</span>
+              <span>FAQ</span>
             </Link>
           </Button>
           <ModeToggle />

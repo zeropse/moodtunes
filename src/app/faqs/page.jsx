@@ -1,5 +1,6 @@
 "use client";
 
+import CTA from "@/components/cta";
 import {
   Accordion,
   AccordionItem,
@@ -59,7 +60,7 @@ const FAQPage = () => {
           <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-6">
             Frequently Asked Questions
           </h1>
-          <p className="text-xl md:text-2xl text-zinc-500 font-light max-w-2xl mx-auto">
+          <p className="text-xl md:text-2xl text-muted-foreground font-light max-w-2xl mx-auto">
             Find answers to common questions about MoodTunes.
           </p>
         </div>
@@ -87,6 +88,8 @@ const FAQPage = () => {
           </Accordion>
         </div>
       </section>
+
+      <CTA />
     </div>
   );
 };
