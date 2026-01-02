@@ -1,8 +1,8 @@
 export default function AppPage() {
   return (
-    <main>
-      <h1>Welcome to the Home Page</h1>
-      <p>This is the main landing page of the application.</p>
-    </main>
+    <div>
+      <h1 className="text-2xl font-bold mb-4">App Content</h1>
+      <p>Welcome to the demo page for the Sidebar component.</p>
+    </div>
   );
 }

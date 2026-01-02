@@ -1,8 +1,7 @@
 import { Roboto, Roboto_Mono } from "next/font/google";
 import "@/style/globals.css";
 import { ThemeProvider } from "@/style/theme-provider";
-import Footer from "@/components/footer";
-import Navbar from "@/components/navbar";
+import RouteFrame from "@/components/route-frame";
 
 const roboto = Roboto({
   variable: "--font-roboto",
@@ -28,9 +27,7 @@ export default function RootLayout({ children }) {
           defaultTheme="dark"
           disableTransitionOnChange
         >
-          <Navbar />
-          {children}
-          <Footer />
+          <RouteFrame>{children}</RouteFrame>
         </ThemeProvider>
       </body>
     </html>
