@@ -21,8 +21,34 @@ import {
   IconSquareRoundedPlus,
 } from "@tabler/icons-react";
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { getHistory } from "@/lib/history-utils";
+import { Spinner } from "@/components/ui/spinner";
 
-export function AppSidebar({ ...props }) {
+export function AppSidebar(props) {
+  const [history, setHistory] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const loadHistory = () => {
+      setIsLoading(true);
+      const data = getHistory();
+      setHistory(data);
+      setIsLoading(false);
+    };
+
+    loadHistory();
+
+    const handleHistoryUpdate = () => {
+      loadHistory();
+    };
+
+    window.addEventListener("moodHistoryUpdated", handleHistoryUpdate);
+    return () => {
+      window.removeEventListener("moodHistoryUpdated", handleHistoryUpdate);
+    };
+  }, []);
+
   const footerLinks = [
     {
       href: "https://github.com/zeropse/",
@@ -34,11 +60,16 @@ export function AppSidebar({ ...props }) {
       Icon: IconBrandLinkedin,
       label: "LinkedIn",
     },
-    { href: "https://x.com/zer0pse/", Icon: IconBrandX, label: "X" },
+    {
+      href: "https://x.com/zer0pse/",
+      Icon: IconBrandX,
+      label: "X",
+    },
   ];
 
   return (
     <Sidebar side="left" variant="sidebar" collapsible="icon" {...props}>
+      {/* Header */}
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
@@ -61,7 +92,9 @@ export function AppSidebar({ ...props }) {
 
       <SidebarSeparator />
 
+      {/* Content */}
       <SidebarContent>
+        {/* New Mood Entry */}
         <SidebarGroup>
           <SidebarMenu>
             <SidebarMenuItem>
@@ -79,16 +112,45 @@ export function AppSidebar({ ...props }) {
           </SidebarMenu>
         </SidebarGroup>
 
-        <SidebarGroup>
+        {/* Recent */}
+        <SidebarGroup className="group-data-[collapsible=icon]:hidden">
           <SidebarGroupLabel className="flex items-center gap-2">
             <IconHistory className="size-4" />
-            <span>Your Mood History</span>
+            <span>Recent</span>
           </SidebarGroupLabel>
+
+          <SidebarMenu>
+            {isLoading ? (
+              <SidebarMenuItem>
+                <div className="flex items-center justify-center">
+                  <Spinner />
+                </div>
+              </SidebarMenuItem>
+            ) : history && history.length === 0 ? (
+              <SidebarMenuItem>
+                <div className="px-2 py-1.5 text-sm text-muted-foreground">
+                  No recent entries yet
+                </div>
+              </SidebarMenuItem>
+            ) : (
+              history &&
+              history.map((item) => (
+                <SidebarMenuItem key={item.id}>
+                  <SidebarMenuButton asChild tooltip={`Mood: ${item.mood}`}>
+                    <Link href={`/app/history/${item.id}`}>
+                      <span className="capitalize">Mood: {item.mood}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))
+            )}
+          </SidebarMenu>
         </SidebarGroup>
       </SidebarContent>
 
       <SidebarSeparator />
 
+      {/* Footer */}
       <SidebarFooter>
         <SidebarMenu className="flex-row group-data-[collapsible=icon]:flex-col items-center justify-between group-data-[collapsible=icon]:justify-center gap-1">
           {footerLinks.map(({ href, Icon, label }) => (

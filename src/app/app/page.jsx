@@ -15,6 +15,7 @@ import { IconSend2, IconMusic } from "@tabler/icons-react";
 import prompts from "@/data/prompts.json";
 import { PlaylistResults } from "@/components/playlist-results";
 import { Spinner } from "@/components/ui/spinner";
+import { saveMoodToHistory } from "@/lib/history-utils";
 
 export default function AppPage() {
   const [placeholder] = useState(
@@ -55,6 +56,7 @@ export default function AppPage() {
 
       const data = await response.json();
       setResult(data);
+      saveMoodToHistory(data.mood, data.tracks);
     } catch (err) {
       console.error(err);
       setError(
