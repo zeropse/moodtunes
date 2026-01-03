@@ -16,7 +16,7 @@ const ctaData = [
     title: "Ready to find your soundtrack?",
     description:
       "Tell us how you're feeling and get personalized song recommendations instantly.",
-    href: "/",
+    href: "/app",
   },
 ];
 

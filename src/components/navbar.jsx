@@ -4,8 +4,11 @@ import { Button } from "@/components/ui/button";
 import { ModeToggle } from "@/style/mode-toggle";
 import { IconMusic, IconInfoCircle } from "@tabler/icons-react";
 import Link from "next/link";
+import { useAuth } from "@/lib/auth-context";
 
 export default function Navbar() {
+  const { user } = useAuth();
+
   return (
     <nav className="sticky top-0 z-40 border-b border-border/60 bg-background/80 backdrop-blur-sm">
       <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4">
@@ -35,6 +38,16 @@ export default function Navbar() {
               <span>FAQ</span>
             </Link>
           </Button>
+
+          <Button
+            asChild
+            variant="default"
+            size="sm"
+            className="text-xs font-medium px-3"
+          >
+            <Link href="/app">{user ? "Go to App" : "Get Started"}</Link>
+          </Button>
+
           <ModeToggle />
         </div>
       </div>

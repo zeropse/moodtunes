@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useCallback } from "react";
+import { useRouter } from "next/navigation";
 import {
   IconBrandSpotify,
   IconMessageCircle,
@@ -63,11 +64,17 @@ const FEATURES = [
 ];
 
 export default function HomePage() {
+  const router = useRouter();
+
   const handleScrollToAbout = useCallback(() => {
     const el = document.getElementById("about");
     if (!el) return;
     el.scrollIntoView({ behavior: "smooth", block: "start" });
   }, []);
+
+  const handleGetStarted = useCallback(() => {
+    router.push("/app");
+  }, [router]);
 
   return (
     <div className="min-h-screen">
@@ -89,6 +96,7 @@ export default function HomePage() {
             <Button
               size="lg"
               className="px-8 h-14 text-base font-semibold shadow-xl transition-all cursor-pointer inline-flex items-center justify-center group"
+              onClick={handleGetStarted}
             >
               Get Started
               <IconArrowRight
