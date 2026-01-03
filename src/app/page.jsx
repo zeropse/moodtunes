@@ -108,7 +108,7 @@ export default function HomePage() {
               disabled={!mounted}
             >
               {!mounted ? (
-                <Spinner className="mr-2 h-4 w-4 animate-spin" />
+                <Spinner className="h-4 w-4 animate-spin" />
               ) : (
                 <>
                   {user ? "Go to App" : "Get Started"}
