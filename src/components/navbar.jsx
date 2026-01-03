@@ -5,9 +5,23 @@ import { ModeToggle } from "@/style/mode-toggle";
 import { IconMusic, IconInfoCircle } from "@tabler/icons-react";
 import Link from "next/link";
 import { useAuth } from "@/lib/auth-context";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function Navbar() {
   const { user } = useAuth();
+  const [mounted, setMounted] = useState(false);
+  const router = useRouter();
+
+  useEffect(() => {
+    // This setState is necessary to handle hydration mismatch for auth state eslint-disable-next-line react-hooks/exhaustive-deps
+    setMounted(true);
+  }, []);
+
+  const handleAppClick = () => {
+    router.push("/app");
+  };
 
   return (
     <nav className="sticky top-0 z-40 border-b border-border/60 bg-background/80 backdrop-blur-sm">
@@ -40,12 +54,11 @@ export default function Navbar() {
           </Button>
 
           <Button
-            asChild
-            variant="default"
-            size="sm"
-            className="text-xs font-medium px-3"
+            className="text-xs font-bold cursor-pointer"
+            onClick={handleAppClick}
+            disabled={!mounted}
           >
-            <Link href="/app">{user ? "Go to App" : "Get Started"}</Link>
+            {!mounted ? <Spinner /> : user ? "Go to App" : "Get Started"}
           </Button>
 
           <ModeToggle />

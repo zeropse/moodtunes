@@ -1,3 +1,4 @@
+- implement history api
 - update faq & about (at last)
 - add motion
 - update all CTAs
