@@ -2,7 +2,7 @@ import { Roboto, Roboto_Mono } from "next/font/google";
 import "@/style/globals.css";
 import { ThemeProvider } from "@/style/theme-provider";
 import RouteFrame from "@/components/route-frame";
-import { AuthProvider } from "@/lib/auth-context";
+import { AuthProvider } from "@/contexts/auth-context";
 
 const roboto = Roboto({
   variable: "--font-roboto",

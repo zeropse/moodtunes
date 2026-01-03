@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { ModeToggle } from "@/style/mode-toggle";
 import { IconMusic, IconInfoCircle } from "@tabler/icons-react";
 import Link from "next/link";
-import { useAuth } from "@/lib/auth-context";
+import { useAuth } from "@/contexts/auth-context";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Spinner } from "@/components/ui/spinner";

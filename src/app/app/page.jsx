@@ -35,7 +35,7 @@ export default function AppPage() {
   const [error, setError] = useState(null);
 
   const handleGenerate = async () => {
-    if (!input.trim()) return;
+    if (!input.trim() || loading) return;
 
     setLoading(true);
     setResult(null);
@@ -66,6 +66,14 @@ export default function AppPage() {
       );
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Handle keydown
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
+      e.preventDefault();
+      handleGenerate();
     }
   };
 
@@ -103,6 +111,7 @@ export default function AppPage() {
                   className="min-h-45 text-lg leading-relaxed bg-background/50 border-muted-foreground/20 focus-visible:ring-primary/50 transition-all resize-none p-5 rounded-xl"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={handleKeyDown}
                 />
               </CardContent>
 
