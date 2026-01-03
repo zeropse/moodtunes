@@ -4,6 +4,7 @@ import { IconMoon, IconSun } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "next-themes";
 import { useState, useEffect } from "react";
+import { Spinner } from "@/components/ui/spinner";
 
 export function ModeToggle() {
   const { theme, setTheme } = useTheme();
@@ -15,7 +16,12 @@ export function ModeToggle() {
   }, []);
 
   if (!mounted) {
-    return null;
+    return (
+      <Button variant="ghost" size="icon" disabled>
+        <Spinner className="h-4 w-4" />
+        <span className="sr-only">Loading theme</span>
+      </Button>
+    );
   }
 
   const isDark = theme === "dark";
