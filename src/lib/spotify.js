@@ -23,7 +23,7 @@ export const searchTracks = async (query) => {
   const { access_token } = await getAccessToken();
 
   const response = await fetch(
-    `${SEARCH_ENDPOINT}?q=${encodeURIComponent(query)}&type=track&limit=10`,
+    `${SEARCH_ENDPOINT}?q=${encodeURIComponent(query)}&type=track&limit=25`,
     {
       headers: {
         Authorization: `Bearer ${access_token}`,
