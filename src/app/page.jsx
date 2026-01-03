@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   IconBrandSpotify,
@@ -12,6 +12,8 @@ import {
 } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useAuth } from "@/lib/auth-context";
+import { Spinner } from "@/components/ui/spinner";
 import CTA from "@/components/cta";
 
 const howItWorksSteps = [
@@ -65,6 +67,13 @@ const FEATURES = [
 
 export default function HomePage() {
   const router = useRouter();
+  const { user } = useAuth();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    // This setState is necessary to handle hydration mismatch for auth state eslint-disable-next-line react-hooks/exhaustive-deps
+    setMounted(true);
+  }, []);
 
   const handleScrollToAbout = useCallback(() => {
     const el = document.getElementById("about");
@@ -94,21 +103,23 @@ export default function HomePage() {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Button
-              size="lg"
-              className="px-8 h-14 text-base font-semibold shadow-xl transition-all cursor-pointer inline-flex items-center justify-center group"
+              className="px-8 h-12 text-base font-bold transition-all hover:shadow-lg group cursor-pointer"
               onClick={handleGetStarted}
+              disabled={!mounted}
             >
-              Get Started
-              <IconArrowRight
-                className="group-hover:translate-x-1 transition-transform"
-                size={20}
-              />
+              {!mounted ? (
+                <Spinner className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <>
+                  {user ? "Go to App" : "Get Started"}
+                  <IconArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                </>
+              )}
             </Button>
 
             <Button
               variant="outline"
-              size="lg"
-              className="px-8 h-14 text-base font-medium cursor-pointer"
+              className="px-8 h-12 text-base font-medium transition-all hover:bg-secondary/80 cursor-pointer"
               onClick={handleScrollToAbout}
             >
               Learn More
