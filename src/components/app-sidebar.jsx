@@ -10,9 +10,11 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarSeparator,
+  SidebarGroupLabel,
 } from "@/components/ui/sidebar";
 import {
   IconMusic,
+  IconHistory,
   IconBrandGithub,
   IconBrandLinkedin,
   IconBrandX,
@@ -76,28 +78,33 @@ export function AppSidebar({ ...props }) {
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarGroup>
+
+        <SidebarGroup>
+          <SidebarGroupLabel className="flex items-center gap-2">
+            <IconHistory className="size-4" />
+            <span>Your Mood History</span>
+          </SidebarGroupLabel>
+        </SidebarGroup>
       </SidebarContent>
 
       <SidebarSeparator />
 
       <SidebarFooter>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <div className="flex group-data-[collapsible=icon]:flex-col items-center justify-around p-2 gap-2 text-muted-foreground/80">
-              {footerLinks.map(({ href, Icon, label }) => (
-                <a
-                  key={href}
-                  href={href}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="hover:text-primary"
-                  aria-label={label}
-                >
-                  <Icon className="size-5" />
+        <SidebarMenu className="flex-row group-data-[collapsible=icon]:flex-col items-center justify-between group-data-[collapsible=icon]:justify-center gap-1">
+          {footerLinks.map(({ href, Icon, label }) => (
+            <SidebarMenuItem key={href}>
+              <SidebarMenuButton
+                asChild
+                tooltip={label}
+                className="hover:bg-secondary hover:text-secondary-foreground transition-colors"
+              >
+                <a href={href} target="_blank" rel="noreferrer">
+                  <Icon className="size-10" />
+                  <span className="sr-only">{label}</span>
                 </a>
-              ))}
-            </div>
-          </SidebarMenuItem>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          ))}
         </SidebarMenu>
       </SidebarFooter>
     </Sidebar>
