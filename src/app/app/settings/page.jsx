@@ -11,7 +11,27 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { IconBrandSpotify } from "@tabler/icons-react";
+import {
+  IconBrandSpotify,
+  IconBrandGithub,
+  IconBrandLinkedin,
+  IconBrandX,
+} from "@tabler/icons-react";
+import { Spinner } from "@/components/ui/spinner";
+
+const socials = [
+  {
+    name: "GitHub",
+    href: "https://github.com/zeropse/",
+    icon: IconBrandGithub,
+  },
+  {
+    name: "LinkedIn",
+    href: "https://linkedin.com/in/zeropse/",
+    icon: IconBrandLinkedin,
+  },
+  { name: "X/Twitter", href: "https://x.com/zer0pse/", icon: IconBrandX },
+];
 
 export default function SettingsPage() {
   const { user } = useAuth();
@@ -51,9 +71,9 @@ export default function SettingsPage() {
                 </div>
               </>
             ) : (
-              <p className="text-sm text-muted-foreground">
-                No user information available.
-              </p>
+              <div className="flex items-center justify-center">
+                <Spinner />
+              </div>
             )}
           </CardContent>
         </Card>
@@ -75,6 +95,33 @@ export default function SettingsPage() {
               Connect to Spotify
             </Button>
           </CardFooter>
+        </Card>
+
+        {/* Social Links */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Connect</CardTitle>
+            <CardDescription>
+              Find me on my professional and social networks.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-3 gap-3">
+              {socials.map((social) => (
+                <Button
+                  key={social.name}
+                  variant="outline"
+                  className="w-full justify-center gap-3 transition-all hover:bg-accent hover:text-accent-foreground"
+                  asChild
+                >
+                  <a href={social.href} target="_blank" rel="noreferrer">
+                    <social.icon className="h-5 w-5" />
+                    <span className="font-medium">{social.name}</span>
+                  </a>
+                </Button>
+              ))}
+            </div>
+          </CardContent>
         </Card>
       </div>
     </div>

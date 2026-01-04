@@ -41,7 +41,7 @@ export function PlaylistResults({ result, onReset }) {
             <IconArrowLeft size="20" />
           </Button>
           <h2 className="text-xl font-bold sm:text-2xl">
-            Current Mood:{" "}
+            Your mood:{" "}
             <span className="text-primary capitalize">{result.mood}</span>
           </h2>
         </div>
