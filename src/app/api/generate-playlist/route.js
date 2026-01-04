@@ -4,7 +4,7 @@ import { searchTracks } from "@/lib/spotify";
 
 export async function POST(request) {
   try {
-    const { text } = await request.json();
+    const { text, numTracks = 25 } = await request.json();
 
     if (!text) {
       return NextResponse.json({ error: "Text is required" }, { status: 400 });
@@ -14,7 +14,7 @@ export async function POST(request) {
     const { mood, searchQuery } = await analyzeMood(text);
 
     // 2. Search Spotify
-    const spotifyData = await searchTracks(searchQuery);
+    const spotifyData = await searchTracks(searchQuery, numTracks);
 
     if (!spotifyData || !spotifyData.tracks) {
       return NextResponse.json(

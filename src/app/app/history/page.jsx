@@ -186,6 +186,7 @@ export default function HistoryPage() {
                       {new Date(item.timestamp).toLocaleTimeString([], {
                         hour: "2-digit",
                         minute: "2-digit",
+                        hour12: true,
                       })}
                     </div>
                   </TableCell>
@@ -207,10 +208,9 @@ export default function HistoryPage() {
                     <div className="flex items-center justify-center gap-2">
                       {/* View playlist */}
                       <Button
-                        asChild
-                        variant="secondary"
+                        variant="outline"
                         size="icon"
-                        className="h-8 w-8 text-primary"
+                        className="h-8 w-8 cursor-pointer"
                       >
                         <Link href={`/app/${item.id}`}>
                           <IconExternalLink size={16} />

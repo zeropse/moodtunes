@@ -12,10 +12,18 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { IconSend2, IconMusic } from "@tabler/icons-react";
 import prompts from "@/data/prompts.json";
 import { Spinner } from "@/components/ui/spinner";
 import { saveMoodToHistory } from "@/lib/history-utils";
+import { IconAlertCircle } from "@tabler/icons-react";
 
 export default function AppPage() {
   const router = useRouter();
@@ -33,6 +41,7 @@ export default function AppPage() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [numTracks, setNumTracks] = useState(25);
 
   const handleGenerate = async () => {
     if (!input.trim() || loading) return;
@@ -46,7 +55,7 @@ export default function AppPage() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ text: input }),
+        body: JSON.stringify({ text: input, numTracks }),
       });
 
       if (!response.ok) {
@@ -63,7 +72,6 @@ export default function AppPage() {
           ? err.message
           : "Something went wrong. Please try again."
       );
-    } finally {
       setLoading(false);
     }
   };
@@ -105,36 +113,70 @@ export default function AppPage() {
               />
             </CardContent>
 
-            <CardFooter className="flex flex-col gap-3 pb-8 px-6">
-              <div className="flex w-full flex-col sm:flex-row items-center justify-between gap-4">
+            <CardFooter className="flex flex-col gap-4 px-6">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 w-full">
                 <p
                   suppressHydrationWarning
-                  className="text-xs text-muted-foreground italic"
+                  className="text-xs text-muted-foreground italic leading-relaxed"
                 >
                   {footer}
                 </p>
 
-                <Button
-                  size="lg"
-                  className="w-full sm:w-auto px-8 font-semibold shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all cursor-pointer"
-                  onClick={handleGenerate}
-                  disabled={loading || !input.trim()}
-                >
-                  {loading ? (
-                    <>
-                      <Spinner /> Analyzing...
-                    </>
-                  ) : (
-                    "Generate Playlist"
-                  )}
-                  {!loading && <IconSend2 className="h-4 w-4 ml-2" />}
-                </Button>
+                <div className="flex items-center gap-3 w-full md:w-auto">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-medium text-muted-foreground whitespace-nowrap">
+                      Tracks:
+                    </span>
+                    <Select
+                      value={numTracks.toString()}
+                      onValueChange={(value) => setNumTracks(parseInt(value))}
+                    >
+                      <SelectTrigger
+                        className="h-10 cursor-pointer bg-background"
+                        suppressHydrationWarning
+                      >
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {[25, 30, 40, 50].map((num) => (
+                          <SelectItem
+                            key={num}
+                            value={num.toString()}
+                            className="cursor-pointer"
+                          >
+                            {num}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <Button
+                    size="lg"
+                    className="flex-1 md:flex-none px-8 font-semibold shadow-md hover:shadow-primary/20 transition-all cursor-pointer"
+                    onClick={handleGenerate}
+                    disabled={loading || !input.trim()}
+                  >
+                    {loading ? (
+                      <>
+                        <Spinner />
+                        <span>Analyzing...</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>Generate Playlist</span>
+                        <IconSend2 className="h-4 w-4" />
+                      </>
+                    )}
+                  </Button>
+                </div>
               </div>
 
               {error && (
-                <p className="w-full text-sm text-destructive bg-secondary/50 p-3 rounded-md">
+                <div className="flex items-center gap-2 w-full text-sm text-destructive font-medium bg-destructive/10 border border-destructive/20 p-3 rounded-lg animate-in fade-in slide-in-from-top-1">
+                  <IconAlertCircle className="h-4 w-4" />
                   {error}
-                </p>
+                </div>
               )}
             </CardFooter>
           </Card>

@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { getHistory } from "@/lib/history-utils";
 import { PlaylistResults } from "@/components/playlist-results";
 import { Button } from "@/components/ui/button";
-import { IconArrowLeft, IconAlertCircle } from "@tabler/icons-react";
+import { IconAlertCircle } from "@tabler/icons-react";
 import { Spinner } from "@/components/ui/spinner";
 import {
   Card,
@@ -68,17 +68,7 @@ export default function HistoryDetailPage() {
   }
 
   return (
-    <div className="w-full max-w-4xl mx-auto p-6">
-      <div className="mb-6 flex justify-center">
-        <Button
-          variant="secondary"
-          onClick={() => router.push("/app/history")}
-          className="gap-2 cursor-pointer"
-        >
-          <IconArrowLeft size="20" />
-          Back to History List
-        </Button>
-      </div>
+    <div className="w-full max-w-5xl mx-auto">
       <PlaylistResults result={item} onReset={() => router.push("/app")} />
     </div>
   );

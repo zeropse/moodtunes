@@ -33,7 +33,7 @@ export function AppSidebar(props) {
     const loadHistory = () => {
       setIsLoading(true);
       const data = getHistory();
-      setHistory(data.slice(0, 5));
+      setHistory(data.slice(0, 17));
       setIsLoading(false);
     };
 
@@ -49,7 +49,7 @@ export function AppSidebar(props) {
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton size="lg" asChild>
+            <SidebarMenuButton size="lg" asChild className={"mt-1"}>
               <Link href="/">
                 <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
                   <IconMusic className="size-5" />
@@ -68,7 +68,7 @@ export function AppSidebar(props) {
 
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Application</SidebarGroupLabel>
+          <SidebarGroupLabel>Quick Actions</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
@@ -80,10 +80,10 @@ export function AppSidebar(props) {
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip="All History">
+                <SidebarMenuButton asChild tooltip="History">
                   <Link href="/app/history">
                     <IconHistory />
-                    <span>View Full History</span>
+                    <span>History</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>

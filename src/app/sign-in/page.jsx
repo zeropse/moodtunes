@@ -42,7 +42,7 @@ export default function SignInPage() {
       <div className="w-full max-w-md space-y-4">
         <div className="flex justify-center">
           <Badge variant="secondary">
-            Full Authentication System Not Implemented
+            Demo Mode: Use any email address and password to sign in
           </Badge>
         </div>
         <Card className="w-full max-w-md">
