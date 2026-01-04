@@ -87,7 +87,7 @@ export default function HistoryPage() {
                 size="sm"
                 className="gap-2 cursor-pointer"
               >
-                <IconTrash size={16} />
+                <IconTrash size="16" />
                 Clear All
               </Button>
             </DialogTrigger>
@@ -118,7 +118,7 @@ export default function HistoryPage() {
         <Card className="border-dashed">
           <CardContent className="flex items-center justify-center py-16">
             <div className="flex items-center gap-3 text-muted-foreground">
-              <Spinner size="lg" />
+              <Spinner />
               Loading history…
             </div>
           </CardContent>

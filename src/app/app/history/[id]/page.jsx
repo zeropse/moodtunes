@@ -33,7 +33,7 @@ export default function HistoryDetailPage() {
   if (loading) {
     return (
       <div className="flex h-full w-full items-center justify-center">
-        <Spinner size="lg" />
+        <Spinner />
       </div>
     );
   }
@@ -71,11 +71,11 @@ export default function HistoryDetailPage() {
     <div className="w-full max-w-4xl mx-auto p-6">
       <div className="mb-6 flex justify-center">
         <Button
-          variant="ghost"
+          variant="secondary"
           onClick={() => router.push("/app/history")}
-          className="gap-2 hover:bg-accent hover:text-primary cursor-pointer"
+          className="gap-2 cursor-pointer"
         >
-          <IconArrowLeft size={20} />
+          <IconArrowLeft size="20" />
           Back to History List
         </Button>
       </div>
