@@ -19,6 +19,7 @@ import {
   IconBrandLinkedin,
   IconBrandX,
   IconSquareRoundedPlus,
+  IconSettings,
 } from "@tabler/icons-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -75,7 +76,7 @@ export function AppSidebar(props) {
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild tooltip="MoodTunes">
               <Link href="/">
-                <div className="flex aspect-square size-8 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+                <div className="flex aspect-square size-8 shrink-0 items-center justify-center rounded-sm bg-primary text-primary-foreground">
                   <IconMusic className="size-5" />
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
@@ -152,21 +153,34 @@ export function AppSidebar(props) {
 
       {/* Footer */}
       <SidebarFooter>
-        <SidebarMenu className="flex-row group-data-[collapsible=icon]:flex-col items-center justify-between group-data-[collapsible=icon]:justify-center gap-1">
-          {footerLinks.map(({ href, Icon, label }) => (
-            <SidebarMenuItem key={href}>
-              <SidebarMenuButton
-                asChild
-                tooltip={label}
-                className="hover:bg-secondary hover:text-secondary-foreground transition-colors"
+        <SidebarMenu className="flex-row items-center justify-between group-data-[collapsible=icon]:flex-col group-data-[collapsible=icon]:justify-center gap-1">
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              asChild
+              tooltip="Settings"
+              className="hover:bg-secondary hover:text-secondary-foreground transition-colors"
+            >
+              <Link href="/app/settings">
+                <IconSettings className="size-5" />
+                <span>Settings</span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <div className="flex items-center gap-1 group-data-[collapsible=icon]:flex-col">
+            {footerLinks.map(({ href, Icon, label }) => (
+              <a
+                key={href}
+                href={href}
+                target="_blank"
+                rel="noreferrer"
+                title={label}
+                className="hover:bg-secondary hover:text-secondary-foreground transition-colors p-2 rounded"
               >
-                <a href={href} target="_blank" rel="noreferrer">
-                  <Icon className="size-10" />
-                  <span className="sr-only">{label}</span>
-                </a>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          ))}
+                <Icon className="size-5" />
+                <span className="sr-only">{label}</span>
+              </a>
+            ))}
+          </div>
         </SidebarMenu>
       </SidebarFooter>
     </Sidebar>
