@@ -100,10 +100,16 @@ export default function HistoryPage() {
               </DialogHeader>
               <DialogFooter>
                 <DialogClose asChild>
-                  <Button variant="outline">Cancel</Button>
+                  <Button variant="outline" className={"cursor-pointer"}>
+                    Cancel
+                  </Button>
                 </DialogClose>
                 <DialogClose asChild>
-                  <Button variant="destructive" onClick={handleClearHistory}>
+                  <Button
+                    variant="destructive"
+                    onClick={handleClearHistory}
+                    className={"cursor-pointer"}
+                  >
                     Clear All
                   </Button>
                 </DialogClose>
@@ -206,7 +212,7 @@ export default function HistoryPage() {
                         size="icon"
                         className="h-8 w-8 text-primary"
                       >
-                        <Link href={`/app/history/${item.id}`}>
+                        <Link href={`/app/${item.id}`}>
                           <IconExternalLink size={16} />
                         </Link>
                       </Button>
@@ -226,19 +232,27 @@ export default function HistoryPage() {
 
                         <DialogContent>
                           <DialogHeader>
-                            <DialogTitle>Delete {item.mood}?</DialogTitle>
+                            <DialogTitle>
+                              Delete playlist for {item.mood}?
+                            </DialogTitle>
                             <DialogDescription>
                               This action cannot be undone.
                             </DialogDescription>
                           </DialogHeader>
                           <DialogFooter>
                             <DialogClose asChild>
-                              <Button variant="outline">Cancel</Button>
+                              <Button
+                                variant="outline"
+                                className={"cursor-pointer"}
+                              >
+                                Cancel
+                              </Button>
                             </DialogClose>
                             <DialogClose asChild>
                               <Button
                                 variant="destructive"
                                 onClick={handleDeleteSingle}
+                                className={"cursor-pointer"}
                               >
                                 Delete
                               </Button>

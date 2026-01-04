@@ -7,7 +7,7 @@ export const getHistory = () => {
 export const saveMoodToHistory = (mood, tracks) => {
   const history = getHistory();
   const newEntry = {
-    id: Date.now().toString(),
+    id: crypto.randomUUID(),
     mood,
     tracks,
     timestamp: new Date().toISOString(),

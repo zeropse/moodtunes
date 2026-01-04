@@ -26,7 +26,7 @@ export default function HistoryDetailPage() {
   }, [params.id]);
 
   useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 100);
+    const timer = setTimeout(() => setLoading(false), 400);
     return () => clearTimeout(timer);
   }, []);
 

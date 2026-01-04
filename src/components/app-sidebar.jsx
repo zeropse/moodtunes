@@ -20,6 +20,7 @@ import {
   IconBrandX,
   IconSquareRoundedPlus,
   IconSettings,
+  IconMessage,
 } from "@tabler/icons-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -27,7 +28,7 @@ import { getHistory } from "@/lib/history-utils";
 import { Spinner } from "@/components/ui/spinner";
 
 export function AppSidebar(props) {
-  const [history, setHistory] = useState(null);
+  const [history, setHistory] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -41,7 +42,7 @@ export function AppSidebar(props) {
     loadHistory();
 
     const handleHistoryUpdate = () => {
-      loadHistory();
+      setHistory(getHistory());
     };
 
     window.addEventListener("moodHistoryUpdated", handleHistoryUpdate);
@@ -113,38 +114,42 @@ export function AppSidebar(props) {
           </SidebarMenu>
         </SidebarGroup>
 
-        {/* Recent */}
+        {/* Recent Chats */}
         <SidebarGroup className="group-data-[collapsible=icon]:hidden">
-          <SidebarGroupLabel className="flex items-center gap-2">
-            <IconHistory className="size-4" />
-            <span>Recent</span>
-          </SidebarGroupLabel>
-
+          <SidebarGroupLabel>Recent Moods</SidebarGroupLabel>
           <SidebarMenu>
             {isLoading ? (
               <SidebarMenuItem>
-                <div className="flex items-center justify-center">
+                <div className="flex items-center justify-center py-2">
                   <Spinner />
                 </div>
               </SidebarMenuItem>
-            ) : history && history.length === 0 ? (
-              <SidebarMenuItem>
-                <div className="px-2 py-1.5 text-sm text-muted-foreground">
-                  No recent entries yet
-                </div>
-              </SidebarMenuItem>
             ) : (
-              history &&
               history.map((item) => (
                 <SidebarMenuItem key={item.id}>
                   <SidebarMenuButton asChild tooltip={`Mood: ${item.mood}`}>
-                    <Link href={`/app/history/${item.id}`}>
+                    <Link href={`/app/${item.id}`}>
+                      <IconMessage className="size-4" />
                       <span className="capitalize">Mood: {item.mood}</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))
             )}
+          </SidebarMenu>
+        </SidebarGroup>
+
+        {/* History Button */}
+        <SidebarGroup className="mt-auto">
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild tooltip="History">
+                <Link href="/app/history">
+                  <IconHistory className="size-5" />
+                  <span>History</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
           </SidebarMenu>
         </SidebarGroup>
       </SidebarContent>
