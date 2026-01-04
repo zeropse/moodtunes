@@ -20,18 +20,33 @@ const getAccessToken = async () => {
 };
 
 export const searchTracks = async (query, limit = 25) => {
-  const { access_token } = await getAccessToken();
+  try {
+    const { access_token } = await getAccessToken();
 
-  const response = await fetch(
-    `${SEARCH_ENDPOINT}?q=${encodeURIComponent(
-      query
-    )}&type=track&limit=${limit}`,
-    {
-      headers: {
-        Authorization: `Bearer ${access_token}`,
-      },
+    if (!access_token) {
+      throw new Error("Failed to get Spotify access token");
     }
-  );
 
-  return response.json();
+    const response = await fetch(
+      `${SEARCH_ENDPOINT}?q=${encodeURIComponent(
+        query
+      )}&type=track&limit=${limit}`,
+      {
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("Spotify API error:", errorData);
+      throw new Error(`Spotify API responded with ${response.status}`);
+    }
+
+    return response.json();
+  } catch (error) {
+    console.error("Error in searchTracks:", error);
+    return { tracks: { items: [] } };
+  }
 };

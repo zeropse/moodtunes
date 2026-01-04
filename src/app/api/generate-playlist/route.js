@@ -35,6 +35,7 @@ export async function POST(request) {
 
     return NextResponse.json({
       mood,
+      searchQuery,
       tracks,
     });
   } catch (error) {

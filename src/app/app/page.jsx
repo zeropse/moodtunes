@@ -110,6 +110,7 @@ export default function AppPage() {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
+                disabled={loading}
               />
             </CardContent>
 
@@ -130,6 +131,7 @@ export default function AppPage() {
                     <Select
                       value={numTracks.toString()}
                       onValueChange={(value) => setNumTracks(parseInt(value))}
+                      disabled={loading}
                     >
                       <SelectTrigger
                         className="h-10 cursor-pointer bg-background"

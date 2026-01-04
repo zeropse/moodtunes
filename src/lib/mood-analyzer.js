@@ -1,79 +1,53 @@
+import { GoogleGenAI } from "@google/genai";
+import { fallbackAnalyzeMood } from "@/lib/backup-mood-analyzer.js";
+
 export const analyzeMood = async (text) => {
-  const lowerText = text.toLowerCase();
+  const apiKey = process.env.GEMINI_API_KEY;
 
-  const moodMap = {
-    happy: [
-      "happy",
-      "joy",
-      "excited",
-      "good",
-      "great",
-      "awesome",
-      "fantastic",
-      "cheerful",
-    ],
-    sad: [
-      "sad",
-      "down",
-      "unhappy",
-      "depressed",
-      "blue",
-      "crying",
-      "lonely",
-      "grief",
-    ],
-    energetic: [
-      "energetic",
-      "pumped",
-      "active",
-      "workout",
-      "running",
-      "gym",
-      "dance",
-      "party",
-    ],
-    relaxed: [
-      "relaxed",
-      "chill",
-      "calm",
-      "peaceful",
-      "sleep",
-      "rest",
-      "quiet",
-      "meditate",
-    ],
-    romantic: ["romantic", "love", "date", "passion", "heart", "crush"],
-    focused: ["focused", "study", "work", "concentrate", "reading", "coding"],
-    angry: ["angry", "mad", "furious", "rage", "annoyed", "frustrated"],
-  };
-
-  let detectedMood = "chill"; // Default
-  let maxMatches = 0;
-
-  for (const [mood, keywords] of Object.entries(moodMap)) {
-    const matches = keywords.filter((keyword) =>
-      lowerText.includes(keyword)
-    ).length;
-    if (matches > maxMatches) {
-      maxMatches = matches;
-      detectedMood = mood;
-    }
+  if (!apiKey) {
+    console.warn("GEMINI_API_KEY not set, using local analysis.");
+    return fallbackAnalyzeMood(text);
   }
 
-  // Map mood to Spotify search query terms
-  const queryMap = {
-    happy: "happy upbeat pop",
-    sad: "sad acoustic melancholic",
-    energetic: "high energy workout dance",
-    relaxed: "lo-fi chill acoustic",
-    romantic: "romantic love songs r&b",
-    focused: "instrumental study lo-fi",
-    angry: "rock metal aggressive",
-    chill: "chill pop indie",
-  };
+  try {
+    const ai = new GoogleGenAI({ apiKey });
 
-  return {
-    mood: detectedMood,
-    searchQuery: queryMap[detectedMood] || "chill music",
-  };
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash-lite",
+      contents: `You are a professional music curator. Analyze the user's input and provide a mood and a Spotify search query.
+      
+      User Input: "${text}"
+      
+      Instructions:
+      1. "mood": A single descriptive word.
+      2. "searchQuery": A highly optimized string for Spotify search. Combine genres, moods, and styles. Do NOT use quotes or punctuation.
+      
+      Example:
+      Input: "I'm feeling nostalgic for the 90s but in a sad way"
+      Output: {"mood": "nostalgic", "searchQuery": "90s slow grunge melancholic alternative"}`,
+      config: {
+        responseMimeType: "application/json",
+        temperature: 0.7,
+      },
+    });
+
+    const responseText = response.text;
+
+    if (responseText) {
+      try {
+        const data = JSON.parse(responseText);
+        return {
+          mood: (data.mood || "chill").toLowerCase(),
+          searchQuery: data.searchQuery || "chill music",
+        };
+      } catch (parseError) {
+        console.error("Failed to parse Gemini response:", responseText);
+      }
+    }
+  } catch (error) {
+    console.error("Gemini API error:", error.message);
+  }
+
+  // Final fallback if anything above fails
+  return fallbackAnalyzeMood(text);
 };
