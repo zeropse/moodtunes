@@ -1,7 +1,10 @@
 import { GoogleGenAI } from "@google/genai";
 import { fallbackAnalyzeMood } from "@/lib/backup-mood-analyzer.js";
 
-export const analyzeMood = async (text) => {
+export const analyzeMood = async (
+  text,
+  modelName = "gemini-2.5-flash-lite"
+) => {
   const apiKey = process.env.GEMINI_API_KEY;
 
   if (!apiKey) {
@@ -13,7 +16,7 @@ export const analyzeMood = async (text) => {
     const ai = new GoogleGenAI({ apiKey });
 
     const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
+      model: modelName,
       contents: `You are a professional music curator. Analyze the user's input and provide a mood and a Spotify search query.
       
       User Input: "${text}"

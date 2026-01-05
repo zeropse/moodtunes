@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -12,26 +12,40 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { IconSend2, IconMusic } from "@tabler/icons-react";
 import prompts from "@/data/prompts.json";
+import models from "@/data/models.json";
 import { Spinner } from "@/components/ui/spinner";
 import { saveMoodToHistory, getHistory } from "@/lib/history-utils";
 import { IconAlertCircle } from "@tabler/icons-react";
 
 export default function AppPage() {
   const router = useRouter();
-  const [placeholder] = useState(
-    () =>
+  const [mounted, setMounted] = useState(false);
+  const [placeholder, setPlaceholder] = useState("");
+  const [footer, setFooter] = useState("");
+
+  useEffect(() => {
+    setMounted(true);
+    setPlaceholder(
       prompts.placeholders[
         Math.floor(Math.random() * prompts.placeholders.length)
       ]
-  );
-
-  const [footer] = useState(
-    () => prompts.footers[Math.floor(Math.random() * prompts.footers.length)]
-  );
+    );
+    setFooter(
+      prompts.footers[Math.floor(Math.random() * prompts.footers.length)]
+    );
+  }, []);
 
   const [input, setInput] = useState("");
+  const [model, setModel] = useState("gemini-2.5-flash-lite");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -52,7 +66,7 @@ export default function AppPage() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ text: input, excludeIds }),
+        body: JSON.stringify({ text: input, excludeIds, model }),
       });
 
       if (!response.ok) {
@@ -101,7 +115,6 @@ export default function AppPage() {
 
             <CardContent>
               <Textarea
-                suppressHydrationWarning
                 placeholder={placeholder}
                 className="min-h-45 text-lg leading-relaxed bg-background/50 border-muted-foreground/20 focus-visible:ring-primary/50 transition-all resize-none p-5 rounded-xl"
                 value={input}
@@ -113,14 +126,34 @@ export default function AppPage() {
 
             <CardFooter className="flex flex-col gap-4 px-6">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 w-full">
-                <p
-                  suppressHydrationWarning
-                  className="text-xs text-muted-foreground italic leading-relaxed"
-                >
+                <p className="text-xs text-muted-foreground italic leading-relaxed">
                   {footer}
                 </p>
 
                 <div className="flex items-center gap-3 w-full md:w-auto justify-end">
+                  {mounted && (
+                    <Select
+                      value={model}
+                      onValueChange={setModel}
+                      disabled={loading}
+                    >
+                      <SelectTrigger className="cursor-pointer">
+                        <SelectValue placeholder="Select Model" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {models.map((m) => (
+                          <SelectItem
+                            key={m.id}
+                            value={m.id}
+                            className={"cursor-pointer"}
+                          >
+                            {m.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+
                   <Button
                     size="lg"
                     className="flex-1 md:flex-none px-8 font-semibold shadow-md hover:shadow-primary/20 transition-all cursor-pointer"
