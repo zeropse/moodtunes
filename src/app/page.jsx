@@ -9,7 +9,7 @@ import {
   IconSearch,
   IconMusic,
   IconMessageHeart,
-  IconArrowRight,
+  IconChevronRight,
 } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -121,16 +121,16 @@ export default function HomePage() {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Button
-              className="px-8 h-12 text-base font-bold transition-all hover:shadow-lg group cursor-pointer"
+              className="px-10 h-14 text-lg rounded-full transition-all hover:scale-105 group cursor-pointer"
               onClick={handleGetStarted}
             >
               Get Started
-              <IconArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+              <IconChevronRight className="group-hover:translate-x-1 transition-transform" />
             </Button>
 
             <Button
               variant="outline"
-              className="px-8 h-12 text-base font-medium transition-all hover:bg-secondary/80 cursor-pointer"
+              className="px-10 h-14 text-lg rounded-full transition-all hover:scale-105 cursor-pointer"
               onClick={handleScrollToAbout}
             >
               Learn More
