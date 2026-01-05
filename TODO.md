@@ -1,4 +1,4 @@
 - update faq (at last) [FAQ CREATE ACC*]
 - implement jsonbin sharing
-- add footer player
 - add auth
+- add readme (last)
