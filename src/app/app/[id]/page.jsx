@@ -56,10 +56,10 @@ export default function HistoryDetailPage() {
 
           <CardFooter className="flex justify-center w-full">
             <Button
-              onClick={() => router.push("/app/history")}
+              onClick={() => router.push("/app")}
               className={"w-full cursor-pointer"}
             >
-              Back to History
+              Go back
             </Button>
           </CardFooter>
         </Card>

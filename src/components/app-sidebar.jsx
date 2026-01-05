@@ -17,13 +17,29 @@ import {
   IconMusic,
   IconHistory,
   IconSquareRoundedPlus,
-  IconSettings,
   IconMessage,
+  IconBrandGithub,
+  IconBrandLinkedin,
+  IconBrandX,
 } from "@tabler/icons-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { getHistory } from "@/lib/history-utils";
 import { Spinner } from "@/components/ui/spinner";
+
+const socials = [
+  {
+    name: "GitHub",
+    href: "https://github.com/zeropse/",
+    icon: IconBrandGithub,
+  },
+  {
+    name: "LinkedIn",
+    href: "https://linkedin.com/in/zeropse/",
+    icon: IconBrandLinkedin,
+  },
+  { name: "X/Twitter", href: "https://x.com/zer0pse/", icon: IconBrandX },
+];
 
 export function AppSidebar(props) {
   const [history, setHistory] = useState([]);
@@ -123,17 +139,20 @@ export function AppSidebar(props) {
       <SidebarSeparator />
 
       <SidebarFooter>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton asChild tooltip="Settings">
-              <Link href="/app/settings">
-                <IconSettings />
-                <span className="group-data-[collapsible=icon]:hidden">
-                  Settings
-                </span>
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
+        <SidebarMenu className="flex-row items-center justify-center gap-5 group-data-[collapsible=icon]:flex-col">
+          {socials.map((social) => (
+            <SidebarMenuItem key={social.name}>
+              <SidebarMenuButton
+                asChild
+                tooltip={social.name}
+                className="flex justify-center cursor-pointer bg-accent"
+              >
+                <a href={social.href} target="_blank" rel="noopener noreferrer">
+                  <social.icon className="size-5" />
+                </a>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          ))}
         </SidebarMenu>
       </SidebarFooter>
     </Sidebar>
