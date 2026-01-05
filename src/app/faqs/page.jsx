@@ -17,7 +17,7 @@ const faqs = [
   {
     question: "How does MoodTunes analyze my mood?",
     answer:
-      "The app processes your text input using natural language processing to understand your emotional state and matches it with appropriate musical characteristics.",
+      "The app analyzes your text input using Gemini AI for faster and more accurate results. If Gemini AI is unavailable, it falls back on natural language processing to understand your emotional state and match it with appropriate musical characteristics.",
   },
   {
     question: "Is MoodTunes free to use?",
@@ -32,7 +32,7 @@ const faqs = [
   {
     question: "Can I connect my Spotify account?",
     answer:
-      "MoodTunes may have Spotify integration features in the future. Currently, you can use the app to discover music without a direct link.",
+      "No all features are available without Spotify integration at this time.",
   },
   {
     question: "What kind of music does MoodTunes suggest?",
@@ -41,8 +41,7 @@ const faqs = [
   },
   {
     question: "Can I save my mood analysis results?",
-    answer:
-      "If you have an account, your results are saved to your profile. Without an account, data is only stored temporarily in your local browser session.",
+    answer: "If you have an account, your results are saved to your profile.",
   },
   {
     question: "Is my data private?",
