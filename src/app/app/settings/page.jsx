@@ -91,7 +91,7 @@ export default function SettingsPage() {
           </CardHeader>
 
           <CardFooter>
-            <Button className="w-full cursor-pointer">
+            <Button className="w-full cursor-pointer font-semibold">
               Connect to Spotify
             </Button>
           </CardFooter>
