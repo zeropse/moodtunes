@@ -5,14 +5,12 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import {
-  IconBrandSpotify,
   IconBrandGithub,
   IconBrandLinkedin,
   IconBrandX,
@@ -76,25 +74,6 @@ export default function SettingsPage() {
               </div>
             )}
           </CardContent>
-        </Card>
-
-        {/* Spotify Integration */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <IconBrandSpotify className="h-8 w-8" />
-              Spotify
-            </CardTitle>
-            <CardDescription>
-              Connect Spotify to create mood-based playlists.
-            </CardDescription>
-          </CardHeader>
-
-          <CardFooter>
-            <Button className="w-full cursor-pointer font-semibold">
-              Connect to Spotify
-            </Button>
-          </CardFooter>
         </Card>
 
         {/* Social Links */}
