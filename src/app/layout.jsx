@@ -2,7 +2,6 @@ import { Roboto, Roboto_Mono } from "next/font/google";
 import "@/style/globals.css";
 import { ThemeProvider } from "@/style/theme-provider";
 import RouteFrame from "@/components/route-frame";
-import { AuthProvider } from "@/contexts/auth-context";
 
 const roboto = Roboto({
   variable: "--font-roboto",
@@ -28,9 +27,7 @@ export default function RootLayout({ children }) {
           defaultTheme="dark"
           disableTransitionOnChange
         >
-          <AuthProvider>
-            <RouteFrame>{children}</RouteFrame>
-          </AuthProvider>
+          <RouteFrame>{children}</RouteFrame>
         </ThemeProvider>
       </body>
     </html>

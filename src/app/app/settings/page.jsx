@@ -1,6 +1,5 @@
 "use client";
 
-import { useAuth } from "@/contexts/auth-context";
 import {
   Card,
   CardContent,
@@ -9,13 +8,11 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import {
   IconBrandGithub,
   IconBrandLinkedin,
   IconBrandX,
 } from "@tabler/icons-react";
-import { Spinner } from "@/components/ui/spinner";
 
 const socials = [
   {
@@ -32,8 +29,6 @@ const socials = [
 ];
 
 export default function SettingsPage() {
-  const { user } = useAuth();
-
   return (
     <div className="container max-w-3xl mx-auto py-10">
       {/* Page Header */}
@@ -46,36 +41,6 @@ export default function SettingsPage() {
 
       {/* Vertical Stack */}
       <div className="space-y-6">
-        {/* Account Settings */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Account</CardTitle>
-            <CardDescription>Your account information</CardDescription>
-          </CardHeader>
-
-          <CardContent className="space-y-4">
-            {user ? (
-              <>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">Name</span>
-                  <span className="text-sm font-medium">{user.name}</span>
-                </div>
-
-                <Separator />
-
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">Email</span>
-                  <span className="text-sm font-medium">{user.email}</span>
-                </div>
-              </>
-            ) : (
-              <div className="flex items-center justify-center">
-                <Spinner />
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
         {/* Social Links */}
         <Card>
           <CardHeader>
