@@ -9,12 +9,8 @@ export function proxy(request) {
     pathname.startsWith("/app/") ||
     pathname.startsWith("/api/")
   ) {
-    // Allow sign-in and sign-up endpoints
-    if (
-      pathname === "/api/sign-in" ||
-      pathname === "/api/sign-up" ||
-      pathname === "/api/logout"
-    ) {
+    // Allow auth endpoint
+    if (pathname === "/api/auth") {
       return NextResponse.next();
     }
 

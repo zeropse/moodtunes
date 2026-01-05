@@ -25,10 +25,10 @@ export function AuthProvider({ children }) {
   const signIn = async (email, password) => {
     setLoading(true);
     try {
-      const response = await fetch("/api/sign-in", {
+      const response = await fetch("/api/auth", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ action: "sign-in", email, password }),
       });
 
       if (!response.ok) {
@@ -48,10 +48,10 @@ export function AuthProvider({ children }) {
   const signUp = async (name, email, password) => {
     setLoading(true);
     try {
-      const response = await fetch("/api/sign-up", {
+      const response = await fetch("/api/auth", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password }),
+        body: JSON.stringify({ action: "sign-up", name, email, password }),
       });
 
       if (!response.ok) {
@@ -70,7 +70,11 @@ export function AuthProvider({ children }) {
 
   const logout = async () => {
     try {
-      await fetch("/api/logout", { method: "POST" });
+      await fetch("/api/auth", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "logout" }),
+      });
     } catch (error) {
       console.error("Logout error:", error);
     }
