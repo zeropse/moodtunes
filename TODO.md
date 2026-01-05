@@ -1,3 +1,4 @@
 - update faq & about (at last)
-- add motion
 - implement jsonbin sharing
+- add footer player
+- add auth
