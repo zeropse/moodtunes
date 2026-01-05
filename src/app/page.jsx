@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import {
   IconBrandSpotify,
   IconMessageCircle,
@@ -12,6 +13,13 @@ import {
 } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { Spinner } from "@/components/ui/spinner";
 import CTA from "@/components/cta";
 
 const howItWorksSteps = [
@@ -56,15 +64,34 @@ const FEATURES = [
   {
     title: "Spotify Integration",
     description:
-      "Seamlessly connect with Spotify to access songs. Click any suggestion to open it directly in Spotify.",
+      "Instantly find songs on Spotify that match your mood. Click any suggestion to listen to a preview or open it in the Spotify app.",
     icon: IconBrandSpotify,
     iconBg: "bg-emerald-100",
     iconColor: "text-emerald-600",
   },
 ];
 
+const FAQ_ITEMS = [
+  {
+    question: "Is MoodTunes free?",
+    answer:
+      "Yes, MoodTunes is currently free to use for all basic mood-based song suggestions.",
+  },
+  {
+    question: "How does it work?",
+    answer:
+      "We use Gemini AI to analyze the emotional sentiment of your text and match it with songs that share similar emotional characteristics.",
+  },
+  {
+    question: "Do I need to connect Spotify?",
+    answer:
+      "No, you can get recommendations without a Spotify account. However, you can click on any song to open it in Spotify and listen to the full track.",
+  },
+];
+
 export default function HomePage() {
   const router = useRouter();
+  const [imageLoading, setImageLoading] = useState(true);
 
   const handleScrollToAbout = useCallback(() => {
     const el = document.getElementById("about");
@@ -109,6 +136,28 @@ export default function HomePage() {
               Learn More
             </Button>
           </div>
+        </div>
+
+        {/* App Preview Image */}
+        <div className="mt-16 max-w-5xl mx-auto">
+          <Card className="overflow-hidden shadow-2xl border border-border/50 bg-muted/30 p-2 relative min-h-50 flex items-center justify-center">
+            {imageLoading && (
+              <div className="absolute inset-0 flex items-center justify-center bg-background/50 z-10">
+                <Spinner className="size-8 text-primary" />
+              </div>
+            )}
+            <Image
+              src="/landing.png"
+              alt="MoodTunes App Preview"
+              width={1200}
+              height={800}
+              className={`rounded-xl w-full h-auto transition-opacity duration-500 ${
+                imageLoading ? "opacity-0" : "opacity-100"
+              }`}
+              onLoad={() => setImageLoading(false)}
+              priority
+            />
+          </Card>
         </div>
       </section>
 
@@ -206,6 +255,34 @@ export default function HomePage() {
               )
             )}
           </div>
+        </div>
+      </section>
+
+      {/* --- FAQ Preview --- */}
+      <section className="px-6 py-20">
+        <div className="max-w-3xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold tracking-tight md:text-4xl">
+              Common Questions
+            </h2>
+          </div>
+
+          <Accordion type="single" collapsible className="w-full">
+            {FAQ_ITEMS.map((item, idx) => (
+              <AccordionItem key={idx} value={`item-${idx}`}>
+                <AccordionTrigger>{item.question}</AccordionTrigger>
+                <AccordionContent>{item.answer}</AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+
+          <Button
+            variant="link"
+            onClick={() => router.push("/faqs")}
+            className="mx-auto block cursor-pointer"
+          >
+            View all FAQs
+          </Button>
         </div>
       </section>
 

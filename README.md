@@ -1,6 +1,6 @@
 # MoodTunes - Mood Music Recommendations
 
-![MoodTunes Landing Page](images/Landing.png)
+![MoodTunes Landing Page](public/landing.png)
 
 Transform your feelings into the perfect soundtrack. MoodTunes uses advanced mood analysis to understand your emotional state and recommends personalized songs from Spotify that perfectly match how you're feeling.
 
