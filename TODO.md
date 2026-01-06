@@ -1,3 +1,3 @@
-- implement jsonbin sharing
-- update faq (at last) [FAQ CREATE ACC*]
+- implement jsonbin sharing (update faq)
+- [x] update faq (at last) [FAQ CREATE ACC*]
 - add readme (last)

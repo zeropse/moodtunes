@@ -30,9 +30,29 @@ const faqs = [
       "Yes, creating an account is necessary to access all features and save your mood analysis history.",
   },
   {
+    question: "Where is my data stored?",
+    answer:
+      "To ensure maximum privacy and speed, all your mood results, history, and account settings are stored locally in your browser's storage. We do not maintain a central database of your personal moods.",
+  },
+  {
+    question: "What happens if I clear my browser's cache?",
+    answer:
+      "Since your data is stored locally, clearing your browser's 'Local Storage' or 'Site Data' will remove your history and local account profile. Your account cannot be recovered once this data is wiped.",
+  },
+  {
+    question: "Can I access my history on another device?",
+    answer:
+      "Not at this time. Because the data lives inside your specific browser, your history is unique to the device and browser you used to generate it.",
+  },
+  {
+    question: "Is my password safe if it's stored locally?",
+    answer:
+      "Yes. Your password is never stored in plain text. We use industry-standard SHA-256 cryptographic hashing to ensure that your actual password is never readable, even by someone with access to your device.",
+  },
+  {
     question: "Can I connect my Spotify account?",
     answer:
-      "No all features are available without Spotify integration at this time.",
+      "No, all features of MoodTunes are available without requiring a Spotify login at this time.",
   },
   {
     question: "What kind of music does MoodTunes suggest?",
