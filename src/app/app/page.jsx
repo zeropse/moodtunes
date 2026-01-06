@@ -1,281 +1,196 @@
 "use client";
+
 import { useState, useEffect } from "react";
-import { useAuth } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Card } from "@/components/ui/card";
-import { Music, Sparkles, Heart, Zap } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { Vortex } from "@/components/ui/vortex";
-import { toast } from "sonner";
 import {
-  getPreviousTrackIds,
-  getRetryAttempt,
-  isRepeatedMood,
-} from "@/lib/history-utils";
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { IconSend2, IconMusic } from "@tabler/icons-react";
+import prompts from "@/data/prompts.json";
+import models from "@/data/models.json";
+import { Spinner } from "@/components/ui/spinner";
+import { saveMoodToHistory, getHistory } from "@/lib/history-utils";
+import { IconAlertCircle } from "@tabler/icons-react";
+import { useSession } from "next-auth/react";
 
-export default function AppHome() {
-  const { userId, isLoaded } = useAuth();
-  const [moodText, setMoodText] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
+export default function AppPage() {
   const router = useRouter();
+  const { data: session } = useSession();
+  const [mounted, setMounted] = useState(false);
+  const [placeholder, setPlaceholder] = useState("");
+  const [footer, setFooter] = useState("");
 
-  const handleSubmit = async (e) => {
-    e?.preventDefault();
+  useEffect(() => {
+    setMounted(true);
+    setPlaceholder(
+      prompts.placeholders[
+        Math.floor(Math.random() * prompts.placeholders.length)
+      ]
+    );
+    setFooter(
+      prompts.footers[Math.floor(Math.random() * prompts.footers.length)]
+    );
+  }, []);
 
-    if (!moodText.trim()) {
-      setError("Please tell us how you're feeling");
-      toast.error("Please tell us how you're feeling", {
-        style: { background: "#ef4444", color: "#fff", border: "none" },
-      });
-      return;
-    }
+  const [input, setInput] = useState("");
+  const [model, setModel] = useState("gemini-2.5-flash-lite");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const handleGenerate = async () => {
+    if (!input.trim() || loading) return;
+
+    setLoading(true);
+    setError(null);
 
     try {
-      setIsLoading(true);
-      setError("");
-
-      // Analyze mood
-      const moodResponse = await fetch("/api/analyze-mood", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ moodText: moodText.trim() }),
-      });
-
-      if (!moodResponse.ok) {
-        if (moodResponse.status === 401) {
-          toast.error("Please sign in to analyze your mood", {
-            style: { background: "#ef4444", color: "#fff", border: "none" },
-            action: {
-              label: "Sign In",
-              onClick: () => router.push("/sign-in"),
-            },
-          });
-          return;
-        }
-        throw new Error("Failed to analyze mood");
-      }
-      const moodData = await moodResponse.json();
-      const analysisData = moodData.success ? moodData.data : moodData;
-
-      toast.success("Mood analyzed successfully!", {
-        style: { background: "#22c55e", color: "#fff", border: "none" },
-      });
-
-      // Check for previous similar moods and get retry attempt
-      const previousTrackIds = getPreviousTrackIds();
-      const retryAttempt = getRetryAttempt(moodText.trim(), analysisData);
-      const isRepeated = isRepeatedMood(moodText.trim(), analysisData);
-
-      console.log("Mood generation info:", {
-        isRepeated,
-        retryAttempt,
-        previousTracksCount: previousTrackIds.length,
-        mood: analysisData.mood,
-      });
-
-      // Generate suggestions with diversity for repeated moods
-      const suggestionsResponse = await fetch("/api/suggest-songs", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          mood: analysisData.mood,
-          genres: analysisData.genres,
-          energy: analysisData.energy,
-          valence: analysisData.valence,
-          tempo: analysisData.tempo,
-          moodText: moodText.trim(),
-          retryAttempt: retryAttempt,
-          excludeTrackIds: previousTrackIds,
-        }),
-      });
-
-      if (!suggestionsResponse.ok) {
-        if (suggestionsResponse.status === 401) {
-          toast.error("Please sign in to get song suggestions", {
-            style: { background: "#ef4444", color: "#fff", border: "none" },
-            action: {
-              label: "Sign In",
-              onClick: () => router.push("/sign-in"),
-            },
-          });
-          return;
-        }
-        toast.error("Failed to generate song suggestions", {
-          style: { background: "#ef4444", color: "#fff", border: "none" },
-        });
-        throw new Error("Failed to generate suggestions");
-      }
-      const suggestionsData = await suggestionsResponse.json();
-      const suggestions = suggestionsData.success
-        ? suggestionsData.suggestions
-        : suggestionsData;
-
-      toast.success("Perfect songs found for your mood!", {
-        style: { background: "#22c55e", color: "#fff", border: "none" },
-      });
-
-      // Store and navigate
-      sessionStorage.setItem(
-        "moodData",
-        JSON.stringify({
-          mood: moodText.trim(),
-          moodAnalysis: analysisData,
-          suggestions: suggestions,
-        })
+      const history = getHistory(session?.user?.id);
+      const excludeIds = history.flatMap((entry) =>
+        entry.tracks.map((track) => track.id)
       );
 
-      router.push("/app/suggestions");
-    } catch (err) {
-      toast.error("Something went wrong. Please try again.", {
-        style: { background: "#ef4444", color: "#fff", border: "none" },
+      const response = await fetch("/api/generate-playlist", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ text: input, excludeIds, model }),
       });
-    } finally {
-      setIsLoading(false);
+
+      if (!response.ok) {
+        throw new Error("Failed to generate playlist. Please try again.");
+      }
+
+      const data = await response.json();
+      const newEntry = saveMoodToHistory(
+        data.mood,
+        data.tracks,
+        session?.user?.id
+      );
+      router.push(`/app/${newEntry.id}`);
+    } catch (err) {
+      console.error(err);
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Something went wrong. Please try again."
+      );
+      setLoading(false);
     }
   };
 
-  // Keyboard shortcut for button
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (
-        (e.metaKey || e.ctrlKey) &&
-        e.key === "Enter" &&
-        !isLoading &&
-        moodText.trim()
-      ) {
-        handleSubmit();
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [moodText, isLoading]);
-
-  // Show loading while checking auth
-  if (!isLoaded) {
-    return (
-      <Vortex>
-        <div className="flex min-h-screen items-center justify-center">
-          <div className="text-white">Loading...</div>
-        </div>
-      </Vortex>
-    );
-  }
-
-  // Redirect if not authenticated
-  if (!userId) {
-    router.push("/sign-in");
-    return null;
-  }
+  // Handle keydown
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
+      e.preventDefault();
+      handleGenerate();
+    }
+  };
 
   return (
-    <Vortex>
-      <div className="min-h-screen  flex items-center justify-center p-4">
-        <div className="w-full max-w-2xl">
-          {/* Header */}
-          <div className="text-center mb-8">
-            <div className="flex items-center justify-center gap-2 mb-4">
-              <Music className="w-8 h-8 text-white" />
-              <h1 className="text-4xl font-bold text-white">MoodTunes</h1>
-            </div>
-            <p className="text-xl text-gray-100 text-balance">
-              Tell us how you're feeling and we'll find the perfect songs for
-              your mood
-            </p>
-          </div>
+    <div className="relative min-h-screen w-full overflow-y-auto">
+      <div className="relative flex min-h-full flex-col items-center justify-center p-6 md:p-12">
+        <div className="w-full max-w-2xl space-y-10">
+          <Card>
+            <CardHeader className="items-center text-center">
+              <CardTitle className="flex items-center justify-center gap-3 text-xl font-semibold">
+                <span className="p-2 rounded-lg bg-secondary text-primary">
+                  <IconMusic size={20} />
+                </span>
+                How are you feeling today?
+              </CardTitle>
 
-          {/* Main Card */}
-          <Card className="p-8 backdrop-blur-sm bg-[#000]/30 border-white/20 shadow-2xl">
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="space-y-3">
-                <label
-                  htmlFor="mood"
-                  className="text-lg font-medium text-white block"
-                >
-                  How are you feeling today?
-                </label>
-                <Textarea
-                  id="mood"
-                  value={moodText}
-                  onChange={(e) => {
-                    setMoodText(e.target.value);
-                    if (error) setError("");
-                  }}
-                  placeholder="I'm feeling happy and energetic... or maybe sad and need some comfort music..."
-                  className="min-h-[120px] text-base bg-white/20 border-white/30 text-white placeholder:text-white/60 focus:bg-white/25 focus:border-white/50"
-                  disabled={isLoading}
-                />
-                {error && <p className="text-red-200 text-sm">{error}</p>}
+              <CardDescription className="text-base">
+                Type anything from a specific mood to your current surroundings.
+              </CardDescription>
+            </CardHeader>
+
+            <CardContent>
+              <Textarea
+                placeholder={placeholder}
+                className="min-h-45 text-lg leading-relaxed bg-background/50 border-muted-foreground/20 focus-visible:ring-primary/50 transition-all resize-none p-5 rounded-xl"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={handleKeyDown}
+                disabled={loading}
+              />
+            </CardContent>
+
+            <CardFooter className="flex flex-col gap-4 px-6">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 w-full">
+                <p className="text-xs text-muted-foreground italic leading-relaxed">
+                  {footer}
+                </p>
+
+                <div className="flex items-center gap-3 w-full md:w-auto justify-end">
+                  {mounted && (
+                    <Select
+                      value={model}
+                      onValueChange={setModel}
+                      disabled={loading}
+                    >
+                      <SelectTrigger className="cursor-pointer">
+                        <SelectValue placeholder="Select Model" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {models.map((m) => (
+                          <SelectItem
+                            key={m.id}
+                            value={m.id}
+                            className={"cursor-pointer"}
+                          >
+                            {m.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+
+                  <Button
+                    size="lg"
+                    className="flex-1 md:flex-none px-8 font-semibold shadow-md hover:shadow-primary/20 transition-all cursor-pointer"
+                    onClick={handleGenerate}
+                    disabled={loading || !input.trim()}
+                  >
+                    {loading ? (
+                      <>
+                        <Spinner />
+                        <span>Analyzing...</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>Generate Playlist</span>
+                        <IconSend2 className="h-4 w-4" />
+                      </>
+                    )}
+                  </Button>
+                </div>
               </div>
 
-              <Button
-                type="submit"
-                disabled={isLoading || !moodText.trim()}
-                size="lg"
-                className="w-full bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 hover:from-purple-600 hover:via-pink-600 hover:to-blue-600 text-white font-semibold text-lg h-12 rounded-xl shadow-xl hover:shadow-purple-500/25 transition-all duration-300 transform hover:cursor-pointer"
-              >
-                {isLoading ? (
-                  <>
-                    <Sparkles className="w-5 h-5 animate-spin mr-2" />
-                    Finding your perfect songs...
-                  </>
-                ) : (
-                  <>
-                    <Heart className="w-5 h-5 mr-2" />
-                    Get My Music
-                  </>
-                )}
-              </Button>
-            </form>
+              {error && (
+                <div className="flex items-center gap-2 w-full text-sm text-destructive font-medium bg-destructive/10 border border-destructive/20 p-3 rounded-lg animate-in fade-in slide-in-from-top-1">
+                  <IconAlertCircle className="h-4 w-4" />
+                  {error}
+                </div>
+              )}
+            </CardFooter>
           </Card>
-
-          {/* Quick Mood Buttons */}
-          <div className="flex flex-wrap justify-center gap-4 mt-6">
-            <Button
-              onClick={() => router.push("/app/demo/happy")}
-              variant="outline"
-              className="bg-white/10 border-white/30 text-white hover:bg-white/20 hover:border-white/50 cursor-pointer"
-            >
-              <Heart className="w-4 h-4 mr-2" />
-              I'm Feeling Happy
-            </Button>
-            <Button
-              onClick={() => router.push("/app/demo/nostalgic")}
-              variant="outline"
-              className="bg-white/10 border-white/30 text-white hover:bg-white/20 hover:border-white/50 cursor-pointer"
-            >
-              <Music className="w-4 h-4 mr-2" />
-              I'm Feeling Nostalgic
-            </Button>
-            <Button
-              onClick={() => router.push("/app/demo/chill")}
-              variant="outline"
-              className="bg-white/10 border-white/30 text-white hover:bg-white/20 hover:border-white/50 cursor-pointer"
-            >
-              <Zap className="w-4 h-4 mr-2" />
-              I'm Feeling Chill
-            </Button>
-          </div>
-
-          {/* Feature Icons */}
-          <div className="flex justify-center gap-8 mt-8 text-gray-300">
-            <div className="flex items-center gap-2">
-              <Zap className="w-5 h-5" />
-              <span className="text-sm">Fast</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Music className="w-5 h-5" />
-              <span className="text-sm">Personalized</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Heart className="w-5 h-5" />
-              <span className="text-sm">Mood-Based</span>
-            </div>
-          </div>
         </div>
       </div>
-    </Vortex>
+    </div>
   );
 }

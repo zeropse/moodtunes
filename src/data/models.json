@@ -1,0 +1,5 @@
+[
+  { "id": "gemini-2.5-flash-lite", "name": "2.5 Flash Lite" },
+  { "id": "gemini-3-flash-preview", "name": "3 Flash (Preview)" },
+  { "id": "gemini-2.5-flash", "name": "2.5 Flash" }
+]

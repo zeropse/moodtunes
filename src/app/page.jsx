@@ -1,278 +1,308 @@
 "use client";
-import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import {
-  Music,
-  Sparkles,
-  Heart,
-  Zap,
-  ArrowRight,
-  Headphones,
-} from "lucide-react";
+
+import React, { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@clerk/nextjs";
+import Image from "next/image";
+import {
+  IconBrandSpotify,
+  IconMessageCircle,
+  IconSearch,
+  IconMusic,
+  IconMessageHeart,
+  IconChevronRight,
+} from "@tabler/icons-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { Spinner } from "@/components/ui/spinner";
+import CTA from "@/components/cta";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 
-export default function LandingPage() {
-  const [isVisible, setIsVisible] = useState(false);
-  const router = useRouter();
-  const { isSignedIn, isLoaded } = useAuth();
+const howItWorksSteps = [
+  {
+    title: "Share Your Mood",
+    description:
+      "Tell us how you're feeling in your own words. Our advanced mood analysis understands complex emotions.",
+    icon: IconMessageCircle,
+  },
+  {
+    title: "Advanced Analysis",
+    description:
+      "Our sophisticated algorithms analyze your emotional state and musical preferences to find perfect matches.",
+    icon: IconSearch,
+  },
+  {
+    title: "Discover Music",
+    description:
+      "Get a curated playlist of songs that perfectly match your current emotional state and energy level.",
+    icon: IconMusic,
+  },
+];
 
-  useEffect(() => {
-    setIsVisible(true);
+const FEATURES = [
+  {
+    title: "Advanced Mood Analysis",
+    description:
+      "Our sophisticated system understands the nuances of human emotion, analyzing your mood description to identify the perfect musical match.",
+    icon: IconMessageHeart,
+    iconBg: "bg-amber-100",
+    iconColor: "text-amber-600",
+  },
+  {
+    title: "Personalized Suggestions",
+    description:
+      "Every recommendation is tailored to your specific emotional state, ensuring you get music that truly resonates with how you feel.",
+    icon: IconMusic,
+    iconBg: "bg-blue-100",
+    iconColor: "text-blue-600",
+    reverse: true,
+  },
+  {
+    title: "Spotify Integration",
+    description:
+      "Instantly find songs on Spotify that match your mood. Click any suggestion to listen to a preview or open it in the Spotify app.",
+    icon: IconBrandSpotify,
+    iconBg: "bg-emerald-100",
+    iconColor: "text-emerald-600",
+  },
+];
+
+const FAQ_ITEMS = [
+  {
+    question: "Is MoodTunes free?",
+    answer:
+      "Yes, MoodTunes is currently free to use for all basic mood-based song suggestions.",
+  },
+  {
+    question: "How does it work?",
+    answer:
+      "We use Gemini AI to analyze the emotional sentiment of your text and match it with songs that share similar emotional characteristics.",
+  },
+  {
+    question: "Do I need to connect Spotify?",
+    answer:
+      "No, you can get recommendations without a Spotify account. However, you can click on any song to open it in Spotify and listen to the full track.",
+  },
+];
+
+export default function HomePage() {
+  const router = useRouter();
+  const [imageLoading, setImageLoading] = useState(true);
+  const { data: session } = useSession();
+
+  const handleScrollToAbout = useCallback(() => {
+    const el = document.getElementById("about");
+    if (!el) return;
+    el.scrollIntoView({ behavior: "smooth", block: "start" });
   }, []);
 
-  const handleGetStarted = () => {
-    if (isSignedIn) {
-      router.push("/app");
-    } else {
-      router.push("/sign-in");
-    }
-  };
+  const handleGetStarted = useCallback(() => {
+    router.push("/app");
+  }, [router]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900/10 to-slate-900">
-      {/* Hero Section */}
-      <section className="relative flex items-center justify-center min-h-screen p-4 sm:p-6 lg:p-8 overflow-hidden">
-        {/* Background Elements */}
-        <div className="absolute inset-0 bg-gradient-to-r from-purple-500/5 via-pink-500/5 to-blue-500/5"></div>
-        <div className="absolute top-1/4 left-1/4 w-48 h-48 sm:w-72 sm:h-72 lg:w-96 lg:h-96 bg-purple-500/10 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-64 h-64 sm:w-96 sm:h-96 lg:w-[28rem] lg:h-[28rem] bg-pink-500/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+    <div className="min-h-screen">
+      {/* --- Hero Section --- */}
+      <section className="relative px-6 pt-24 pb-16 md:pt-40 md:pb-32 overflow-hidden">
+        <div className="max-w-4xl mx-auto text-center">
+          <h1 className="mb-6 text-5xl font-extrabold tracking-tight md:text-7xl lg:text-8xl lg:leading-[1.05]">
+            Your emotions, <br />
+            <span className="text-primary">your soundtrack</span>
+          </h1>
 
-        <div className="relative w-full max-w-7xl text-center z-10">
-          {/* Main Hero Content */}
-          <div
-            className={`transition-all duration-1200 ease-out ${
-              isVisible
-                ? "opacity-100 translate-y-0"
-                : "opacity-0 translate-y-12"
-            }`}
-          >
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 mb-6 sm:mb-8">
-              <div className="relative">
-                <Music className="w-12 h-12 sm:w-16 sm:h-16 text-transparent bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text animate-pulse" />
-                <div className="absolute inset-0 w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 rounded-lg blur-xl opacity-20 animate-pulse"></div>
-              </div>
-              <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-black bg-gradient-to-r from-white via-purple-200 to-blue-200 bg-clip-text text-transparent tracking-tight leading-none">
-                MoodTunes
-              </h1>
-            </div>
+          <p className="mb-10 text-lg text-muted-foreground md:text-xl max-w-xl mx-auto leading-relaxed">
+            Transform your feelings into the perfect playlist. Our advanced mood
+            analysis technology analyzes your mood and discovers songs that
+            resonate with your emotional state.
+          </p>
 
-            <div className="space-y-4 sm:space-y-6 mb-12 sm:mb-16">
-              <p className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl text-white/90 font-light tracking-wide leading-tight">
-                Your emotions, your soundtrack
-              </p>
-
-              <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-white/70 max-w-xs sm:max-w-2xl lg:max-w-4xl mx-auto leading-relaxed font-light px-4 sm:px-0">
-                Transform your feelings into the perfect playlist. Our advanced
-                mood analysis technology analyzes your mood and discovers songs
-                that resonate with your emotional state.
-              </p>
-            </div>
-
-            {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-center mb-16 sm:mb-20 px-4 sm:px-0">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            {session ? (
               <Button
+                className="px-10 h-14 text-lg rounded-full transition-all hover:scale-105 group cursor-pointer"
                 onClick={handleGetStarted}
-                size="lg"
-                className="group relative w-full sm:w-auto bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 hover:from-purple-500 hover:via-pink-500 hover:to-blue-500 text-white font-bold text-lg sm:text-xl px-8 sm:px-12 py-4 sm:py-6 rounded-2xl shadow-2xl hover:shadow-purple-500/30 transition-all duration-500 transform hover:scale-105 cursor-pointer border-0 overflow-hidden"
               >
-                <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                <Heart className="w-5 h-5 sm:w-6 sm:h-6 mr-2 sm:mr-3 group-hover:animate-bounce" />
-                {isLoaded && isSignedIn ? "Go to App" : "Get Started"}
-                <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6 ml-2 sm:ml-3 group-hover:translate-x-1 transition-transform duration-300" />
+                Launch App
+                <IconChevronRight className="group-hover:translate-x-1 transition-transform" />
               </Button>
+            ) : (
+              <Button
+                asChild
+                className="px-10 h-14 text-lg rounded-full transition-all hover:scale-105 group cursor-pointer"
+              >
+                <Link href="/signup">
+                  Get Started
+                  <IconChevronRight className="group-hover:translate-x-1 transition-transform" />
+                </Link>
+              </Button>
+            )}
 
-              <Link href="/about">
-                <Button
-                  variant="outline"
-                  size="lg"
-                  className="group w-full sm:w-auto border-2 border-white/20 bg-white/5 backdrop-blur-sm text-white hover:bg-white/10 hover:border-white/40 font-bold text-lg sm:text-xl px-8 sm:px-12 py-4 sm:py-6 rounded-2xl transition-all duration-500 cursor-pointer hover:scale-105"
+            <Button
+              variant="outline"
+              className="px-10 h-14 text-lg rounded-full transition-all hover:scale-105 cursor-pointer"
+              onClick={handleScrollToAbout}
+            >
+              Learn More
+            </Button>
+          </div>
+        </div>
+
+        {/* App Preview Image */}
+        <div className="mt-16 max-w-5xl mx-auto">
+          <Card className="overflow-hidden shadow-2xl border border-border/50 bg-muted/30 p-2 relative min-h-50 flex items-center justify-center">
+            {imageLoading && (
+              <div className="absolute inset-0 flex items-center justify-center bg-background/50 z-10">
+                <Spinner className="size-8 text-primary" />
+              </div>
+            )}
+            <Image
+              src="/landing.png"
+              alt="MoodTunes App Preview"
+              width={1200}
+              height={800}
+              className={`rounded-xl w-full h-auto transition-opacity duration-500 ${
+                imageLoading ? "opacity-0" : "opacity-100"
+              }`}
+              onLoad={() => setImageLoading(false)}
+              priority
+            />
+          </Card>
+        </div>
+      </section>
+
+      {/* --- How It Works --- */}
+      <section className="px-6 py-24 bg-secondary/50">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold tracking-tight md:text-4xl">
+              How It Works
+            </h2>
+          </div>
+
+          <div className="grid gap-6 md:grid-cols-3">
+            {howItWorksSteps.map((step, idx) => {
+              const Icon = step.icon;
+              return (
+                <Card
+                  key={step.title}
+                  className="group border-none shadow-sm hover:shadow-md transition-all duration-300"
                 >
-                  <span className="group-hover:text-purple-200 transition-colors duration-300">
-                    Learn More
-                  </span>
-                </Button>
-              </Link>
-            </div>
-          </div>
-
-          {/* Feature Cards */}
-          <div
-            className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 max-w-6xl mx-auto transition-all duration-1200 delay-500 px-4 sm:px-0 ${
-              isVisible
-                ? "opacity-100 translate-y-0"
-                : "opacity-0 translate-y-12"
-            }`}
-          >
-            <Card className="group p-6 sm:p-8 backdrop-blur-md bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all duration-500 transform hover:scale-105 hover:-translate-y-2 rounded-3xl shadow-xl hover:shadow-2xl hover:shadow-purple-500/20">
-              <div className="text-center">
-                <div className="relative mb-4 sm:mb-6">
-                  <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-2xl flex items-center justify-center mx-auto group-hover:rotate-12 transition-transform duration-500">
-                    <Zap className="w-7 h-7 sm:w-8 sm:h-8 text-white" />
-                  </div>
-                  <div className="absolute inset-0 w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-2xl blur-xl opacity-20 mx-auto group-hover:opacity-40 transition-opacity duration-500"></div>
-                </div>
-                <h3 className="text-xl sm:text-2xl font-bold text-white mb-3 sm:mb-4 group-hover:text-yellow-200 transition-colors duration-300">
-                  Lightning Fast
-                </h3>
-                <p className="text-white/70 text-base sm:text-lg leading-relaxed">
-                  Get personalized music recommendations in seconds with our
-                  optimized mood analysis engine
-                </p>
-              </div>
-            </Card>
-
-            <Card className="group p-6 sm:p-8 backdrop-blur-md bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all duration-500 transform hover:scale-105 hover:-translate-y-2 rounded-3xl shadow-xl hover:shadow-2xl hover:shadow-purple-500/20">
-              <div className="text-center">
-                <div className="relative mb-4 sm:mb-6">
-                  <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-r from-purple-400 to-pink-400 rounded-2xl flex items-center justify-center mx-auto group-hover:rotate-12 transition-transform duration-500">
-                    <Sparkles className="w-7 h-7 sm:w-8 sm:h-8 text-white" />
-                  </div>
-                  <div className="absolute inset-0 w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-r from-purple-400 to-pink-400 rounded-2xl blur-xl opacity-20 mx-auto group-hover:opacity-40 transition-opacity duration-500"></div>
-                </div>
-                <h3 className="text-xl sm:text-2xl font-bold text-white mb-3 sm:mb-4 group-hover:text-purple-200 transition-colors duration-300">
-                  Mood Analysis
-                </h3>
-                <p className="text-white/70 text-base sm:text-lg leading-relaxed">
-                  Advanced emotion analysis using sophisticated algorithms for
-                  perfect song matching
-                </p>
-              </div>
-            </Card>
-
-            <Card className="group p-6 sm:p-8 backdrop-blur-md bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all duration-500 transform hover:scale-105 hover:-translate-y-2 rounded-3xl shadow-xl hover:shadow-2xl hover:shadow-purple-500/20 sm:col-span-2 lg:col-span-1">
-              <div className="text-center">
-                <div className="relative mb-4 sm:mb-6">
-                  <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-r from-green-400 to-blue-400 rounded-2xl flex items-center justify-center mx-auto group-hover:rotate-12 transition-transform duration-500">
-                    <Headphones className="w-7 h-7 sm:w-8 sm:h-8 text-white" />
-                  </div>
-                  <div className="absolute inset-0 w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-r from-green-400 to-blue-400 rounded-2xl blur-xl opacity-20 mx-auto group-hover:opacity-40 transition-opacity duration-500"></div>
-                </div>
-                <h3 className="text-xl sm:text-2xl font-bold text-white mb-3 sm:mb-4 group-hover:text-green-200 transition-colors duration-300">
-                  Spotify Integration
-                </h3>
-                <p className="text-white/70 text-base sm:text-lg leading-relaxed">
-                  Seamlessly play and save playlists to Spotify with one click
-                </p>
-              </div>
-            </Card>
+                  <CardHeader>
+                    <div className="w-14 h-14 mb-4 flex items-center justify-center rounded-2xl bg-muted shadow-inner text-primary group-hover:scale-110 transition-transform duration-300">
+                      <Icon size={28} strokeWidth={1.5} />
+                    </div>
+                    <CardTitle className="text-xl font-bold flex items-center">
+                      {step.title}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground leading-relaxed">
+                      {step.description}
+                    </p>
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         </div>
       </section>
 
-      {/* How It Works Section */}
-      <section className="py-20 sm:py-24 lg:py-32 px-4 sm:px-6 lg:px-8 relative">
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-purple-900/5 to-transparent"></div>
-        <div className="relative max-w-6xl mx-auto text-center">
-          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black text-white mb-6 sm:mb-8 tracking-tight">
-            How It Works
-          </h2>
-          <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-white/80 mb-12 sm:mb-16 lg:mb-20 font-light max-w-3xl mx-auto">
-            Three simple steps to discover your perfect soundtrack
-          </p>
+      {/* --- Features --- */}
+      <section id="about" className="px-6 py-24">
+        <div className="max-w-5xl mx-auto">
+          <div className="space-y-24 md:space-y-40">
+            {FEATURES.map(
+              ({
+                title,
+                description,
+                icon: Icon,
+                reverse,
+                iconBg,
+                iconColor,
+              }) => (
+                <div
+                  key={title}
+                  className={`flex flex-col items-center justify-between gap-12 md:gap-20 ${
+                    reverse ? "md:flex-row-reverse" : "md:flex-row"
+                  }`}
+                >
+                  {/* Text Content */}
+                  <div
+                    className={`flex-1 space-y-5 text-center ${
+                      reverse ? "md:text-right" : "md:text-left"
+                    }`}
+                  >
+                    <h3 className="text-3xl font-bold tracking-tight md:text-4xl">
+                      {title}
+                    </h3>
+                    <p
+                      className={`text-muted-foreground text-lg leading-relaxed md:max-w-md ${
+                        reverse ? "md:ml-auto" : "md:mr-auto"
+                      }`}
+                    >
+                      {description}
+                    </p>
+                  </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-10 lg:gap-12">
-            <div
-              className={`group transition-all duration-1200 delay-700 ${
-                isVisible
-                  ? "opacity-100 translate-y-0"
-                  : "opacity-0 translate-y-12"
-              }`}
-            >
-              <div className="relative mb-6 sm:mb-8">
-                <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-r from-purple-500 to-pink-500 rounded-3xl flex items-center justify-center mx-auto shadow-2xl group-hover:scale-110 transition-transform duration-500">
-                  <span className="text-2xl sm:text-3xl font-black text-white">
-                    1
-                  </span>
+                  {/* Icon Visual */}
+                  <div
+                    className={`flex-1 flex ${
+                      reverse ? "md:justify-start" : "md:justify-end"
+                    }`}
+                  >
+                    <div
+                      className={`relative aspect-square w-full max-w-70 rounded-[3rem] flex items-center justify-center shadow-2xl transition-all duration-1500 hover:rotate-360 ${iconBg}`}
+                    >
+                      <Icon
+                        size={100}
+                        strokeWidth={1}
+                        className={`${iconColor} drop-shadow-sm`}
+                      />
+                    </div>
+                  </div>
                 </div>
-                <div className="absolute inset-0 w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-r from-purple-500 to-pink-500 rounded-3xl blur-xl opacity-30 mx-auto group-hover:opacity-50 transition-opacity duration-500"></div>
-              </div>
-              <h3 className="text-2xl sm:text-3xl font-bold text-white mb-4 sm:mb-6 group-hover:text-purple-200 transition-colors duration-300">
-                Share Your Mood
-              </h3>
-              <p className="text-white/70 text-lg sm:text-xl leading-relaxed">
-                Tell us how you're feeling in your own words. Our advanced mood
-                analysis understands complex emotions and nuances.
-              </p>
-            </div>
-
-            <div
-              className={`group transition-all duration-1200 delay-900 ${
-                isVisible
-                  ? "opacity-100 translate-y-0"
-                  : "opacity-0 translate-y-12"
-              }`}
-            >
-              <div className="relative mb-6 sm:mb-8">
-                <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-r from-pink-500 to-blue-500 rounded-3xl flex items-center justify-center mx-auto shadow-2xl group-hover:scale-110 transition-transform duration-500">
-                  <span className="text-2xl sm:text-3xl font-black text-white">
-                    2
-                  </span>
-                </div>
-                <div className="absolute inset-0 w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-r from-pink-500 to-blue-500 rounded-3xl blur-xl opacity-30 mx-auto group-hover:opacity-50 transition-opacity duration-500"></div>
-              </div>
-              <h3 className="text-2xl sm:text-3xl font-bold text-white mb-4 sm:mb-6 group-hover:text-pink-200 transition-colors duration-300">
-                Advanced Analysis
-              </h3>
-              <p className="text-white/70 text-lg sm:text-xl leading-relaxed">
-                Our sophisticated algorithms analyze your emotional state and
-                musical preferences to find perfect matches.
-              </p>
-            </div>
-
-            <div
-              className={`group transition-all duration-1200 delay-1100 ${
-                isVisible
-                  ? "opacity-100 translate-y-0"
-                  : "opacity-0 translate-y-12"
-              }`}
-            >
-              <div className="relative mb-6 sm:mb-8">
-                <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-r from-blue-500 to-purple-500 rounded-3xl flex items-center justify-center mx-auto shadow-2xl group-hover:scale-110 transition-transform duration-500">
-                  <span className="text-2xl sm:text-3xl font-black text-white">
-                    3
-                  </span>
-                </div>
-                <div className="absolute inset-0 w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-r from-blue-500 to-purple-500 rounded-3xl blur-xl opacity-30 mx-auto group-hover:opacity-50 transition-opacity duration-500"></div>
-              </div>
-              <h3 className="text-2xl sm:text-3xl font-bold text-white mb-4 sm:mb-6 group-hover:text-blue-200 transition-colors duration-300">
-                Discover Music
-              </h3>
-              <p className="text-white/70 text-lg sm:text-xl leading-relaxed">
-                Get a curated playlist of songs that perfectly match your
-                current emotional state and energy level.
-              </p>
-            </div>
+              )
+            )}
           </div>
         </div>
       </section>
 
-      {/* Final CTA */}
-      <section className="py-20 sm:py-24 lg:py-32 px-4 sm:px-6 lg:px-8 relative">
-        <div className="absolute inset-0 bg-gradient-to-t from-purple-900/10 to-transparent"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 sm:w-96 sm:h-96 bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-full blur-3xl"></div>
+      {/* --- FAQ Preview --- */}
+      <section className="px-6 py-20">
+        <div className="max-w-3xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold tracking-tight md:text-4xl">
+              Common Questions
+            </h2>
+          </div>
 
-        <div className="relative max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black text-white mb-6 sm:mb-8 tracking-tight">
-            Ready to discover your soundtrack?
-          </h2>
-          <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-white/80 mb-8 sm:mb-12 font-light max-w-3xl mx-auto">
-            Join thousands of users who have found their perfect music match
-          </p>
+          <Accordion type="single" collapsible className="w-full">
+            {FAQ_ITEMS.map((item, idx) => (
+              <AccordionItem key={idx} value={`item-${idx}`}>
+                <AccordionTrigger>{item.question}</AccordionTrigger>
+                <AccordionContent>{item.answer}</AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+
           <Button
-            onClick={handleGetStarted}
-            size="lg"
-            className="group relative bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 hover:from-purple-500 hover:via-pink-500 hover:to-blue-500 text-white font-black text-lg sm:text-xl lg:text-2xl px-12 sm:px-16 py-6 sm:py-8 rounded-3xl shadow-2xl hover:shadow-purple-500/30 transition-all duration-500 transform hover:scale-105 cursor-pointer border-0 overflow-hidden"
+            variant="link"
+            onClick={() => router.push("/faqs")}
+            className="mx-auto block cursor-pointer"
           >
-            <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-            <Heart className="w-6 h-6 sm:w-8 sm:h-8 mr-3 sm:mr-4 group-hover:animate-bounce" />
-            {isLoaded && isSignedIn ? "Go to App" : "Start Your Journey"}
-            <ArrowRight className="w-6 h-6 sm:w-8 sm:h-8 ml-3 sm:ml-4 group-hover:translate-x-2 transition-transform duration-500" />
+            View all FAQs
           </Button>
         </div>
       </section>
+
+      {/* --- CTA --- */}
+      <CTA />
     </div>
   );
 }

@@ -1,74 +1,90 @@
-export function getPreviousTrackIds() {
-  try {
-    if (typeof window === "undefined") return [];
+export const getHistory = (userId) => {
+  if (typeof window === "undefined") return [];
+  const history = localStorage.getItem("mood_history");
+  const allHistory = history ? JSON.parse(history) : [];
+  if (!userId) return allHistory;
+  return allHistory.filter((item) => item.userId === userId);
+};
 
-    const existingHistory = localStorage.getItem("moodMusicHistory");
-    if (!existingHistory) return [];
+export const saveMoodToHistory = (mood, tracks, userId) => {
+  const allHistoryStr = localStorage.getItem("mood_history");
+  const allHistory = allHistoryStr ? JSON.parse(allHistoryStr) : [];
 
-    const history = JSON.parse(existingHistory);
-    const trackIds = new Set();
+  const newEntry = {
+    id: crypto.randomUUID(),
+    userId,
+    mood,
+    tracks,
+    timestamp: new Date().toISOString(),
+  };
 
-    history.forEach((entry) => {
-      if (entry.suggestions && entry.suggestions.tracks) {
-        entry.suggestions.tracks.forEach((track) => {
-          if (track.id) {
-            trackIds.add(track.id);
-          }
-        });
-      }
-    });
+  const updatedHistory = [newEntry, ...allHistory];
+  localStorage.setItem("mood_history", JSON.stringify(updatedHistory));
 
-    return Array.from(trackIds);
-  } catch (error) {
-    console.warn("Error getting previous track IDs:", error);
-    return [];
+  // Dispatch event for real-time updates
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new Event("moodHistoryUpdated"));
   }
-}
 
-export function getSimilarMoodCount(currentMood, currentAnalysis) {
-  try {
-    if (typeof window === "undefined") return 0;
+  return newEntry;
+};
 
-    const existingHistory = localStorage.getItem("moodMusicHistory");
-    if (!existingHistory) return 0;
+export const deleteHistoryItem = (id) => {
+  const allHistoryStr = localStorage.getItem("mood_history");
+  const allHistory = allHistoryStr ? JSON.parse(allHistoryStr) : [];
+  const updatedHistory = allHistory.filter((item) => item.id !== id);
+  localStorage.setItem("mood_history", JSON.stringify(updatedHistory));
 
-    const history = JSON.parse(existingHistory);
-
-    // Count entries with similar moods (same analyzed mood or similar text)
-    return history.filter((entry) => {
-      if (!entry.moodAnalysis) return false;
-
-      // Check if analyzed mood is the same
-      if (entry.moodAnalysis.mood === currentAnalysis.mood) return true;
-
-      // Check if the original mood text is very similar (basic similarity check)
-      const similarity = calculateTextSimilarity(entry.mood, currentMood);
-      return similarity > 0.7; // 70% similarity threshold
-    }).length;
-  } catch (error) {
-    console.warn("Error counting similar moods:", error);
-    return 0;
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new Event("moodHistoryUpdated"));
   }
-}
+};
 
-function calculateTextSimilarity(text1, text2) {
-  if (!text1 || !text2) return 0;
+export const clearHistory = (userId) => {
+  if (!userId) {
+    localStorage.removeItem("mood_history");
+  } else {
+    const allHistoryStr = localStorage.getItem("mood_history");
+    const allHistory = allHistoryStr ? JSON.parse(allHistoryStr) : [];
+    const updatedHistory = allHistory.filter((item) => item.userId !== userId);
+    localStorage.setItem("mood_history", JSON.stringify(updatedHistory));
+  }
 
-  const words1 = text1.toLowerCase().split(/\s+/);
-  const words2 = text2.toLowerCase().split(/\s+/);
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new Event("moodHistoryUpdated"));
+  }
+};
 
-  const commonWords = words1.filter((word) => words2.includes(word));
-  const totalWords = new Set([...words1, ...words2]).size;
+// --- User Management ---
+export const hashPassword = async (password) => {
+  if (!password) return "";
+  const encoder = new TextEncoder();
+  const data = encoder.encode(password);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+};
 
-  return commonWords.length / totalWords;
-}
+export const saveUser = (user) => {
+  if (typeof window === "undefined") return;
+  const users = JSON.parse(localStorage.getItem("mood_users") || "[]");
+  // Check if user already exists
+  const existingIndex = users.findIndex((u) => u.email === user.email);
+  if (existingIndex > -1) {
+    users[existingIndex] = {
+      ...users[existingIndex],
+      ...user,
+      password: user.password || users[existingIndex].password,
+      id: user.id || user.email,
+    };
+  } else {
+    users.push({ ...user, id: user.id || user.email });
+  }
+  localStorage.setItem("mood_users", JSON.stringify(users));
+};
 
-export function getRetryAttempt(currentMood, currentAnalysis) {
-  const similarCount = getSimilarMoodCount(currentMood, currentAnalysis);
-
-  return Math.min(similarCount, 5);
-}
-
-export function isRepeatedMood(currentMood, currentAnalysis) {
-  return getSimilarMoodCount(currentMood, currentAnalysis) > 0;
-}
+export const getUserByEmail = (email) => {
+  if (typeof window === "undefined") return null;
+  const users = JSON.parse(localStorage.getItem("mood_users") || "[]");
+  return users.find((u) => u.email === email) || null;
+};

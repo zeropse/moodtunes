@@ -1,0 +1,2 @@
+- implement jsonbin sharing (update faq)
+- update hero image to video
