@@ -1,13 +1,20 @@
 import { NextResponse } from "next/server";
 import { analyzeMood } from "@/lib/mood-analyzer";
 import { searchTracks } from "@/lib/spotify";
+import { auth } from "@/auth";
 
 export async function POST(request) {
   try {
+    const session = await auth();
+
+    if (!session?.user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const {
       text,
       excludeIds = [],
-      model = "gemini-1.5-flash",
+      model = "gemini-2.5-flash-lite",
     } = await request.json();
 
     if (!text) {
