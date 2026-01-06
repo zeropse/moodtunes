@@ -15,7 +15,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
         if (email && password) {
           return {
-            id: crypto.randomUUID(),
+            id: email, // Use email for now.. in a real app, use a proper user ID eg. crypto.randomUUID()
             name: fullName || "MoodTunes User",
             email: email,
           };
