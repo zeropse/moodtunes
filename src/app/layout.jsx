@@ -15,8 +15,51 @@ const robotoMono = Roboto_Mono({
 });
 
 export const metadata = {
-  title: "MoodTunes",
-  description: "Get Tunes based on your mood",
+  title: {
+    default: "MoodTunes - Personalized Music for Every Mood",
+    template: "%s | MoodTunes",
+  },
+  description:
+    "Discover the perfect music for your current mood. MoodTunes uses AI to curate personalized playlists based on how you feel.",
+  keywords: [
+    "music",
+    "mood",
+    "playlists",
+    "AI music",
+    "personalized music",
+    "Spotify",
+  ],
+  authors: [{ name: "MoodTunes Team" }],
+  creator: "MoodTunes Team",
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "https://moodtunes.zeropse.org",
+    siteName: "MoodTunes",
+    title: "MoodTunes - Personalized Music for Every Mood",
+    description:
+      "Discover the perfect music for your current mood. MoodTunes uses AI to curate personalized playlists based on how you feel.",
+    images: [
+      {
+        url: "/landing.png",
+        width: 1200,
+        height: 630,
+        alt: "MoodTunes",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "MoodTunes - Personalized Music for Every Mood",
+    description:
+      "Discover the perfect music for your current mood. MoodTunes uses AI to curate personalized playlists based on how you feel.",
+    images: ["/landing.png"],
+    creator: "@moodtunes",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({ children }) {

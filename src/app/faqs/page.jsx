@@ -1,5 +1,3 @@
-"use client";
-
 import CTA from "@/components/cta";
 import {
   Accordion,
@@ -7,6 +5,12 @@ import {
   AccordionTrigger,
   AccordionContent,
 } from "@/components/ui/accordion";
+
+export const metadata = {
+  title: "Frequently Asked Questions",
+  description:
+    "Find answers to common questions about MoodTunes, how it works, and how your data is handled.",
+};
 
 const faqs = [
   {
