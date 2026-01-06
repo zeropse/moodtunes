@@ -1,4 +1,3 @@
-- implement jsonbin sharing + basic auth
-- add auth
+- implement jsonbin sharing
 - update faq (at last) [FAQ CREATE ACC*]
 - add readme (last)

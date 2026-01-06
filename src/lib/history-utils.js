@@ -56,6 +56,15 @@ export const clearHistory = (userId) => {
 };
 
 // --- User Management ---
+export const hashPassword = async (password) => {
+  if (!password) return "";
+  const encoder = new TextEncoder();
+  const data = encoder.encode(password);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+};
+
 export const saveUser = (user) => {
   if (typeof window === "undefined") return;
   const users = JSON.parse(localStorage.getItem("mood_users") || "[]");
@@ -65,6 +74,7 @@ export const saveUser = (user) => {
     users[existingIndex] = {
       ...users[existingIndex],
       ...user,
+      password: user.password || users[existingIndex].password,
       id: user.id || user.email,
     };
   } else {

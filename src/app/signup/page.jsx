@@ -16,7 +16,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { IconMusic } from "@tabler/icons-react";
-import { saveUser } from "@/lib/history-utils";
+import { Spinner } from "@/components/ui/spinner";
+import { saveUser, hashPassword } from "@/lib/history-utils";
 
 export default function SignupPage() {
   const [name, setName] = useState("");
@@ -32,8 +33,14 @@ export default function SignupPage() {
     setError("");
 
     try {
+      // Simulate network delay
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      // Hash password before storing in localStorage
+      const hashedPassword = await hashPassword(password);
+
       // Save user profile locally since there's no database
-      saveUser({ name, email });
+      saveUser({ name, email, password: hashedPassword });
 
       // For now, we simulate signup by just logging them in
       await signIn("credentials", {
@@ -111,7 +118,14 @@ export default function SignupPage() {
                 className="w-full font-bold h-11"
                 disabled={isLoading}
               >
-                {isLoading ? "Creating account..." : "Sign Up"}
+                {isLoading ? (
+                  <>
+                    <Spinner />
+                    Creating account...
+                  </>
+                ) : (
+                  "Sign Up"
+                )}
               </Button>
             </form>
           </CardContent>

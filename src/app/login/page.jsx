@@ -16,7 +16,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { IconMusic } from "@tabler/icons-react";
-import { getUserByEmail } from "@/lib/history-utils";
+import { Spinner } from "@/components/ui/spinner";
+import { getUserByEmail, hashPassword } from "@/lib/history-utils";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -31,11 +32,21 @@ export default function LoginPage() {
     setError("");
 
     try {
-      // Find user locally to restore their name
+      // Simulate network delay
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      // Find user locally to verify password
       const localUser = getUserByEmail(email);
+      const hashedPassword = await hashPassword(password);
+
+      if (localUser && localUser.password !== hashedPassword) {
+        setError("Invalid email or password");
+        setIsLoading(false);
+        return;
+      }
 
       const result = await signIn("credentials", {
-        fullName: localUser?.name || "",
+        fullName: localUser?.name || "MoodTunes User",
         email,
         password,
         redirect: false,
@@ -101,7 +112,14 @@ export default function LoginPage() {
                 className="w-full font-bold h-11"
                 disabled={isLoading}
               >
-                {isLoading ? "Signing in..." : "Sign In"}
+                {isLoading ? (
+                  <>
+                    <Spinner />
+                    Signing in...
+                  </>
+                ) : (
+                  "Sign In"
+                )}
               </Button>
             </form>
           </CardContent>
