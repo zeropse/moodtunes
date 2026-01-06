@@ -10,6 +10,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 const ctaData = [
   {
@@ -21,6 +23,9 @@ const ctaData = [
 ];
 
 export default function CTA() {
+  const { data: session } = useSession();
+  const router = useRouter();
+
   return (
     <section className="py-24 px-6">
       <div className="max-w-3xl mx-auto">
@@ -36,19 +41,33 @@ export default function CTA() {
             </CardHeader>
 
             <CardFooter className="flex justify-center">
-              <Button
-                asChild
-                size="lg"
-                className="group inline-flex items-center gap-2 px-8 py-6 shadow-md transition-all hover:shadow-xl active:scale-95"
-              >
-                <Link href={cta.href} aria-label="Get started">
-                  Get Started
+              {session ? (
+                <Button
+                  size="lg"
+                  className="group inline-flex items-center gap-2 px-8 py-6 shadow-md transition-all hover:shadow-xl active:scale-95 cursor-pointer"
+                  onClick={() => router.push(cta.href)}
+                >
+                  Launch App
                   <IconArrowRight
                     size={18}
                     className="group-hover:translate-x-1 transition-transform"
                   />
-                </Link>
-              </Button>
+                </Button>
+              ) : (
+                <Button
+                  asChild
+                  size="lg"
+                  className="group inline-flex items-center gap-2 px-8 py-6 shadow-md transition-all hover:shadow-xl active:scale-95 cursor-pointer"
+                >
+                  <Link href="/signup">
+                    Get Started
+                    <IconArrowRight
+                      size={18}
+                      className="group-hover:translate-x-1 transition-transform"
+                    />
+                  </Link>
+                </Button>
+              )}
             </CardFooter>
           </Card>
         ))}

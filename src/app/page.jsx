@@ -21,6 +21,8 @@ import {
 } from "@/components/ui/accordion";
 import { Spinner } from "@/components/ui/spinner";
 import CTA from "@/components/cta";
+import { useSession } from "next-auth/react";
+import Link from "next/link";
 
 const howItWorksSteps = [
   {
@@ -92,6 +94,7 @@ const FAQ_ITEMS = [
 export default function HomePage() {
   const router = useRouter();
   const [imageLoading, setImageLoading] = useState(true);
+  const { data: session } = useSession();
 
   const handleScrollToAbout = useCallback(() => {
     const el = document.getElementById("about");
@@ -120,13 +123,25 @@ export default function HomePage() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Button
-              className="px-10 h-14 text-lg rounded-full transition-all hover:scale-105 group cursor-pointer"
-              onClick={handleGetStarted}
-            >
-              Get Started
-              <IconChevronRight className="group-hover:translate-x-1 transition-transform" />
-            </Button>
+            {session ? (
+              <Button
+                className="px-10 h-14 text-lg rounded-full transition-all hover:scale-105 group cursor-pointer"
+                onClick={handleGetStarted}
+              >
+                Launch App
+                <IconChevronRight className="group-hover:translate-x-1 transition-transform" />
+              </Button>
+            ) : (
+              <Button
+                asChild
+                className="px-10 h-14 text-lg rounded-full transition-all hover:scale-105 group cursor-pointer"
+              >
+                <Link href="/signup">
+                  Get Started
+                  <IconChevronRight className="group-hover:translate-x-1 transition-transform" />
+                </Link>
+              </Button>
+            )}
 
             <Button
               variant="outline"

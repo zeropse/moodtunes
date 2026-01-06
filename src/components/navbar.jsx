@@ -5,9 +5,11 @@ import { ModeToggle } from "@/style/mode-toggle";
 import { IconMusic, IconInfoCircle } from "@tabler/icons-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 
 export default function Navbar() {
   const router = useRouter();
+  const { data: session } = useSession();
 
   const handleAppClick = () => {
     router.push("/app");
@@ -43,12 +45,23 @@ export default function Navbar() {
             </Link>
           </Button>
 
-          <Button
-            className="text-xs font-bold cursor-pointer"
-            onClick={handleAppClick}
-          >
-            Get Started
-          </Button>
+          {session ? (
+            <Button
+              size="sm"
+              className="text-xs font-bold cursor-pointer"
+              onClick={handleAppClick}
+            >
+              Launch App
+            </Button>
+          ) : (
+            <Button
+              asChild
+              size="sm"
+              className="text-xs font-bold cursor-pointer"
+            >
+              <Link href="/signup">Get Started</Link>
+            </Button>
+          )}
 
           <ModeToggle />
         </div>

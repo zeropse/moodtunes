@@ -2,6 +2,7 @@ import { Roboto, Roboto_Mono } from "next/font/google";
 import "@/style/globals.css";
 import { ThemeProvider } from "@/style/theme-provider";
 import RouteFrame from "@/components/route-frame";
+import SessionWrapper from "@/components/session-wrapper";
 
 const roboto = Roboto({
   variable: "--font-roboto",
@@ -22,13 +23,15 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${roboto.variable} ${robotoMono.variable} antialiased`}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          disableTransitionOnChange
-        >
-          <RouteFrame>{children}</RouteFrame>
-        </ThemeProvider>
+        <SessionWrapper>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="dark"
+            disableTransitionOnChange
+          >
+            <RouteFrame>{children}</RouteFrame>
+          </ThemeProvider>
+        </SessionWrapper>
       </body>
     </html>
   );
