@@ -19,7 +19,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { IconUser, IconLogout, IconChevronDown } from "@tabler/icons-react";
+import { IconUser, IconLogout } from "@tabler/icons-react";
 import Image from "next/image";
 
 export default function AppLayout({ children }) {

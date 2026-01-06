@@ -6,18 +6,18 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     Credentials({
       name: "Credentials",
       credentials: {
-        name: { label: "Name", type: "text" },
+        fullName: { label: "Name", type: "text" },
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        // This is a placeholder for your login/signup logic
-        // For now, it accepts any email/password to allow development
-        if (credentials?.email && credentials?.password) {
+        const { fullName, email, password } = credentials;
+
+        if (email && password) {
           return {
-            id: "1",
-            name: credentials.name || "MoodTunes User",
-            email: credentials.email,
+            id: crypto.randomUUID(),
+            name: fullName || "MoodTunes User",
+            email: email,
           };
         }
         return null;
@@ -28,12 +28,18 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
+        token.name = user.name;
+        token.email = user.email;
       }
       return token;
     },
     async session({ session, token }) {
       if (token) {
-        session.user.id = token.id;
+        if (session.user) {
+          session.user.id = token.id;
+          session.user.name = token.name;
+          session.user.email = token.email;
+        }
       }
       return session;
     },

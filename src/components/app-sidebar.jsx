@@ -26,6 +26,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { getHistory } from "@/lib/history-utils";
 import { Spinner } from "@/components/ui/spinner";
+import { useSession } from "next-auth/react";
 
 const socials = [
   {
@@ -44,11 +45,13 @@ const socials = [
 export function AppSidebar(props) {
   const [history, setHistory] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const { data: session } = useSession();
 
   useEffect(() => {
     const loadHistory = () => {
+      if (!session?.user?.id) return;
       setIsLoading(true);
-      const data = getHistory();
+      const data = getHistory(session.user.id);
       setHistory(data.slice(0, 17));
       setIsLoading(false);
     };
@@ -58,7 +61,7 @@ export function AppSidebar(props) {
     window.addEventListener("moodHistoryUpdated", handleHistoryUpdate);
     return () =>
       window.removeEventListener("moodHistoryUpdated", handleHistoryUpdate);
-  }, []);
+  }, [session?.user?.id]);
 
   return (
     <Sidebar side="left" variant="sidebar" collapsible="icon" {...props}>

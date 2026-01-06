@@ -1,18 +1,24 @@
-export const getHistory = () => {
+export const getHistory = (userId) => {
   if (typeof window === "undefined") return [];
   const history = localStorage.getItem("mood_history");
-  return history ? JSON.parse(history) : [];
+  const allHistory = history ? JSON.parse(history) : [];
+  if (!userId) return allHistory;
+  return allHistory.filter((item) => item.userId === userId);
 };
 
-export const saveMoodToHistory = (mood, tracks) => {
-  const history = getHistory();
+export const saveMoodToHistory = (mood, tracks, userId) => {
+  const allHistoryStr = localStorage.getItem("mood_history");
+  const allHistory = allHistoryStr ? JSON.parse(allHistoryStr) : [];
+
   const newEntry = {
     id: crypto.randomUUID(),
+    userId,
     mood,
     tracks,
     timestamp: new Date().toISOString(),
   };
-  const updatedHistory = [newEntry, ...history];
+
+  const updatedHistory = [newEntry, ...allHistory];
   localStorage.setItem("mood_history", JSON.stringify(updatedHistory));
 
   // Dispatch event for real-time updates
@@ -24,8 +30,9 @@ export const saveMoodToHistory = (mood, tracks) => {
 };
 
 export const deleteHistoryItem = (id) => {
-  const history = getHistory();
-  const updatedHistory = history.filter((item) => item.id !== id);
+  const allHistoryStr = localStorage.getItem("mood_history");
+  const allHistory = allHistoryStr ? JSON.parse(allHistoryStr) : [];
+  const updatedHistory = allHistory.filter((item) => item.id !== id);
   localStorage.setItem("mood_history", JSON.stringify(updatedHistory));
 
   if (typeof window !== "undefined") {
@@ -33,8 +40,16 @@ export const deleteHistoryItem = (id) => {
   }
 };
 
-export const clearHistory = () => {
-  localStorage.removeItem("mood_history");
+export const clearHistory = (userId) => {
+  if (!userId) {
+    localStorage.removeItem("mood_history");
+  } else {
+    const allHistoryStr = localStorage.getItem("mood_history");
+    const allHistory = allHistoryStr ? JSON.parse(allHistoryStr) : [];
+    const updatedHistory = allHistory.filter((item) => item.userId !== userId);
+    localStorage.setItem("mood_history", JSON.stringify(updatedHistory));
+  }
+
   if (typeof window !== "undefined") {
     window.dispatchEvent(new Event("moodHistoryUpdated"));
   }

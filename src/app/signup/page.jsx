@@ -32,18 +32,12 @@ export default function SignupPage() {
 
     try {
       // For now, we simulate signup by just logging them in
-      const result = await signIn("credentials", {
-        name,
+      await signIn("credentials", {
+        fullName: name,
         email,
         password,
-        redirect: false,
+        callbackUrl: "/app",
       });
-
-      if (result?.error) {
-        setError("Something went wrong with the registration");
-      } else {
-        router.push("/app");
-      }
     } catch (err) {
       setError("An error occurred during registration");
     } finally {

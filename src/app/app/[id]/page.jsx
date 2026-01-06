@@ -7,6 +7,7 @@ import { PlaylistResults } from "@/components/playlist-results";
 import { Button } from "@/components/ui/button";
 import { IconAlertCircle } from "@tabler/icons-react";
 import { Spinner } from "@/components/ui/spinner";
+import { useSession } from "next-auth/react";
 import {
   Card,
   CardDescription,
@@ -18,12 +19,15 @@ import {
 export default function HistoryDetailPage() {
   const params = useParams();
   const router = useRouter();
+  const { data: session } = useSession();
   const [loading, setLoading] = useState(true);
 
+  const userId = session?.user?.id;
   const item = useMemo(() => {
-    const history = getHistory();
+    if (!userId) return null;
+    const history = getHistory(userId);
     return history.find((i) => i.id === params.id);
-  }, [params.id]);
+  }, [params.id, userId]);
 
   useEffect(() => {
     const timer = setTimeout(() => setLoading(false), 400);

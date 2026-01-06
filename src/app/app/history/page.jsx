@@ -35,33 +35,38 @@ import {
 } from "@tabler/icons-react";
 import Link from "next/link";
 import { Spinner } from "@/components/ui/spinner";
+import { useSession } from "next-auth/react";
 
 export default function HistoryPage() {
+  const { data: session } = useSession();
   const [history, setHistory] = useState([]);
   const [deleteId, setDeleteId] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const loadHistory = () => {
+      if (!session?.user?.id) return;
       setIsLoading(true);
-      setHistory(getHistory());
+      setHistory(getHistory(session.user.id));
       setIsLoading(false);
     };
 
     loadHistory();
 
     const handleHistoryUpdate = () => {
-      setHistory(getHistory());
+      if (session?.user?.id) {
+        setHistory(getHistory(session.user.id));
+      }
     };
 
     window.addEventListener("moodHistoryUpdated", handleHistoryUpdate);
     return () => {
       window.removeEventListener("moodHistoryUpdated", handleHistoryUpdate);
     };
-  }, []);
+  }, [session?.user?.id]);
 
   const handleClearHistory = () => {
-    clearHistory();
+    clearHistory(session?.user?.id);
   };
 
   const handleDeleteSingle = () => {

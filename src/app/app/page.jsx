@@ -25,9 +25,11 @@ import models from "@/data/models.json";
 import { Spinner } from "@/components/ui/spinner";
 import { saveMoodToHistory, getHistory } from "@/lib/history-utils";
 import { IconAlertCircle } from "@tabler/icons-react";
+import { useSession } from "next-auth/react";
 
 export default function AppPage() {
   const router = useRouter();
+  const { data: session } = useSession();
   const [mounted, setMounted] = useState(false);
   const [placeholder, setPlaceholder] = useState("");
   const [footer, setFooter] = useState("");
@@ -56,7 +58,7 @@ export default function AppPage() {
     setError(null);
 
     try {
-      const history = getHistory();
+      const history = getHistory(session?.user?.id);
       const excludeIds = history.flatMap((entry) =>
         entry.tracks.map((track) => track.id)
       );
@@ -74,7 +76,11 @@ export default function AppPage() {
       }
 
       const data = await response.json();
-      const newEntry = saveMoodToHistory(data.mood, data.tracks);
+      const newEntry = saveMoodToHistory(
+        data.mood,
+        data.tracks,
+        session?.user?.id
+      );
       router.push(`/app/${newEntry.id}`);
     } catch (err) {
       console.error(err);
