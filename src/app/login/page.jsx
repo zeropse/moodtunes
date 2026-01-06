@@ -16,6 +16,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { IconMusic } from "@tabler/icons-react";
+import { getUserByEmail } from "@/lib/history-utils";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -30,7 +31,11 @@ export default function LoginPage() {
     setError("");
 
     try {
+      // Find user locally to restore their name
+      const localUser = getUserByEmail(email);
+
       const result = await signIn("credentials", {
+        fullName: localUser?.name || "",
         email,
         password,
         redirect: false,

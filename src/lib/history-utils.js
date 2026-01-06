@@ -54,3 +54,27 @@ export const clearHistory = (userId) => {
     window.dispatchEvent(new Event("moodHistoryUpdated"));
   }
 };
+
+// --- User Management ---
+export const saveUser = (user) => {
+  if (typeof window === "undefined") return;
+  const users = JSON.parse(localStorage.getItem("mood_users") || "[]");
+  // Check if user already exists
+  const existingIndex = users.findIndex((u) => u.email === user.email);
+  if (existingIndex > -1) {
+    users[existingIndex] = {
+      ...users[existingIndex],
+      ...user,
+      id: user.id || user.email,
+    };
+  } else {
+    users.push({ ...user, id: user.id || user.email });
+  }
+  localStorage.setItem("mood_users", JSON.stringify(users));
+};
+
+export const getUserByEmail = (email) => {
+  if (typeof window === "undefined") return null;
+  const users = JSON.parse(localStorage.getItem("mood_users") || "[]");
+  return users.find((u) => u.email === email) || null;
+};

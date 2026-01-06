@@ -16,6 +16,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { IconMusic } from "@tabler/icons-react";
+import { saveUser } from "@/lib/history-utils";
 
 export default function SignupPage() {
   const [name, setName] = useState("");
@@ -31,6 +32,9 @@ export default function SignupPage() {
     setError("");
 
     try {
+      // Save user profile locally since there's no database
+      saveUser({ name, email });
+
       // For now, we simulate signup by just logging them in
       await signIn("credentials", {
         fullName: name,

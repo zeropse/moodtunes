@@ -21,9 +21,21 @@ import {
 import { Button } from "@/components/ui/button";
 import { IconUser, IconLogout } from "@tabler/icons-react";
 import Image from "next/image";
+import { useEffect } from "react";
+import { saveUser } from "@/lib/history-utils";
 
 export default function AppLayout({ children }) {
   const { data: session } = useSession();
+
+  useEffect(() => {
+    if (session?.user) {
+      saveUser({
+        name: session.user.name,
+        email: session.user.email,
+        id: session.user.id || session.user.email,
+      });
+    }
+  }, [session]);
 
   return (
     <PlayerProvider>
