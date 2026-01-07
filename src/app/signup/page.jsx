@@ -190,9 +190,6 @@ export default function SignupPage() {
                 Log in
               </Link>
             </p>
-            <div className="text-[10px] text-muted-foreground/60">
-              Dev Mode: Account creation is simulated
-            </div>
           </CardFooter>
         </Card>
       </div>

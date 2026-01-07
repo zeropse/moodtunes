@@ -143,9 +143,6 @@ export default function LoginPage() {
                 Sign up
               </Link>
             </p>
-            <div className="text-[10px] text-muted-foreground/60">
-              Dev Mode: Any credentials will work
-            </div>
           </CardFooter>
         </Card>
       </div>
