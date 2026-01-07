@@ -9,7 +9,6 @@ import {
   IconSearch,
   IconMusic,
   IconMessageHeart,
-  IconChevronRight,
 } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -19,10 +18,11 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Spinner } from "@/components/ui/spinner";
+import { Badge } from "@/components/ui/badge";
 import CTA from "@/components/cta";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
+import { Spinner } from "@/components/ui/spinner";
 
 const howItWorksSteps = [
   {
@@ -110,42 +110,56 @@ export default function HomePage() {
     <div className="min-h-screen">
       {/* --- Hero Section --- */}
       <section className="relative px-6 pt-24 pb-16 md:pt-40 md:pb-32 overflow-hidden">
-        <div className="max-w-4xl mx-auto text-center">
+        {/* Decorative Background Elements */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full -z-10 pointer-events-none overflow-hidden text-primary/5">
+          <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-primary/20 blur-3xl animate-pulse" />
+          <div className="absolute bottom-[20%] right-[-5%] w-[30%] h-[30%] rounded-full bg-amber-200/20 blur-3xl animate-pulse" />
+          <div className="absolute top-[20%] right-[10%] w-[20%] h-[20%] rounded-full bg-blue-200/20 blur-3xl animate-pulse" />
+        </div>
+
+        <div className="max-w-4xl mx-auto text-center relative">
+          <div className="flex justify-center mb-6">
+            <Badge
+              variant="secondary"
+              className="px-4 py-1.5 text-sm font-medium rounded-full bg-primary/10 text-primary border-primary/20 backdrop-blur-sm"
+            >
+              ✨ Experience AI-Powered Music Discovery
+            </Badge>
+          </div>
+
           <h1 className="mb-6 text-5xl font-extrabold tracking-tight md:text-7xl lg:text-8xl lg:leading-[1.05]">
             Your emotions, <br />
-            <span className="text-primary">your soundtrack</span>
+            <span className="text-transparent bg-clip-text bg-linear-to-r from-primary via-primary/80 to-primary/60">
+              your soundtrack
+            </span>
           </h1>
 
-          <p className="mb-10 text-lg text-muted-foreground md:text-xl max-w-xl mx-auto leading-relaxed">
+          <p className="mb-10 text-lg text-muted-foreground md:text-xl max-w-2xl mx-auto leading-relaxed">
             Transform your feelings into the perfect playlist. Our advanced mood
-            analysis technology analyzes your mood and discovers songs that
-            resonate with your emotional state.
+            analysis technology understands your emotional state and discovers
+            songs that truly resonate with you.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             {session ? (
               <Button
-                className="px-10 h-14 text-lg rounded-full transition-all hover:scale-105 group cursor-pointer"
+                className="px-10 h-14 text-lg rounded-full shadow-lg shadow-primary/20 transition-all hover:scale-105 active:scale-95 group cursor-pointer bg-primary hover:bg-primary/90"
                 onClick={handleGetStarted}
               >
                 Launch App
-                <IconChevronRight className="group-hover:translate-x-1 transition-transform" />
               </Button>
             ) : (
               <Button
                 asChild
-                className="px-10 h-14 text-lg rounded-full transition-all hover:scale-105 group cursor-pointer"
+                className="px-10 h-14 text-lg rounded-full shadow-lg shadow-primary/20 transition-all hover:scale-105 active:scale-95 group cursor-pointer bg-primary hover:bg-primary/90"
               >
-                <Link href="/signup">
-                  Get Started
-                  <IconChevronRight className="group-hover:translate-x-1 transition-transform" />
-                </Link>
+                <Link href="/signup">Get Started</Link>
               </Button>
             )}
 
             <Button
-              variant="outline"
-              className="px-10 h-14 text-lg rounded-full transition-all hover:scale-105 cursor-pointer"
+              variant="secondary"
+              className="px-10 h-14 text-lg rounded-full transition-all hover:scale-105 active:scale-95 cursor-pointer backdrop-blur-sm"
               onClick={handleScrollToAbout}
             >
               Learn More
@@ -154,8 +168,9 @@ export default function HomePage() {
         </div>
 
         {/* App Preview Image */}
-        <div className="mt-16 max-w-5xl mx-auto">
-          <Card className="overflow-hidden shadow-2xl border border-border/50 bg-muted/30 p-2 relative min-h-50 flex items-center justify-center">
+        <div className="mt-20 max-w-5xl mx-auto relative group">
+          <div className="absolute -inset-1 bg-linear-to-r from-primary/30 via-amber-200/20 to-blue-300/30 rounded-2xl blur opacity-25 group-hover:opacity-40 transition duration-1000 group-hover:duration-200" />
+          <Card className="relative overflow-hidden shadow-2xl border border-border/50 bg-background/80 backdrop-blur-sm p-2 min-h-50 flex items-center justify-center">
             {imageLoading && (
               <div className="absolute inset-0 flex items-center justify-center bg-background/50 z-10">
                 <Spinner className="size-8 text-primary" />
@@ -166,7 +181,7 @@ export default function HomePage() {
               alt="MoodTunes App Preview"
               width={1200}
               height={800}
-              className={`rounded-xl w-full h-auto transition-opacity duration-500 ${
+              className={`rounded-xl w-full h-auto transition-opacity duration-700 ${
                 imageLoading ? "opacity-0" : "opacity-100"
               }`}
               onLoad={() => setImageLoading(false)}
