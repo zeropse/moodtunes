@@ -1,8 +1,7 @@
 "use client";
 
-import React, { useCallback, useState } from "react";
+import React, { useCallback } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 import {
   IconBrandSpotify,
   IconMessageCircle,
@@ -22,7 +21,6 @@ import { Badge } from "@/components/ui/badge";
 import CTA from "@/components/cta";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { Spinner } from "@/components/ui/spinner";
 
 const howItWorksSteps = [
   {
@@ -93,9 +91,7 @@ const FAQ_ITEMS = [
 
 export default function HomePage() {
   const router = useRouter();
-  const [imageLoading, setImageLoading] = useState(true);
   const { data: session } = useSession();
-  const [videoError, setVideoError] = useState(false);
 
   const handleScrollToAbout = useCallback(() => {
     const el = document.getElementById("about");
@@ -168,48 +164,21 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* App Preview Image */}
+        {/* App Preview Video */}
         <div className="mt-20 max-w-5xl mx-auto relative group">
           <div className="absolute -inset-1 bg-linear-to-r from-primary/30 via-amber-200/20 to-blue-300/30 rounded-2xl blur opacity-25 group-hover:opacity-40 transition duration-1000 group-hover:duration-200" />
-          <Card className="relative overflow-hidden shadow-2xl border border-border/50 bg-background/80 backdrop-blur-sm p-2 min-h-50 flex items-center justify-center">
-            {imageLoading && (
-              <div className="absolute inset-0 flex items-center justify-center bg-background/50 z-10">
-                <Spinner className="size-8 text-primary" />
-              </div>
-            )}
-            {/**
-             * Show the demo video primarily. If the video fails to load/play, show the image instead.
-             */}
-            {!videoError ? (
+          <Card className="relative overflow-hidden shadow-2xl border border-border/50 bg-background/80 backdrop-blur-sm p-0">
+            <div className="relative w-full">
               <video
                 src="/landing-demo.mp4"
-                width={1200}
-                height={800}
-                className={`rounded-xl w-full h-auto transition-opacity duration-700 ${
-                  imageLoading ? "opacity-0" : "opacity-100"
-                }`}
+                className="h-full w-full rounded-xl object-cover object-center"
                 autoPlay
                 muted
                 loop
                 playsInline
-                preload="metadata"
-                onLoadedMetadata={() => setImageLoading(false)}
-                onError={() => setVideoError(true)}
-                poster="/landing.webp"
+                preload="auto"
               />
-            ) : (
-              <Image
-                src="/landing.webp"
-                alt="MoodTunes App Preview"
-                width={1200}
-                height={800}
-                className={`rounded-xl w-full h-auto transition-opacity duration-700 ${
-                  imageLoading ? "opacity-0" : "opacity-100"
-                }`}
-                onLoad={() => setImageLoading(false)}
-                priority
-              />
-            )}
+            </div>
           </Card>
         </div>
       </section>
