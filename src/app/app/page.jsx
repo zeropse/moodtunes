@@ -19,12 +19,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { IconSend2, IconMusic } from "@tabler/icons-react";
+import { IconSend2, IconMusic, IconAlertCircle } from "@tabler/icons-react";
 import prompts from "@/data/prompts.json";
 import models from "@/data/models.json";
 import { Spinner } from "@/components/ui/spinner";
 import { saveMoodToHistory, getHistory } from "@/lib/history-utils";
-import { IconAlertCircle } from "@tabler/icons-react";
 import { useSession } from "next-auth/react";
 
 export default function AppPage() {
@@ -32,7 +31,6 @@ export default function AppPage() {
   const { data: session } = useSession();
   const [mounted, setMounted] = useState(false);
   const [placeholder, setPlaceholder] = useState("");
-  const [footer, setFooter] = useState("");
 
   useEffect(() => {
     setMounted(true);
@@ -40,9 +38,6 @@ export default function AppPage() {
       prompts.placeholders[
         Math.floor(Math.random() * prompts.placeholders.length)
       ]
-    );
-    setFooter(
-      prompts.footers[Math.floor(Math.random() * prompts.footers.length)]
     );
   }, []);
 
@@ -65,9 +60,7 @@ export default function AppPage() {
 
       const response = await fetch("/api/generate-playlist", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text: input, excludeIds, model }),
       });
 
@@ -83,17 +76,11 @@ export default function AppPage() {
       );
       router.push(`/app/${newEntry.id}`);
     } catch (err) {
-      console.error(err);
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Something went wrong. Please try again."
-      );
+      setError(err instanceof Error ? err.message : "Something went wrong.");
       setLoading(false);
     }
   };
 
-  // Handle keydown
   const handleKeyDown = (e) => {
     if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
       e.preventDefault();
@@ -102,94 +89,92 @@ export default function AppPage() {
   };
 
   return (
-    <div className="relative min-h-screen w-full overflow-y-auto">
-      <div className="relative flex min-h-full flex-col items-center justify-center p-6 md:p-12">
-        <div className="w-full max-w-2xl space-y-10">
-          <Card>
-            <CardHeader className="items-center text-center">
-              <CardTitle className="flex items-center justify-center gap-3 text-xl font-semibold">
-                <span className="p-2 rounded-lg bg-secondary text-primary">
-                  <IconMusic size={20} />
-                </span>
-                How are you feeling today?
-              </CardTitle>
+    <div className="relative min-h-[90vh] w-full flex flex-col items-center justify-center p-4 sm:p-6 md:p-12">
+      <div className="w-full max-w-2xl mx-auto">
+        <Card className="border-none sm:border backdrop-blur-md shadow-xl">
+          <CardHeader className="items-center text-center space-y-2 px-4 sm:px-6">
+            <CardTitle className="flex items-center justify-center gap-3 text-lg sm:text-2xl font-bold">
+              <span className="p-2 rounded-xl bg-primary/10 text-primary">
+                <IconMusic size={24} />
+              </span>
+              How are you feeling today?
+            </CardTitle>
 
-              <CardDescription className="text-base">
-                Type anything from a specific mood to your current surroundings.
-              </CardDescription>
-            </CardHeader>
+            <CardDescription className="text-sm sm:text-base max-w-sm mx-auto">
+              Type anything from a specific mood to your current surroundings.
+            </CardDescription>
+          </CardHeader>
 
-            <CardContent>
-              <Textarea
-                placeholder={placeholder}
-                className="min-h-45 text-lg leading-relaxed bg-background/50 border-muted-foreground/20 focus-visible:ring-primary/50 transition-all resize-none p-5 rounded-xl"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={handleKeyDown}
-                disabled={loading}
-              />
-            </CardContent>
+          <CardContent className="px-4 sm:px-6">
+            <Textarea
+              placeholder={placeholder}
+              className="min-h-40 md:min-h-55 text-base md:text-lg leading-relaxed bg-background/50 border-muted-foreground/20 focus-visible:ring-primary/50 transition-all resize-none p-4 md:p-5 rounded-xl"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={handleKeyDown}
+              disabled={loading}
+            />
+          </CardContent>
 
-            <CardFooter className="flex flex-col gap-4 px-6">
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 w-full">
-                <p className="text-xs text-muted-foreground italic leading-relaxed">
-                  {footer}
-                </p>
-
-                <div className="flex items-center gap-3 w-full md:w-auto justify-end">
-                  {mounted && (
-                    <Select
-                      value={model}
-                      onValueChange={setModel}
-                      disabled={loading}
-                    >
-                      <SelectTrigger className="cursor-pointer">
-                        <SelectValue placeholder="Select Model" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {models.map((m) => (
-                          <SelectItem
-                            key={m.id}
-                            value={m.id}
-                            className={"cursor-pointer"}
-                          >
-                            {m.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  )}
-
-                  <Button
-                    size="lg"
-                    className="flex-1 md:flex-none px-8 font-semibold shadow-md hover:shadow-primary/20 transition-all cursor-pointer"
-                    onClick={handleGenerate}
-                    disabled={loading || !input.trim()}
+          <CardFooter className="flex flex-col gap-4 px-4 sm:px-6 pb-6">
+            <div className="flex flex-col md:flex-row items-center justify-end gap-3 w-full">
+              {mounted && (
+                <div className="w-full md:w-48">
+                  <Select
+                    value={model}
+                    onValueChange={setModel}
+                    disabled={loading}
                   >
-                    {loading ? (
-                      <>
-                        <Spinner />
-                        <span>Analyzing...</span>
-                      </>
-                    ) : (
-                      <>
-                        <span>Generate Playlist</span>
-                        <IconSend2 className="h-4 w-4" />
-                      </>
-                    )}
-                  </Button>
-                </div>
-              </div>
-
-              {error && (
-                <div className="flex items-center gap-2 w-full text-sm text-destructive font-medium bg-destructive/10 border border-destructive/20 p-3 rounded-lg animate-in fade-in slide-in-from-top-1">
-                  <IconAlertCircle className="h-4 w-4" />
-                  {error}
+                    <SelectTrigger className="w-full cursor-pointer">
+                      <SelectValue placeholder="Select Model" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {models.map((m) => (
+                        <SelectItem
+                          key={m.id}
+                          value={m.id}
+                          className={"cursor-pointer"}
+                        >
+                          {m.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               )}
-            </CardFooter>
-          </Card>
-        </div>
+
+              <Button
+                size="lg"
+                className="w-full md:w-auto px-8 font-semibold shadow-lg hover:shadow-primary/20 transition-all cursor-pointer"
+                onClick={handleGenerate}
+                disabled={loading || !input.trim()}
+              >
+                {loading ? (
+                  <div className="flex items-center gap-2">
+                    <Spinner size="sm" />
+                    <span>Analyzing...</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <span>Generate Playlist</span>
+                    <IconSend2 className="h-4 w-4" />
+                  </div>
+                )}
+              </Button>
+            </div>
+
+            {error && (
+              <div className="flex items-start gap-2 w-full text-sm text-destructive font-medium bg-destructive/10 border border-destructive/20 p-3 rounded-lg animate-in fade-in slide-in-from-top-1">
+                <IconAlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
+                <span>{error}</span>
+              </div>
+            )}
+
+            <p className="text-[10px] text-center text-muted-foreground md:hidden">
+              Press &quot;Generate&quot; to continue
+            </p>
+          </CardFooter>
+        </Card>
       </div>
     </div>
   );
