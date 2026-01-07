@@ -31,6 +31,14 @@ export default function LoginPage() {
     setIsLoading(true);
     setError("");
 
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setError("Please enter a valid email address");
+      setIsLoading(false);
+      return;
+    }
+
     try {
       // Simulate network delay
       await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -39,7 +47,7 @@ export default function LoginPage() {
       const localUser = getUserByEmail(email);
       const hashedPassword = await hashPassword(password);
 
-      if (localUser && localUser.password !== hashedPassword) {
+      if (!localUser || localUser.password !== hashedPassword) {
         setError("Invalid email or password");
         setIsLoading(false);
         return;

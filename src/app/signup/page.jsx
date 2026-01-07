@@ -17,20 +17,56 @@ import {
 } from "@/components/ui/card";
 import { IconMusic } from "@tabler/icons-react";
 import { Spinner } from "@/components/ui/spinner";
-import { saveUser, hashPassword } from "@/lib/history-utils";
+import { saveUser, hashPassword, getUserByEmail } from "@/lib/history-utils";
 
 export default function SignupPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
+
+  const validateForm = () => {
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setError("Please enter a valid email address.");
+      return false;
+    }
+
+    // Password validation: min 8 characters
+    if (password.length < 8) {
+      setError("Password must be at least 8 characters long.");
+      return false;
+    }
+
+    // Confirm password check
+    if (password !== confirmPassword) {
+      setError("Passwords do not match.");
+      return false;
+    }
+
+    // Check if user already exists
+    const existingUser = getUserByEmail(email);
+    if (existingUser) {
+      setError("An account with this email already exists.");
+      return false;
+    }
+
+    return true;
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     setError("");
+
+    if (!validateForm()) {
+      setIsLoading(false);
+      return;
+    }
 
     try {
       // Simulate network delay
@@ -111,6 +147,18 @@ export default function SignupPage() {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  required
+                  autoComplete="new-password"
+                  className="bg-muted/30"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="confirmPassword">Confirm Password</Label>
+                <Input
+                  id="confirmPassword"
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
                   required
                   autoComplete="new-password"
                   className="bg-muted/30"
