@@ -15,6 +15,7 @@ const robotoMono = Roboto_Mono({
 });
 
 export const metadata = {
+  metadataBase: new URL("https://moodtunes.zeropse.org"),
   title: {
     default: "MoodTunes - Personalized Music for Every Mood",
     template: "%s | MoodTunes",
