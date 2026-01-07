@@ -1,6 +1,6 @@
-# 🎵 MoodTunes
+# MoodTunes
 
-![MoodTunes Landing Page](public/landing.png)
+![MoodTunes Landing Page](public/landing.webp)
 
 **MoodTunes** is an AI-powered music recommendation platform that transforms your feelings into the perfect soundtrack. Using advanced natural language processing, MoodTunes analyzes your emotional state and generates personalized Spotify playlists that match how you're feeling right now.
 
@@ -12,26 +12,25 @@
 
 </div>
 
-## ✨ Features
+## Features
 
 - **AI Mood Analysis**: Powered by Google Gemini (gemini-2.5-flash-lite), the app understands the nuance of your input—from "feeling nostalgic but sad" to "pumped for the gym."
 - **Smart Spotify Search**: Automatically generates optimized search queries to find tracks that perfectly align with your detected mood.
 - **Playlist Generation**: Instant generation of track lists with artist details, album art, and direct Spotify links.
-- **Mood History**: Keep track of your past moods and the playlists generated for them (stored locally for privacy).
-- **Dark/Light Mode**: Full theme support for a comfortable listening experience at any time of day.
+- **Mood History**: Keep track of your past moods and the playlists generated for them (stored locally for now).
 - **Secure Authentication**: Integrated simple authentication with NextAuth.js.
 - **Fully Responsive**: A seamless experience across desktop, tablet, and mobile devices.
 
-## 🚀 Tech Stack
+## Tech Stack
 
 - **Framework**: [Next.js 16](https://nextjs.org/)
 - **Language**: JavaScript / React 19
-- **AI Engine**: [Google Gemini](https://ai.google.dev/)
-- **Music Data**: [Spotify Web API](https://developer.spotify.com/documentation/web-api)
+- **AI**: [Google Gemini](https://ai.google.dev/)
+- **Music**: [Spotify Web API](https://developer.spotify.com/documentation/web-api)
 - **Styling**: [Tailwind CSS 4](https://tailwindcss.com/) & [Shadcn UI](https://ui.shadcn.com/)
 - **Authentication**: [NextAuth.js](https://next-auth.js.org/)
 
-## 🛠️ Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -71,13 +70,13 @@
     ```
     Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-## 📖 How It Works
+## How It Works
 
 1.  **Input**: User describes their current mood or vibe in plain text.
 2.  **Analyze**: The Google Gemini model processes the text to extract a descriptive mood label and an optimized Spotify search query.
 3.  **Search**: The app queries the Spotify API using the generated search parameters.
 4.  **Display**: A curated list of tracks is presented to the user with playback options and links to open in Spotify.
 
-## 📄 License
+## License
 
 This project is licensed under the GPL-3.0 License - see the [LICENSE](LICENSE) file for details.

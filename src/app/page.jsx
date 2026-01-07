@@ -95,6 +95,7 @@ export default function HomePage() {
   const router = useRouter();
   const [imageLoading, setImageLoading] = useState(true);
   const { data: session } = useSession();
+  const [videoError, setVideoError] = useState(false);
 
   const handleScrollToAbout = useCallback(() => {
     const el = document.getElementById("about");
@@ -176,17 +177,39 @@ export default function HomePage() {
                 <Spinner className="size-8 text-primary" />
               </div>
             )}
-            <Image
-              src="/landing.png"
-              alt="MoodTunes App Preview"
-              width={1200}
-              height={800}
-              className={`rounded-xl w-full h-auto transition-opacity duration-700 ${
-                imageLoading ? "opacity-0" : "opacity-100"
-              }`}
-              onLoad={() => setImageLoading(false)}
-              priority
-            />
+            {/**
+             * Show the demo video primarily. If the video fails to load/play, show the image instead.
+             */}
+            {!videoError ? (
+              <video
+                src="/landing-demo.mp4"
+                width={1200}
+                height={800}
+                className={`rounded-xl w-full h-auto transition-opacity duration-700 ${
+                  imageLoading ? "opacity-0" : "opacity-100"
+                }`}
+                autoPlay
+                muted
+                loop
+                playsInline
+                preload="metadata"
+                onLoadedMetadata={() => setImageLoading(false)}
+                onError={() => setVideoError(true)}
+                poster="/landing.webp"
+              />
+            ) : (
+              <Image
+                src="/landing.webp"
+                alt="MoodTunes App Preview"
+                width={1200}
+                height={800}
+                className={`rounded-xl w-full h-auto transition-opacity duration-700 ${
+                  imageLoading ? "opacity-0" : "opacity-100"
+                }`}
+                onLoad={() => setImageLoading(false)}
+                priority
+              />
+            )}
           </Card>
         </div>
       </section>

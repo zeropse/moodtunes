@@ -42,7 +42,7 @@ export const metadata = {
       "Discover the perfect music for your current mood. MoodTunes uses AI to curate personalized playlists based on how you feel.",
     images: [
       {
-        url: "/landing.png",
+        url: "/landing.webp",
         width: 1200,
         height: 630,
         alt: "MoodTunes",
@@ -54,7 +54,7 @@ export const metadata = {
     title: "MoodTunes - Personalized Music for Every Mood",
     description:
       "Discover the perfect music for your current mood. MoodTunes uses AI to curate personalized playlists based on how you feel.",
-    images: ["/landing.png"],
+    images: ["/landing.webp"],
     creator: "@moodtunes",
   },
   robots: {
