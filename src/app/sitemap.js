@@ -1,5 +1,5 @@
 export default function sitemap() {
-  const baseUrl = "https://moodtunes.zeropse.org";
+  const baseUrl = "https://moodtunes.zeropse.me";
 
   // Define your routes
   const routes = ["", "/faqs", "/login", "/signup"].map((route) => ({

@@ -15,7 +15,7 @@ const robotoMono = Roboto_Mono({
 });
 
 export const metadata = {
-  metadataBase: new URL("https://moodtunes.zeropse.org"),
+  metadataBase: new URL("https://moodtunes.zeropse.me"),
   title: {
     default: "MoodTunes - Personalized Music for Every Mood",
     template: "%s | MoodTunes",
@@ -35,7 +35,7 @@ export const metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://moodtunes.zeropse.org",
+    url: "https://moodtunes.zeropse.me",
     siteName: "MoodTunes",
     title: "MoodTunes - Personalized Music for Every Mood",
     description:
@@ -71,8 +71,7 @@ export default function RootLayout({ children }) {
           <ThemeProvider
             attribute="class"
             defaultTheme="dark"
-            disableTransitionOnChange
-          >
+            disableTransitionOnChange>
             <RouteFrame>{children}</RouteFrame>
           </ThemeProvider>
         </SessionWrapper>

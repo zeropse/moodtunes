@@ -8,7 +8,7 @@
 
 [![Demo Video](https://img.shields.io/badge/Demo-Watch_Now-red)](https://youtu.be/RUkqsLs97gU)
 
-**Live Site:** [moodtunes.zeropse.org](https://moodtunes.zeropse.org)
+**Live Site:** [moodtunes.zeropse.me](https://moodtunes.zeropse.me)
 
 </div>
 
