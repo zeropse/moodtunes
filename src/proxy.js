@@ -13,7 +13,7 @@ export default auth((req) => {
     if (isApiRoute) {
       return Response.json(
         { message: "Authentication required" },
-        { status: 401 }
+        { status: 401 },
       );
     }
     return Response.redirect(new URL("/", nextUrl));

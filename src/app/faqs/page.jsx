@@ -97,8 +97,7 @@ const FAQPage = () => {
               <AccordionItem
                 key={`faq-${index}`}
                 value={`item-${index}`}
-                className="border rounded-lg px-4 bg-card transition-all hover:bg-accent/20"
-              >
+                className="border rounded-lg px-4 bg-card transition-all hover:bg-accent/20">
                 <AccordionTrigger className="hover:no-underline py-4 text-left font-medium cursor-pointer">
                   <span className="text-base sm:text-lg">{faq.question}</span>
                 </AccordionTrigger>

@@ -3,6 +3,7 @@ import "@/style/globals.css";
 import { ThemeProvider } from "@/style/theme-provider";
 import RouteFrame from "@/components/route-frame";
 import SessionWrapper from "@/components/session-wrapper";
+import FloatingBanner from "@/components/floating-banner";
 
 const roboto = Roboto({
   variable: "--font-roboto",
@@ -72,6 +73,7 @@ export default function RootLayout({ children }) {
             attribute="class"
             defaultTheme="dark"
             disableTransitionOnChange>
+            <FloatingBanner />
             <RouteFrame>{children}</RouteFrame>
           </ThemeProvider>
         </SessionWrapper>
