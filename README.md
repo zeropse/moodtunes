@@ -35,7 +35,7 @@
 ### Prerequisites
 
 - [Node.js](https://nodejs.org/) (Latest LTS recommended)
-- [pnpm](https://pnpm.io/) (Recommended)
+- [bun](https://bun.sh/) (Recommended)
 - Spotify Developer Account
 - Google AI Studio API Key
 
@@ -51,7 +51,7 @@
 2.  **Install dependencies**:
 
     ```bash
-    pnpm install
+    bun install
     ```
 
 3.  **Set up environment variables**:
@@ -66,7 +66,7 @@
 
 4.  **Run the development server**:
     ```bash
-    pnpm dev
+    bun dev
     ```
     Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
